@@ -19,7 +19,7 @@
 #
 
 # By default, the RPM will install to the standard REDHAWK OSSIE root location (/usr/local/redhawk/core)
-%{!?_ossiehome: %define _ossiehome /usr/local/redhawk/core}
+%{!?_ossiehome: %global _ossiehome /usr/local/redhawk/core}
 %define _prefix %{_ossiehome}
 Prefix: %{_prefix}
 
@@ -29,25 +29,21 @@ Prefix: %{_prefix}
 %define _mandir        %{_prefix}/man
 %define _infodir       %{_prefix}/info
 
-# Assume Java support by default. Use "rpmbuild --without java" to disable, or define RPM variable "_without_java"
-%{!?_with_java: %{!?_without_java: %define _with_java 1}}
+# Assume Java support by default. Use "rpmbuild --without java" to disable
+%bcond_without java
 
 Summary: The frontend library for REDHAWK
 Name: frontendInterfaces
-Version: 2.0.1
-Release: 1.%{?dist}
+Version: 2.0.2
+Release: 1%{?dist}
 License: None
 Group: REDHAWK/Interfaces
 Source: %{name}-%{version}.tar.gz 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires: redhawk >= 1.8
 Requires: bulkioInterfaces >= 1.8
-BuildRequires: redhawk >= 1.8
+BuildRequires: redhawk-devel >= 1.8
 BuildRequires: bulkioInterfaces >= 1.8
-BuildRequires: autoconf automake libtool
-BuildRequires: omniORB
-BuildRequires: python omniORBpy omniORBpy-devel
-%{?_with_java:BuildRequires: jdk}
 
 %description
 Libraries and interface definitions for frontend.
@@ -56,9 +52,6 @@ Libraries and interface definitions for frontend.
 %setup
 
 %build
-# Explicitly set JAVA_HOME and add to PATH (for idlj)
-export JAVA_HOME=/usr/java/default
-export PATH=${JAVA_HOME}/bin:${PATH}
 ./reconf
 %configure %{?_without_java: --disable-java}
 make
@@ -77,12 +70,12 @@ rm -rf --preserve-root $RPM_BUILD_ROOT
 %{_libdir}/libfrontendInterfaces.*
 %{_libdir}/pkgconfig/frontendInterfaces.pc
 %{_prefix}/lib/python/redhawk/frontendInterfaces
-%if %{?_with_java:1}%{!?_with_java:0}
+%if 0%{?rhel} >= 6
+%{_prefix}/lib/python/frontendInterfaces-%{version}-py%{python_version}.egg-info	
+%endif
+%if %{with java}
 %{_prefix}/lib/FRONTENDInterfaces.jar
 %{_prefix}/lib/FRONTENDInterfaces.src.jar
-%endif
-%if "%{?rhel}" == "6"
-%{_prefix}/lib/python/%{name}-0.0.0-py2.6.egg-info
 %endif
 
 %post

@@ -18,9 +18,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 
-AC_INIT(frontendInterfaces, 2.0.1)
-
-AC_PREFIX_DEFAULT(${OSSIEHOME})
+AC_INIT(frontendInterfaces, 2.0.2)
 
 AM_INIT_AUTOMAKE(nostdinc)
 AC_PROG_CC
@@ -40,7 +38,7 @@ if test "$IDL" = no; then
   AC_MSG_ERROR([cannot find omniidl program])
 fi
 AC_LANG_PUSH([C++])
-PKG_CHECK_MODULES([OMNIORB], [omniORB4 >= 4.0.0])
+PKG_CHECK_MODULES([OMNIORB], [omniORB4 >= 4.1.0])
 PKG_CHECK_MODULES(OSSIE, ossie >= 1.7.0,,exit)
 
 # If you depend on other IDL modules, such as CF or BULKIO add them here
@@ -50,24 +48,32 @@ AC_CHECK_PYMODULE(bulkio.bulkioInterfaces, [], [AC_MSG_ERROR([the python bulkio.
 # Optionally include java support
 AC_ARG_ENABLE([java], AS_HELP_STRING([--disable-java], [Disable framework java support]))
 
+HAVE_JAVASUPPORT=no
 if test "x$enable_java" != "xno"; then
-  AC_CHECK_PROG([IDLJ], [idlj], [idlj], [no])
-  AC_CHECK_PROG([JAVAC], [javac], [javac], [no])
-  AC_CHECK_PROG([JAR], [jar], [jar], [no])
-  if test "$IDLJ" = no -o "$JAVAC" = no -o "$JAR" = no; then
-    HAVE_JAVASUPPORT=no
-    AC_MSG_WARN([Java support won't be built due to missing dependencies])
+  # Ensure JAVA_HOME is set
+  AC_ARG_VAR([JAVA_HOME], [Java Development Kit (JDK) location])
+  test -r /usr/share/java-utils/java-functions && \
+    . /usr/share/java-utils/java-functions && \
+    set_jvm
+  AC_MSG_CHECKING([for a valid JAVA_HOME])
+  if test -n "$JAVA_HOME" -a -d "$JAVA_HOME"; then
+    AC_MSG_RESULT([$JAVA_HOME])
+    java_test_paths=$JAVA_HOME/jre/sh$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$PATH
   else
-    HAVE_JAVASUPPORT=yes
+    AC_MSG_RESULT([no - this may impact Java tool detection])
+    java_test_paths=$PATH
   fi
-else
-  HAVE_JAVASUPPORT=no
-fi
-AC_MSG_CHECKING([for framework java support])
-AC_MSG_RESULT($HAVE_JAVASUPPORT)
 
+  # Locate the tools we need
+  AC_PATH_PROG([JAVAC], [javac], [no], [$java_test_paths])
+  AC_PATH_PROG([JAR], [jar], [no], [$java_test_paths])
+  AC_PATH_PROG([IDLJ], [idlj], [no], [$java_test_paths])
+  AS_IF([test "$JAVAC" = no -o "$JAR" = no -o "$IDLJ" = no],
+        [AC_MSG_ERROR([Cannot find a required Java tool])])
+
+  HAVE_JAVASUPPORT=yes
+fi
 AM_CONDITIONAL(HAVE_JAVASUPPORT, test $HAVE_JAVASUPPORT = yes)
-# End optional java support
 
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT

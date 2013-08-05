@@ -19,26 +19,21 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 
-config_ac='configure.ac'
-make_am='Makefile.am'
-makefile='Makefile'
-
-if [ "$1" == 'clean' ]; then
+if [ "$1" = "clean" ]; then
   make clean
-elif [ "$1" == 'rpm' ]; then
+elif [ "$1" = "rpm" ]; then
   # A very simplistic RPM build scenario
   mydir=`dirname $0`
   tmpdir=`mktemp -d`
-  cp -r ${mydir} ${tmpdir}/frontendInterfaces-2.0.1
-  tar czf ${tmpdir}/frontendInterfaces-2.0.1.tar.gz --exclude=".svn" -C ${tmpdir} frontendInterfaces-2.0.1
-  rpmbuild -ta ${tmpdir}/frontendInterfaces-2.0.1.tar.gz
+  cp -r ${mydir} ${tmpdir}/frontendInterfaces-2.0.2
+  tar czf ${tmpdir}/frontendInterfaces-2.0.2.tar.gz --exclude=".svn" -C ${tmpdir} frontendInterfaces-2.0.2
+  rpmbuild -ta ${tmpdir}/frontendInterfaces-2.0.2.tar.gz
   rm -rf $tmpdir
 else
   # Checks if build is newer than makefile (based on modification time)
-  if [[ $config_ac -nt $makefile || $make_am -nt $makefile ]]; then
+  if [ ! -e configure ] || [ ! -e Makefile ] || [ configure.ac -nt Makefile ] || [ Makefile.am -nt Makefile ]; then
     ./reconf
     ./configure
   fi
   make
-  exit 0
 fi
