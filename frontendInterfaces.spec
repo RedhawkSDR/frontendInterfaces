@@ -39,7 +39,10 @@ Release: 1%{?dist}
 License: None
 Group: REDHAWK/Interfaces
 Source: %{name}-%{version}.tar.gz 
+Vendor: REDHAWK
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+
 Requires: redhawk >= 1.8
 Requires: bulkioInterfaces >= 1.8
 BuildRequires: redhawk-devel >= 1.8
