@@ -67,7 +67,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 rm -rf --preserve-root $RPM_BUILD_ROOT
 
 %files
-%defattr(-,redhawk,redhawk)
+%defattr(-,root,root,-)
 %{_datadir}/idl/redhawk/FRONTEND
 %{_includedir}/redhawk/FRONTEND
 %{_libdir}/libfrontendInterfaces.*
