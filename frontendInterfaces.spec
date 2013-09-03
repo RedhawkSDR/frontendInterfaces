@@ -50,6 +50,9 @@ BuildRequires: bulkioInterfaces >= 1.8
 
 %description
 Libraries and interface definitions for frontend.
+ * Commit: __REVISION__
+ * Source Date/Time: __DATETIME__
+
 
 %prep
 %setup
