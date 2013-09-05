@@ -91,7 +91,7 @@ module FRONTEND
     /*********************************/
     /**      RFSource INTERFACE      */
     /*********************************/
-    interface RFSoruce {
+    interface RFSource {
     	/** A list of all possible rf inputs that this source could switch to **/
     	attribute RFInfoPktSequence available_rf_inputs;
     	
