@@ -35,7 +35,9 @@ module FRONTEND
 		is a string that uniquely describes the RF source which in most instances will equate to a RFInfoPkt structure (or
 		a structure extended from the RFInfoPkt). The "rf_flow_id" will flow with the data via BULKIO SRI keyword so that the data 
 		can be correlated to a specific frontend. The "rf_flow_id" is also included in such structures as the tuner allocation structure
-		so a user can specify exactly which antenna/feed it needs to allocate against. 
+		so a user can specify exactly which antenna/feed it needs to allocate against.  If a device provides an RFInfo output port it 
+		it is also a RFSource which has two attributes describing the selection of RFInfoPkts.  If an RFSource could feed multiple flows 
+		(RF Distrubution) it will have an attribute for all the possible rf_inputs and one for the currently selected rf_input.       
 		
 	*/
 
@@ -72,11 +74,12 @@ module FRONTEND
         CF::Properties additional_info;
     };
 
+	typedef sequence <RFInfoPkt> RFInfoPktSequence;
 
 
-    /************************/
-    /**      INTERFACE      */
-    /************************/
+    /*******************************/
+    /**      RFInfo INTERFACE      */
+    /*******************************/
     interface RFInfo {
     	/** unique string that flows with data to describe its RF source*/
     	attribute string rf_flow_id;  
@@ -84,6 +87,19 @@ module FRONTEND
     	/** generic container to describe RF frontend */
     	attribute RFInfoPkt rfinfo_pkt;
     };
+    
+    /*********************************/
+    /**      RFSource INTERFACE      */
+    /*********************************/
+    interface RFSource {
+    	/** A list of all possible rf inputs that this source could switch to **/
+    	attribute RFInfoPktSequence available_rf_inputs;
+    	
+    	/** The current select source that is being output **/
+    	attribute RFInfoPkt current_rf_input;
+    	
+    };
+    
 };
 
 #endif
