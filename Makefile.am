@@ -82,6 +82,7 @@ BUNDLE_REQUIRED_EXECUTION_ENVIRONMENT := J2SE-$(JAVA_TARGET_VERSION)
 #            src/cpp/some_fileSK.cpp src/cpp/some_fileDynSK.cpp src/cpp/some_file.h
 lib_LTLIBRARIES = libfrontendInterfaces.la
 libfrontendInterfaces_la_SOURCES = $(redhawk_IDL_SOURCES_auto)
+libfrontendInterfaces_la_LDFLAGS = -version-info 1:0:1
 
 ###############################################################################
 # DO NOT MODIFY ANY LINES BELOW HERE
