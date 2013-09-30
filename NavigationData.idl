@@ -22,6 +22,7 @@
 #define _FRONTEND_NAVIGATIONDATA_IDL_ 
 
 #include "redhawk/FRONTEND/Frontend.idl"
+#include "ossie/BULKIO/bulkioDataTypes.idl"
 
 
 module FRONTEND

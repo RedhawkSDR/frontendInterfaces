@@ -22,8 +22,6 @@
 #define _FRONTEND_IDL_
 
 #include "ossie/CF/cf.idl"
-#include "ossie/CF/PortTypes.idl"
-#include "ossie/BULKIO/bulkioDataTypes.idl"
 
 
 /************************************************************************/
