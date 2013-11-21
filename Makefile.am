@@ -105,6 +105,12 @@ build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl: $(IDL_SOURCE_PATH)/%.idl
 	mkdir -p build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)
 	cp $< $@
 
+# Always build the current directory first (this is hack-ish, but the
+# # alternative is to combine the Makefile.am's)
+SUBDIRS = .
+
+SUBDIRS += libsrc
+
 ###############################################################################
 # C++ (via automake and libtool)
 pkgconfigdir = $(libdir)/pkgconfig

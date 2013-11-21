@@ -45,6 +45,18 @@ PKG_CHECK_MODULES(OSSIE, ossie >= 1.7.0,,exit)
 PKG_CHECK_MODULES([BULKIO], [bulkioInterfaces >= 1.7])
 AC_CHECK_PYMODULE(bulkio.bulkioInterfaces, [], [AC_MSG_ERROR([the python bulkio.bulkioInterfaces module is required])])
 
+AC_SUBST([FRONTEND_SO_VERSION],[0:0:0])
+AC_SUBST([FRONTEND_API_VERSION],[2.1.0])
+
+AX_BOOST_BASE([1.41])
+AX_BOOST_THREAD
+OSSIE_ENABLE_LOG4CXX
+CHECK_VECTOR_IMPL
+
+AC_SUBST(FRONTEND_INF_INCLUDES, "-I../src/cpp -I../src/cpp/redhawk")
+AC_SUBST(FRONTEND_INF_CFLAGS, )
+AC_SUBST(FRONTEND_INF_LIBS, )
+
 # Optionally include java support
 AC_ARG_ENABLE([java], AS_HELP_STRING([--disable-java], [Disable framework java support]))
 
@@ -76,4 +88,10 @@ fi
 AM_CONDITIONAL(HAVE_JAVASUPPORT, test $HAVE_JAVASUPPORT = yes)
 
 AC_CONFIG_FILES(Makefile)
+if test "$enable_base_classes" != "no"; then
+  if test "$HAVE_JAVASUPPORT = yes"; then
+    AC_CONFIG_FILES([libsrc/java/META-INF/MANIFEST.MF libsrc/java/META-INF/MANIFEST.MF.src])
+  fi
+  AC_CONFIG_FILES([libsrc/Makefile libsrc/frontend.pc])
+fi
 AC_OUTPUT
