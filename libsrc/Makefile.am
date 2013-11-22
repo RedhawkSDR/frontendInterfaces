@@ -78,7 +78,7 @@ clean-python:
 ###############################################################################
 # Java
 
-if HAVE_JAVASUPPORT
+if !HAVE_JAVASUPPORT
 
 JAVA_DIR := java
 JAVA_SRCDIR := $(JAVA_DIR)/src
