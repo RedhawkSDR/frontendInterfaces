@@ -17,33 +17,16 @@ libfrontend_@FRONTEND_API_VERSION@_la_LDFLAGS = -version-info $(FRONTEND_SO_VERS
 
 libfrontend_@FRONTEND_API_VERSION@_la_SOURCES = \
     cpp/fe_port_impl.cpp \
-    cpp/fe_tuner_impl.cpp
-#    cpp/rfinfo_in_port.cpp
-#    cpp/bulkio.cpp \
-#    cpp/bulkio_in_port.cpp \
-#    cpp/bulkio_out_port.cpp \
-#    cpp/bulkio_sdds_port.cpp \
-#    cpp/bulkio_sri_helpers.cpp \
-#    cpp/bulkio_time_helpers.cpp \
-#    cpp/bulkio_p.h
+    cpp/fe_tuner_impl.cpp \
+    cpp/rfinfo_port_impl.cpp
 
 ## Define the list of public header files and their install location.
 library_includedir = $(includedir)/frontend
 library_include_HEADERS = \
 	cpp/fe_tuner_struct_props.h \
 	cpp/fe_port_impl.h \
-	cpp/fe_tuner_impl.h
-#	cpp/frontend.h \
-#	cpp/FRONTEND_Interfaces.h \
-#	cpp/rfinfo_in_port.h
-#library_include_HEADERS = cpp/bulkio.h \
-#	cpp/LKIO_Interfaces.h \
-#	cpp/bulkio_base.h \
-#	cpp/bulkio_traits.h \
-#	cpp/bulkio_in_port.h \
-#	cpp/bulkio_out_port.h \
-#	cpp/bulkio_sdds.h \
-#	cpp/bulkio_compat.h
+	cpp/fe_tuner_impl.h \
+        cpp/rfinfo_port_impl.h
 
 ## The generated configuration header is installed in its own subdirectory of
 ## $(libdir).  The reason for this is that the configuration information put
