@@ -1,261 +1,551 @@
 #include "fe_tuner_impl.h"
 
-FE_Tuner_impl::FE_Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl) :
-    Device_impl(devMgr_ior, id, lbl, sftwrPrfl)
-{
-    construct();
-}
+namespace frontend {
 
-FE_Tuner_impl::FE_Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, char *compDev) :
-    Device_impl(devMgr_ior, id, lbl, sftwrPrfl, compDev)
-{
-    construct();
-}
-
-FE_Tuner_impl::FE_Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities) :
-    Device_impl(devMgr_ior, id, lbl, sftwrPrfl, capacities)
-{
-    construct();
-}
-
-FE_Tuner_impl::FE_Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities, char *compDev) :
-    Device_impl(devMgr_ior, id, lbl, sftwrPrfl, capacities, compDev)
-{
-    construct();
-}
-
-void FE_Tuner_impl::construct()
-{
-    Resource_impl::_started = false;
-    loadProperties();
-}
-
-FE_Tuner_impl::~FE_Tuner_impl()
-{
-	for (size_t i = 0; i < tunerChannels.size(); i++) {
-		if (tunerChannels[i].lock != NULL)
-			delete tunerChannels[i].lock;
+	template < typename TunerStatusStructType >
+	Tuner_impl<TunerStatusStructType>::Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl) :
+		Device_impl(devMgr_ior, id, lbl, sftwrPrfl)
+	{
+		construct();
 	}
-	tunerChannels.clear();
-}
 
-/*******************************************************************************************
-    Framework-level functions
-    These functions are generally called by the framework to perform housekeeping.
-*******************************************************************************************/
-void FE_Tuner_impl::loadProperties()
-{
-    addProperty(device_kind,
-                "FRONTEND::TUNER",
-                "DCE:cdc5ee18-7ceb-4ae6-bf4c-31f983179b4d",
-                "device_kind",
-                "readonly",
-                "",
-                "eq",
-                "allocation,configure");
-
-    addProperty(device_model,
-                "USRP",
-                "DCE:0f99b2e4-9903-4631-9846-ff349d18ecfb",
-                "device_model",
-                "readonly",
-                "",
-                "eq",
-                "allocation,configure");
-
-    addProperty(frontend_tuner_allocation,
-    			frontend::frontend_tuner_allocation_struct(),
-                "FRONTEND::tuner_allocation",
-                "frontend_tuner_allocation",
-                "readwrite",
-                "",
-                "external",
-                "allocation");
-
-    addProperty(frontend_listener_allocation,
-    			frontend::frontend_listener_allocation_struct(),
-                "FRONTEND::listener_allocation",
-                "frontend_listener_allocation",
-                "readwrite",
-                "",
-                "external",
-                "allocation");
-
-    addProperty(frontend_tuner_status,
-                "FRONTEND::tuner_status",
-                "frontend_tuner_status",
-                "readonly",
-                "",
-                "external",
-                "configure");
-
-}
-
-std::string FE_Tuner_impl::create_allocation_id_csv(size_t tunerNum){
-	std::string alloc_id_csv = "";
-	// ensure control allocation_id is first in list
-	if (!getTunerChannel(tunerNum)->control_allocation_id.empty())
-		alloc_id_csv = getTunerChannel(tunerNum)->control_allocation_id + ",";
-	// now add the rest
-	for(string_number_mapping::iterator it = allocationId_to_tunerNum.begin(); it != allocationId_to_tunerNum.end(); it++){
-		if(it->second == tunerNum && it->first != getTunerChannel(tunerNum)->control_allocation_id)
-			alloc_id_csv += it->first + ",";
+	template < typename TunerStatusStructType >
+	Tuner_impl<TunerStatusStructType>::Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, char *compDev) :
+		Device_impl(devMgr_ior, id, lbl, sftwrPrfl, compDev)
+	{
+		construct();
 	}
-	// and get rid of the trailing comma
-	if(!alloc_id_csv.empty())
-		alloc_id_csv.erase(alloc_id_csv.size()-1);
-	return alloc_id_csv;
-}
 
-/*****************************************************************/
-/* Allocation/Deallocation of Capacity                           */
-/*****************************************************************/
-CF::Device::UsageType FE_Tuner_impl::updateUsageState() {
-	size_t tunerAllocated = 0;
-	for (size_t i = 0; i < sizeofTunerChannels(); i++) {
-		if (!getTunerChannel(i)->control_allocation_id.empty())
-			tunerAllocated++;
+	template < typename TunerStatusStructType >
+	Tuner_impl<TunerStatusStructType>::Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities) :
+		Device_impl(devMgr_ior, id, lbl, sftwrPrfl, capacities)
+	{
+		construct();
 	}
-	// If no tuners are allocated, device is idle
-	if (tunerAllocated == 0)
-		return CF::Device::IDLE;
-	// If all tuners are allocated, device is busy
-	if (tunerAllocated == sizeofTunerChannels())
-		return CF::Device::BUSY;
-	// Else, device is active
-	return CF::Device::ACTIVE;
-}
 
-////////////////////////////
-//        MAPPING         //
-////////////////////////////
-/*
-long FE_Tuner_impl::addTunerMapping(const frontend::frontend_tuner_allocation_struct & frontend_alloc) {
-	long NO_VALID_TUNER = -1;
+	template < typename TunerStatusStructType >
+	Tuner_impl<TunerStatusStructType>::Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities, char *compDev) :
+		Device_impl(devMgr_ior, id, lbl, sftwrPrfl, capacities, compDev)
+	{
+		construct();
+	}
 
-	// Do not allocate if allocation ID has already been used
-	if(getTunerMapping(frontend_alloc.allocation_id) >= 0)
-		return NO_VALID_TUNER;
+	template < typename TunerStatusStructType >
+	void Tuner_impl<TunerStatusStructType>::construct()
+	{
+		Resource_impl::_started = false;
+		loadProperties();
+	}
 
-	// Next, try to allocate a new tuner
-	exclusive_lock lock(allocationID_MappingLock);
-	for (long tunerNum = 0; tunerNum < long(frontend_tuner_status.size()); tunerNum++) {
-		if(getTunerChannel(tunerNum)->getFrontendStatus()->tuner_type != frontend_alloc.tuner_type)
-			continue;
-		bool freq_valid = is_freq_valid(frontend_alloc.center_frequency, frontend_alloc.bandwidth, frontend_alloc.sample_rate,
-				frontend_tuner_status[tunerNum].center_frequency, frontend_tuner_status[tunerNum].bandwidth, frontend_tuner_status[tunerNum].sample_rate);
-		//listen
-		if (!frontend_alloc.device_control && ! getTunerChannel(tunerNum)->control_allocation_id.empty() && freq_valid){
-			allocationId_to_tunerNum.insert(std::pair<std::string, size_t > (frontend_alloc.allocation_id, tunerNum));
-			getTunerChannel(tunerNum)->getFrontendStatus()->allocation_id_csv = create_allocation_id_csv(tunerNum);
-			return tunerNum;
+	template < typename TunerStatusStructType >
+	Tuner_impl<TunerStatusStructType>::~Tuner_impl()
+	{
+		for (size_t tuner_id = 0; tuner_id < tunerChannels.size(); tuner_id++) {
+			if (tunerChannels[tuner_id].lock != NULL)
+				delete tunerChannels[tuner_id].lock;
 		}
-		//control
-		else if (frontend_alloc.device_control && getTunerChannel(tunerNum)->control_allocation_id.empty()){
-			getTunerChannel(tunerNum)->control_allocation_id = frontend_alloc.allocation_id;
-			allocationId_to_tunerNum.insert(std::pair<std::string, size_t > (frontend_alloc.allocation_id, tunerNum));
-			getTunerChannel(tunerNum)->getFrontendStatus()->allocation_id_csv = create_allocation_id_csv(tunerNum);
-			return tunerNum;
-		}
-
+		tunerChannels.clear();
 	}
-	return NO_VALID_TUNER;
-}
 
+	/*******************************************************************************************
+		Framework-level functions
+		These functions are generally called by the framework to perform housekeeping.
+	*******************************************************************************************/
 
-long FE_Tuner_impl::addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listner_alloc){
+    template < typename TunerStatusStructType >
+    void Tuner_impl<TunerStatusStructType>::loadProperties()
+    {
+        addProperty(device_kind,
+                    "FRONTEND::TUNER",
+                    "DCE:cdc5ee18-7ceb-4ae6-bf4c-31f983179b4d",
+                    "device_kind",
+                    "readonly",
+                    "",
+                    "eq",
+                    "allocation,configure");
 
-	long NO_VALID_TUNER = -1;
+        addProperty(device_model,
+                    "USRP",
+                    "DCE:0f99b2e4-9903-4631-9846-ff349d18ecfb",
+                    "device_model",
+                    "readonly",
+                    "",
+                    "eq",
+                    "allocation,configure");
 
-	//TODO (add this to USRP develop branch) - Do not allocate if allocation ID has already been used
-	if (getTunerMapping(frontend_listner_alloc.listener_allocation_id) >= 0)
-		return NO_VALID_TUNER;
-	int tunerNum = NO_VALID_TUNER;
-	// Do not allocate if existing allocation ID does not exist
-	if ((tunerNum = getTunerMapping(frontend_listner_alloc.existing_allocation_id)) < 0)
-		return NO_VALID_TUNER;
+        addProperty(frontend_tuner_allocation,
+                    frontend::frontend_tuner_allocation_struct(),
+                    "FRONTEND::tuner_allocation",
+                    "frontend_tuner_allocation",
+                    "readwrite",
+                    "",
+                    "external",
+                    "allocation");
 
-	allocationId_to_tunerNum.insert(std::pair<std::string, size_t > (frontend_listner_alloc.listener_allocation_id, tunerNum));
-	getTunerChannel(tunerNum)->getFrontendStatus()->allocation_id_csv = create_allocation_id_csv(tunerNum);
-	return tunerNum;
-}*/
+        addProperty(frontend_listener_allocation,
+                    frontend::frontend_listener_allocation_struct(),
+                    "FRONTEND::listener_allocation",
+                    "frontend_listener_allocation",
+                    "readwrite",
+                    "",
+                    "external",
+                    "allocation");
 
+        addProperty(frontend_tuner_status,
+                    "FRONTEND::tuner_status",
+                    "frontend_tuner_status",
+                    "readonly",
+                    "",
+                    "external",
+                    "configure");
 
-long FE_Tuner_impl::getTunerMapping(std::string allocation_id) {
-	long NO_VALID_TUNER = -1;
+    }
 
-	exclusive_lock lock(allocationID_MappingLock);
-	string_number_mapping::iterator iter = allocationId_to_tunerNum.find(allocation_id);
-	if (iter != allocationId_to_tunerNum.end())
-		return iter->second;
+	template < typename TunerStatusStructType >
+	std::string Tuner_impl<TunerStatusStructType>::create_allocation_id_csv(size_t tuner_id){
+		std::string alloc_id_csv = "";
+		// ensure control allocation_id is first in list
+		if (!tunerChannels[tuner_id].control_allocation_id.empty())
+			alloc_id_csv = tunerChannels[tuner_id].control_allocation_id + ",";
+		// now add the rest
+		for(string_number_mapping::iterator it = allocationID_to_tunerID.begin(); it != allocationID_to_tunerID.end(); it++){
+			if(it->second == tuner_id && it->first != tunerChannels[tuner_id].control_allocation_id)
+				alloc_id_csv += it->first + ",";
+		}
+		// and get rid of the trailing comma
+		if(!alloc_id_csv.empty())
+			alloc_id_csv.erase(alloc_id_csv.size()-1);
+		return alloc_id_csv;
+	}
 
-	return NO_VALID_TUNER;
-}
+	/*****************************************************************/
+	/* Allocation/Deallocation of Capacity                           */
+	/*****************************************************************/
+	template < typename TunerStatusStructType >
+	CF::Device::UsageType Tuner_impl<TunerStatusStructType>::updateUsageState() {
+		size_t tunerAllocated = 0;
+		for (size_t tuner_id = 0; tuner_id < tunerChannels.size(); tuner_id++) {
+			if (!tunerChannels[tuner_id].control_allocation_id.empty())
+				tunerAllocated++;
+		}
+		// If no tuners are allocated, device is idle
+		if (tunerAllocated == 0)
+			return CF::Device::IDLE;
+		// If all tuners are allocated, device is busy
+		if (tunerAllocated == tunerChannels.size())
+			return CF::Device::BUSY;
+		// Else, device is active
+		return CF::Device::ACTIVE;
+	}
 
+	template < typename TunerStatusStructType >
+	CORBA::Boolean Tuner_impl<TunerStatusStructType>::allocateCapacity(const CF::Properties & capacities)
+	throw (CORBA::SystemException, CF::Device::InvalidCapacity, CF::Device::InvalidState) {
+		CORBA::ULong ii;
+		try{
+			for (ii = 0; ii < capacities.length(); ++ii) {
+				const std::string id = (const char*) capacities[ii].id;
+				if (id != "FRONTEND::tuner_allocation" && id != "FRONTEND::listener_allocation")
+					throw CF::Device::InvalidCapacity("UNKNOWN ALLOCATION PROPERTY", capacities);
+				PropertyInterface* property = getPropertyFromId(id);
+				if(!property)
+					throw CF::Device::InvalidCapacity("UNKNOWN PROPERTY", capacities);
+				try{
+					property->setValue(capacities[ii].value);
+				}
+				catch(const std::logic_error &e){
+					throw CF::Device::InvalidCapacity("COULD NOT PARSE CAPACITY", capacities);
+				};
+				if (id == "FRONTEND::tuner_allocation"){
 
-bool FE_Tuner_impl::removeTunerMapping(std::string allocation_id) {
-	exclusive_lock lock(allocationID_MappingLock);
-	if(allocationId_to_tunerNum.erase(allocation_id) > 0)
+					if(!_valid_tuner_type(frontend_tuner_allocation.tuner_type))
+						throw CF::Device::InvalidCapacity("UNKNOWN FRONTEND TUNER TYPE", capacities);
+
+					// Check allocation_id
+					if (frontend_tuner_allocation.allocation_id.empty()) {
+						throw CF::Device::InvalidCapacity("MISSING ALLOCATION_ID", capacities);
+					}
+					// Check if allocation ID has already been used
+					if(getTunerMapping(frontend_tuner_allocation.allocation_id) >= 0)
+						throw CF::Device::InvalidCapacity("ALLOCATION_ID ALREADY IN USE", capacities);
+
+					// Check if available tuner (if not requesting device control, this is all that's needed to add listener)
+					long tuner_id = addTunerMapping(frontend_tuner_allocation);
+					if (tuner_id < 0) {
+						char msg[512];
+						sprintf(msg,"NO AVAILABLE TUNER");
+						throw std::logic_error(msg);
+					}
+
+					// Initialize the tuner (only if requesting device control)
+					if (frontend_tuner_allocation.device_control){
+						bool success = false;
+						//try{
+							success = setupTuner(tuner_id, frontend_tuner_allocation);
+						//}
+						//catch(const std::logic_error &e) {
+						//	throw e;
+						//}
+						//catch(FRONTEND::BadParameterException &e) {
+						//	throw e;
+						//};
+						if (!success){
+							char msg[512];
+							sprintf(msg,"SETUP TUNER FAILED");
+							throw std::logic_error(msg);
+						}
+					}
+				}
+				else if (id == "FRONTEND::listener_allocation") {
+					// Check validity of allocation_id's
+					if (frontend_listener_allocation.existing_allocation_id.empty())
+						throw CF::Device::InvalidCapacity("MISSING EXISTING ALLOCATION ID", capacities);
+					if (frontend_listener_allocation.listener_allocation_id.empty())
+						throw CF::Device::InvalidCapacity("MISSING LISTENER ALLOCATION ID", capacities);
+					// Check if listener allocation ID has already been used
+					if(getTunerMapping(frontend_listener_allocation.listener_allocation_id) >= 0)
+						throw CF::Device::InvalidCapacity("LISTENER ALLOCATION ID ALREADY IN USE", capacities);
+
+					if(addTunerMapping(frontend_listener_allocation) < 0)
+						throw FRONTEND::BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
+				}
+				else {
+					throw CF::Device::InvalidCapacity("UNKNOWN ALLOCATION PROPERTY", capacities);
+				}
+			}
+		}
+		catch(const std::logic_error &e) {
+			deallocateCapacity(capacities);
+			return false;
+		}
+		catch(CF::Device::InvalidCapacity &e) {
+			// without the following check, a valid allocation could be deallocated due to an attempt to alloc w/ an existing alloc id
+			std::stringstream ss;
+			ss << e.msg;
+			if (ss.str() != "ALLOCATION_ID ALREADY IN USE") {
+				deallocateCapacity(capacities);
+			}
+			//else {
+			//}
+			throw e;
+		}
+		catch(FRONTEND::BadParameterException &e) {
+			deallocateCapacity(capacities);
+			return false;
+		}
+		catch(...){
+			deallocateCapacity(capacities);
+			throw;
+		};
+
 		return true;
-	return false;
+	}
 
-}
-
-bool FE_Tuner_impl::removeTunerMapping(size_t tuner_id) {
-	long cnt = 0;
-	for(string_number_mapping::iterator it = allocationId_to_tunerNum.begin(); it != allocationId_to_tunerNum.end(); it++){
-		if(it->second == tuner_id){
-			allocationId_to_tunerNum.erase(it);
-			cnt++;
+	template < typename TunerStatusStructType >
+	void Tuner_impl<TunerStatusStructType>::deallocateCapacity(const CF::Properties & capacities)
+	throw (CORBA::SystemException, CF::Device::InvalidCapacity, CF::Device::InvalidState) {
+		for (CORBA::ULong ii = 0; ii < capacities.length(); ++ii) {
+			try{
+				const std::string id = (const char*) capacities[ii].id;
+				if (id != "FRONTEND::tuner_allocation" && id != "FRONTEND::listener_allocation")
+					throw CF::Device::InvalidCapacity("UNKNOWN ALLOCATION PROPERTY", capacities);
+				PropertyInterface* property = getPropertyFromId(id);
+				if(!property)
+					throw CF::Device::InvalidCapacity("UNKNOWN PROPERTY", capacities);
+				property->setValue(capacities[ii].value);
+				if (id == "FRONTEND::tuner_allocation"){
+					// Try to remove control of the device
+					long tuner_id = getTunerMapping(frontend_tuner_allocation.allocation_id);
+					if (tuner_id < 0)
+						throw CF::Device::InvalidState();
+					if(tunerChannels[tuner_id].control_allocation_id == frontend_tuner_allocation.allocation_id){
+						removeTuner(tuner_id);
+						removeTunerMapping(tuner_id);
+					}
+					else {
+						// send EOS to listener connection only
+						push_EOS_on_listener(frontend_tuner_allocation.allocation_id);
+						removeTunerMapping(frontend_tuner_allocation.allocation_id);
+					}
+					tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
+				}
+				else if (id == "FRONTEND::listener_allocation") {
+					long tuner_id = getTunerMapping(frontend_listener_allocation.listener_allocation_id);
+					if (tuner_id < 0)
+						throw CF::Device::InvalidState();
+					// send EOS to listener connection only
+					push_EOS_on_listener(frontend_listener_allocation.listener_allocation_id);
+					removeTunerMapping(frontend_listener_allocation.listener_allocation_id);
+					tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
+				}
+				else {
+					//LOG_TRACE(USRP_UHD_i,"WARNING: UNKNOWN ALLOCATION PROPERTY \""+ std::string(property->name) + "\". IGNORING!");
+				}
+			}
+			catch(...){
+				//LOG_DEBUG(USRP_UHD_i,"ERROR WHEN DEALLOCATING. SKIPPING...");
+			}
 		}
 	}
-	return cnt > 0;
-}
 
-bool FE_Tuner_impl::is_connectionID_valid_for_tunerNum(const size_t & tunerNum, const std::string & connectionID) {
-	std::map<std::string, size_t>::iterator iter =  allocationId_to_tunerNum.find(connectionID);
-	if(iter == allocationId_to_tunerNum.end())
-		return false;
-	if(iter->second != tunerNum)
-		return false;
-	return true;
-}
+	/*****************************************************************/
+	/* Tuner Configurations                                          */
+	/*****************************************************************/
 
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::setupTuner(size_t tuner_id, const frontend::frontend_tuner_allocation_struct& tuner_req) throw (std::logic_error,FRONTEND::BadParameterException) {
+		if(tuner_req.allocation_id != tunerChannels[tuner_id].control_allocation_id)
+			return false;
 
-bool FE_Tuner_impl::is_connectionID_valid_for_streamID(const std::string & streamID, const std::string & connectionID) {
-	string_number_mapping::iterator iter = streamID_to_tunerNum.find(streamID);
-	if (iter == streamID_to_tunerNum.end())
-		return false;
-	return is_connectionID_valid_for_tunerNum(iter->second, connectionID);
-}
+		// If the freq has changed (change in stream) or the tuner is disabled, then set it as disabled
+		indivTuner<TunerStatusStructType>* tuner_curr = &tunerChannels[tuner_id];
+		bool isTunerEnabled = tuner_curr->frontend_status->enabled;
+		if (!isTunerEnabled || tuner_curr->frontend_status->center_frequency != tuner_req.center_frequency)
+			enableTuner(tuner_id, false); // TODO: is this a generic thing we can assume is desired when changing any tuner device?
+		{
+			exclusive_lock lock(* (tuner_curr->lock));
+			if(!tuner_req.group_id.empty() && tuner_req.group_id != tuner_curr->frontend_status->group_id ){
+				throw FRONTEND::BadParameterException("CAN NOT ALLOCATE A TUNER WITH THAT GROUP ID!");
+			}
 
-bool FE_Tuner_impl::is_connectionID_controller_for_streamID(const std::string & streamID, const std::string & connectionID) {
-	string_number_mapping::iterator iter = streamID_to_tunerNum.find(streamID);
-	if (iter == streamID_to_tunerNum.end())
-		return false;
-	if (!is_connectionID_valid_for_tunerNum(iter->second, connectionID))
-		return false;
-	if (getTunerChannel(iter->second)->control_allocation_id != connectionID)
-		return false;
-	return true;
-}
+			if(!tuner_req.rf_flow_id.empty() && tuner_req.rf_flow_id != tuner_curr->frontend_status->rf_flow_id ){
+				throw FRONTEND::BadParameterException(("CAN NOT ALLOCATE A TUNER WITH RF FLOW ID = " + tuner_req.rf_flow_id + " !").c_str());
+			}
 
-bool FE_Tuner_impl::is_connectionID_listener_for_streamID(const std::string & streamID, const std::string & connectionID) {
-	string_number_mapping::iterator iter = streamID_to_tunerNum.find(streamID);
-	if (iter == streamID_to_tunerNum.end())
-		return false;
-	if (!is_connectionID_valid_for_tunerNum(iter->second, connectionID))
-		return false;
-	if (getTunerChannel(iter->second)->control_allocation_id == connectionID)
-		return false;
-	return true;
-}
+			//Check Validity
+			if (!_valid_center_frequency(tuner_req.center_frequency,tuner_id))
+				throw FRONTEND::BadParameterException("setupTuner(): INVALID FREQUENCY");
+			if (!_valid_gain(tuner_curr->frontend_status->gain,tuner_id))
+				throw FRONTEND::BadParameterException("setupTuner(): INVALID GAIN");
+			if (!_valid_bandwidth(tuner_req.bandwidth,tuner_id))
+				throw FRONTEND::BadParameterException("setupTuner(): INVALID BANDWIDTH");
+			if (!_valid_sample_rate(tuner_req.sample_rate,tuner_id))
+				throw FRONTEND::BadParameterException("setupTuner(): INVALID RATE");
 
-bool FE_Tuner_impl::is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr){
-	double req_min_bw_sr = std::min(req_bw,req_sr);
-	double min_bw_sr = std::min(bw,sr);
-	if( (req_cf + req_min_bw_sr/2 <= cf + min_bw_sr/2) && (req_cf - req_min_bw_sr/2 >= cf - min_bw_sr/2) )
+			_dev_set_all(tuner_req.center_frequency,tuner_req.bandwidth,tuner_req.sample_rate,tuner_curr->frontend_status->gain,tuner_id);
+			//_dev_set_center_frequency(tuner_req.center_frequency,tuner_id);
+			//_dev_set_bandwidth(tuner_req.bandwidth,tuner_id);
+			//_dev_set_sample_rate(tuner_req.sample_rate,tuner_id);
+			//_dev_set_gain(tuner_curr->frontend_status->gain,tuner_id);
+
+			_dev_get_all(tuner_curr->frontend_status->center_frequency,
+						 tuner_curr->frontend_status->bandwidth,
+						 tuner_curr->frontend_status->sample_rate,
+						 tuner_curr->frontend_status->gain,
+					     tuner_id);
+			//tuner_curr->frontend_status->center_frequency = _dev_get_center_frequency(tuner_id);
+			//tuner_curr->frontend_status->bandwidth = _dev_get_bandwidth(tuner_id);
+			//tuner_curr->frontend_status->sample_rate = _dev_get_sample_rate(tuner_id);
+			//tuner_curr->frontend_status->gain = _dev_get_gain(tuner_id);
+
+			// Only check non-TX when bandwidth was not set to don't care
+			if( (tuner_curr->frontend_status->tuner_type != "TX" && tuner_req.bandwidth != 0.0) &&
+				(tuner_curr->frontend_status->bandwidth < tuner_req.bandwidth ||
+				tuner_curr->frontend_status->bandwidth > tuner_req.bandwidth+tuner_req.bandwidth * tuner_req.bandwidth_tolerance/100.0 )){
+				char msg[512];
+				sprintf(msg,"setupTuner(%d): returned bw \"%f\" does not meet tolerance criteria of \"%f + %f percent\". ",int(tuner_id), tuner_curr->frontend_status->bandwidth,tuner_req.bandwidth,tuner_req.bandwidth_tolerance);
+				throw std::logic_error(msg);
+			}
+			// always check TX, but only check non-TX when sample_rate was not set to don't care)
+			if( (tuner_curr->frontend_status->tuner_type == "TX" || tuner_req.sample_rate != 0.0) &&
+				(tuner_curr->frontend_status->sample_rate < tuner_req.sample_rate ||
+				tuner_curr->frontend_status->sample_rate > tuner_req.sample_rate+tuner_req.sample_rate * tuner_req.sample_rate_tolerance/100.0 )){
+				char msg[512];
+				sprintf(msg,"setupTuner(%d): returned sample rate \"%f\" does not meet tolerance criteria of \"%f + %f percent\". ",int(tuner_id), tuner_curr->frontend_status->sample_rate,tuner_req.sample_rate,tuner_req.sample_rate_tolerance);
+				throw std::logic_error(msg);
+			}
+		}
+
+		//TODO - should we catch exceptions here, enable tuner if necessary, and re-throw exception?
+		// otherwise, setting invalid gain value will disable tuner, etc. - is that desired behavior?
+		if (isTunerEnabled)
+			enableTuner(tuner_id, true);
 		return true;
-	return false;
-};
+	}
 
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::removeTuner(size_t tuner_id) {
+		enableTuner(tuner_id, false);
+		tunerChannels[tuner_id].reset();
+		return true;
+	}
+
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::enableTuner(size_t tuner_id, bool enable) {
+		// Lock the tuner
+		exclusive_lock lock(*(tunerChannels[tuner_id].lock));
+
+		bool prev_enabled = tunerChannels[tuner_id].frontend_status->enabled;
+		tunerChannels[tuner_id].frontend_status->enabled = enable;
+
+		// If going from disabled to enabled
+		if (!prev_enabled && enable) {
+			configureTunerSRI(& tunerChannels[tuner_id].sri,
+					tunerChannels[tuner_id].frontend_status->center_frequency,
+					tunerChannels[tuner_id].frontend_status->sample_rate,
+					1,
+					tunerChannels[tuner_id].frontend_status->rf_flow_id);
+			streamID_to_tunerID.insert(std::make_pair(std::string(tunerChannels[tuner_id].sri.streamID), tuner_id));
+			_dev_enable(tuner_id);
+		}
+
+		// If going from enabled to disabled
+		if (prev_enabled && !enable && !std::string(tunerChannels[tuner_id].sri.streamID).empty()) {
+
+			_dev_disable(tuner_id);
+			std::string streamID = std::string(tunerChannels[tuner_id].sri.streamID);
+			streamID_to_tunerID.erase(streamID);
+			BIO_HELPER::zeroSRI(& tunerChannels[tuner_id].sri);
+		}
+
+		return true;
+	}
+
+	////////////////////////////
+	//        MAPPING         //
+	////////////////////////////
+
+	template < typename TunerStatusStructType >
+	long Tuner_impl<TunerStatusStructType>::addTunerMapping(const frontend::frontend_tuner_allocation_struct & frontend_alloc) {
+		long NO_VALID_TUNER = -1;
+
+		// Do not allocate if allocation ID has already been used
+		if(getTunerMapping(frontend_alloc.allocation_id) >= 0)
+			return NO_VALID_TUNER;
+
+		// Next, try to allocate a new tuner
+		exclusive_lock lock(allocationID_MappingLock);
+		for (long tuner_id = 0; tuner_id < long(tunerChannels.size()); tuner_id++) {
+			if(tunerChannels[tuner_id].frontend_status->tuner_type != frontend_alloc.tuner_type)
+				continue;
+			//listen
+			if (!frontend_alloc.device_control && !tunerChannels[tuner_id].control_allocation_id.empty()){
+				bool freq_valid = is_freq_valid(
+						frontend_alloc.center_frequency,
+						frontend_alloc.bandwidth,
+						frontend_alloc.sample_rate,
+						tunerChannels[tuner_id].frontend_status->center_frequency,
+						tunerChannels[tuner_id].frontend_status->bandwidth,
+						tunerChannels[tuner_id].frontend_status->sample_rate);
+				if (freq_valid){
+					allocationID_to_tunerID.insert(std::pair<std::string, size_t > (frontend_alloc.allocation_id, tuner_id));
+					tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
+					return tuner_id;
+				}
+			}
+			//control
+			else if (frontend_alloc.device_control && tunerChannels[tuner_id].control_allocation_id.empty()){
+				tunerChannels[tuner_id].control_allocation_id = frontend_alloc.allocation_id;
+				allocationID_to_tunerID.insert(std::pair<std::string, size_t > (frontend_alloc.allocation_id, tuner_id));
+				tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
+				return tuner_id;
+			}
+		}
+		return NO_VALID_TUNER;
+	}
+
+	template < typename TunerStatusStructType >
+	long Tuner_impl<TunerStatusStructType>::addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listner_alloc){
+		long NO_VALID_TUNER = -1;
+
+		// Do not allocate if allocation ID has already been used
+		if (getTunerMapping(frontend_listner_alloc.listener_allocation_id) >= 0)
+			return NO_VALID_TUNER;
+
+		long tuner_id = NO_VALID_TUNER;
+		// Do not allocate if existing allocation ID does not exist
+		if ((tuner_id = getTunerMapping(frontend_listner_alloc.existing_allocation_id)) < 0)
+			return NO_VALID_TUNER;
+
+		allocationID_to_tunerID.insert(std::pair<std::string, size_t > (frontend_listner_alloc.listener_allocation_id, tuner_id));
+		tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
+		return tuner_id;
+	}
+
+	template < typename TunerStatusStructType >
+	long Tuner_impl<TunerStatusStructType>::getTunerMapping(std::string allocation_id) {
+		long NO_VALID_TUNER = -1;
+
+		exclusive_lock lock(allocationID_MappingLock);
+		string_number_mapping::iterator iter = allocationID_to_tunerID.find(allocation_id);
+		if (iter != allocationID_to_tunerID.end())
+			return iter->second;
+
+		return NO_VALID_TUNER;
+	}
+
+
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::removeTunerMapping(std::string allocation_id) {
+		exclusive_lock lock(allocationID_MappingLock);
+		if(allocationID_to_tunerID.erase(allocation_id) > 0)
+			return true;
+		return false;
+
+	}
+
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::removeTunerMapping(size_t tuner_id) {
+		long cnt = 0;
+		for(string_number_mapping::iterator it = allocationID_to_tunerID.begin(); it != allocationID_to_tunerID.end(); it++){
+			if(it->second == tuner_id){
+				allocationID_to_tunerID.erase(it);
+				cnt++;
+			}
+		}
+		return cnt > 0;
+	}
+
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::is_connectionID_valid_for_tunerID(const size_t & tuner_id, const std::string & connectionID) {
+		std::map<std::string, size_t>::iterator iter =  allocationID_to_tunerID.find(connectionID);
+		if(iter == allocationID_to_tunerID.end())
+			return false;
+		if(iter->second != tuner_id)
+			return false;
+		return true;
+	}
+
+
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::is_connectionID_valid_for_streamID(const std::string & streamID, const std::string & connectionID) {
+		string_number_mapping::iterator iter = streamID_to_tunerID.find(streamID);
+		if (iter == streamID_to_tunerID.end())
+			return false;
+		return is_connectionID_valid_for_tunerID(iter->second, connectionID);
+	}
+
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::is_connectionID_controller_for_streamID(const std::string & streamID, const std::string & connectionID) {
+		string_number_mapping::iterator iter = streamID_to_tunerID.find(streamID);
+		if (iter == streamID_to_tunerID.end())
+			return false;
+		if (!is_connectionID_valid_for_tunerID(iter->second, connectionID))
+			return false;
+		if (tunerChannels[iter->second].control_allocation_id != connectionID)
+			return false;
+		return true;
+	}
+
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::is_connectionID_listener_for_streamID(const std::string & streamID, const std::string & connectionID) {
+		string_number_mapping::iterator iter = streamID_to_tunerID.find(streamID);
+		if (iter == streamID_to_tunerID.end())
+			return false;
+		if (!is_connectionID_valid_for_tunerID(iter->second, connectionID))
+			return false;
+		if (tunerChannels[iter->second].control_allocation_id == connectionID)
+			return false;
+		return true;
+	}
+
+	template < typename TunerStatusStructType >
+	bool Tuner_impl<TunerStatusStructType>::is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr){
+		double req_min_bw_sr = std::min(req_bw,req_sr);
+		double min_bw_sr = std::min(bw,sr);
+		if( (req_cf + req_min_bw_sr/2 <= cf + min_bw_sr/2) && (req_cf - req_min_bw_sr/2 >= cf - min_bw_sr/2) )
+			return true;
+		return false;
+	};
+
+}; // end frontend namespace
