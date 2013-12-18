@@ -32,6 +32,7 @@ library_include_HEADERS = \
 	cpp/fe_rfinfo_port_impl.h \
 	cpp/fe_rfsource_port_impl.h \
 	cpp/fe_tuner_impl.h \
+        cpp/fe_tuner_impl.cpp \
 	cpp/fe_tuner_port_impl.h \
 	cpp/fe_tuner_struct_props.h
 
