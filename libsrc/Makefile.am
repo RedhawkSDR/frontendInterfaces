@@ -16,17 +16,24 @@ lib_LTLIBRARIES = libfrontend-@FRONTEND_API_VERSION@.la
 libfrontend_@FRONTEND_API_VERSION@_la_LDFLAGS = -version-info $(FRONTEND_SO_VERSION)
 
 libfrontend_@FRONTEND_API_VERSION@_la_SOURCES = \
-    cpp/fe_port_impl.cpp \
+    cpp/fe_gps_port_impl.cpp \
+    cpp/fe_navdata_port_impl.cpp \
+    cpp/fe_rfinfo_port_impl.cpp \
     cpp/fe_tuner_impl.cpp \
-    cpp/rfinfo_port_impl.cpp
+    cpp/fe_tuner_port_impl.cpp
+#    cpp/fe_rfsource_port_impl.cpp
 
 ## Define the list of public header files and their install location.
 library_includedir = $(includedir)/frontend
 library_include_HEADERS = \
-	cpp/fe_tuner_struct_props.h \
+	cpp/fe_gps_port_impl.h \
+	cpp/fe_navdata_port_impl.h \
 	cpp/fe_port_impl.h \
+	cpp/fe_rfinfo_port_impl.h \
+	cpp/fe_rfsource_port_impl.h \
 	cpp/fe_tuner_impl.h \
-        cpp/rfinfo_port_impl.h
+	cpp/fe_tuner_port_impl.h \
+	cpp/fe_tuner_struct_props.h
 
 ## The generated configuration header is installed in its own subdirectory of
 ## $(libdir).  The reason for this is that the configuration information put

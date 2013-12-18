@@ -11,7 +11,7 @@
 
 #define CORBA_MAX_TRANSFER_BYTES omniORB::giopMaxMsgSize()
 
-#include <FRONTEND/TunerControl.h>
+#include <ossie/CF/QueryablePort.h>
 #include <FRONTEND/RFInfo.h>
 
 
@@ -34,134 +34,181 @@ namespace frontend {
 	//
 	// Callback signatures to register when functions are called
 	//
-	typedef char* (*CharGetterCBFn)( const char* id );
-	typedef CF::Properties* (*PropGetterCBFn)( const char* id );
-	typedef CORBA::Double (*DoubleGetterCBFn)( const char* id );
-	typedef CORBA::Boolean (*BooleanGetterCBFn)( const char* id );
-	typedef CORBA::Float (*FloatGetterCBFn)( const char* id );
-	typedef CORBA::Long (*LongGetterCBFn)( const char* id );
 
-	typedef void (*DoubleSetterCBFn)( const char* id, CORBA::Double val );
-	typedef void (*BooleanSetterCBFn)( const char* id, CORBA::Boolean val );
-	typedef void (*FloatSetterCBFn)( const char* id, CORBA::Float val );
-	typedef void (*LongSetterCBFn)( const char* id, CORBA::Long val );
+	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
+	typedef char* (*CharFromCharFn)( const char* id );
+	typedef CF::Properties* (*PropFromCharFn)( const char* id );
+	typedef CORBA::Double (*DoubleFromCharFn)( const char* id );
+	typedef CORBA::Boolean (*BooleanFromCharFn)( const char* id );
+	typedef CORBA::Float (*FloatFromCharFn)( const char* id );
+	typedef CORBA::Long (*LongFromCharFn)( const char* id );
+
+	typedef void (*VoidFromCharDoubleFn)( const char* id, CORBA::Double val );
+	typedef void (*VoidFromCharBooleanFn)( const char* id, CORBA::Boolean val );
+	typedef void (*VoidFromCharFloatFn)( const char* id, CORBA::Float val );
+	typedef void (*VoidFromCharLongFn)( const char* id, CORBA::Long val );
+
+	// for InRFInfoPort, InRFSourcePort
+	typedef char* (*CharFromVoidFn)( void );
+	typedef FRONTEND::RFInfoPkt* (*RFInfoPktFromVoidFn)( void );
+	typedef FRONTEND::RFInfoPktSequence* (*RFInfoPktSeqFromVoidFn)( void );
+
+	typedef void (*VoidFromCharFn)( const char* data );
+	typedef void (*VoidFromRFInfoPktFn)( const FRONTEND::RFInfoPkt& data );
+	typedef void (*VoidFromRFInfoPktSeqFn)( const FRONTEND::RFInfoPktSequence& data );
 
 	//
 	// Interface definition that will be notified when a function is called
 	//
-	class CharGetterCB {
+
+	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
+	class CharFromChar {
 		public:
 			virtual char* operator() ( const char* id ) = 0;
-			virtual ~CharGetterCB() {};
+			virtual ~CharFromChar() {};
 	};
-	class PropGetterCB {
+	class PropFromChar {
 		public:
 			virtual CF::Properties* operator() ( const char* id ) = 0;
-			virtual ~PropGetterCB() {};
+			virtual ~PropFromChar() {};
 	};
-	class DoubleGetterCB {
+	class DoubleFromChar {
 		public:
 			virtual CORBA::Double operator() ( const char* id ) = 0;
-			virtual ~DoubleGetterCB() {};
+			virtual ~DoubleFromChar() {};
 	};
-	class BooleanGetterCB {
+	class BooleanFromChar {
 		public:
 			virtual CORBA::Boolean operator() ( const char* id ) = 0;
-			virtual ~BooleanGetterCB() {};
+			virtual ~BooleanFromChar() {};
 	};
-	class FloatGetterCB {
+	class FloatFromChar {
 		public:
 			virtual CORBA::Float operator() ( const char* id ) = 0;
-			virtual ~FloatGetterCB() {};
+			virtual ~FloatFromChar() {};
 	};
-	class LongGetterCB {
+	class LongFromChar {
 		public:
 			virtual CORBA::Long operator() ( const char* id ) = 0;
-			virtual ~LongGetterCB() {};
+			virtual ~LongFromChar() {};
 	};
 
-	class DoubleSetterCB {
+	class VoidFromCharDouble {
 		public:
 			virtual void operator() ( const char* id, CORBA::Double val ) = 0;
-			virtual ~DoubleSetterCB() {};
+			virtual ~VoidFromCharDouble() {};
 	};
-	class BooleanSetterCB {
+	class VoidFromCharBoolean {
 		public:
 			virtual void operator() ( const char* id, CORBA::Boolean val ) = 0;
-			virtual ~BooleanSetterCB() {};
+			virtual ~VoidFromCharBoolean() {};
 	};
-	class FloatSetterCB {
+	class VoidFromCharFloat {
 		public:
 			virtual void operator() ( const char* id, CORBA::Float val ) = 0;
-			virtual ~FloatSetterCB() {};
+			virtual ~VoidFromCharFloat() {};
 	};
-	class LongSetterCB {
+	class VoidFromCharLong {
 		public:
 			virtual void operator() ( const char* id, CORBA::Long val ) = 0;
-			virtual ~LongSetterCB() {};
+			virtual ~VoidFromCharLong() {};
+	};
+
+	// for InRFInfoPort, InRFSourcePort
+	class CharFromVoid {
+		public:
+			virtual char* operator() ( void ) = 0;
+			virtual ~CharFromVoid() {};
+	};
+	class RFInfoPktFromVoid {
+		public:
+			virtual FRONTEND::RFInfoPkt* operator() ( void ) = 0;
+			virtual ~RFInfoPktFromVoid() {};
+	};
+	class RFInfoPktSeqFromVoid {
+		public:
+			virtual FRONTEND::RFInfoPktSequence* operator() ( void ) = 0;
+			virtual ~RFInfoPktSeqFromVoid() {};
+	};
+	class VoidFromChar {
+		public:
+			virtual void operator() ( const char* data ) = 0;
+			virtual ~VoidFromChar() {};
+	};
+	class VoidFromRFInfoPkt {
+		public:
+			virtual void operator() ( const FRONTEND::RFInfoPkt& data ) = 0;
+			virtual ~VoidFromRFInfoPkt() {};
+	};
+	class VoidFromRFInfoPktSeq {
+		public:
+			virtual void operator() ( const FRONTEND::RFInfoPktSequence& data ) = 0;
+			virtual ~VoidFromRFInfoPktSeq() {};
 	};
 
 	/**
 	* Allow for member functions to be used as callbacks
 	*/
+
+	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
 	template <class T>
-	class MemberCharGetterCB : public CharGetterCB
+	class MemberCharFromChar : public CharFromChar
 	{
 		public:
-			typedef boost::shared_ptr< MemberCharGetterCB< T > > SPtr;
-			typedef char* (T::*MemberCharGetterFn)( const char* id );
-			static SPtr Create( T &target, MemberCharGetterFn func ){
-				return SPtr( new MemberCharGetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberCharFromChar< T > > SPtr;
+			typedef char* (T::*MemberCharFromCharFn)( const char* id );
+			static SPtr Create( T &target, MemberCharFromCharFn func ){
+				return SPtr( new MemberCharFromChar(target, func ) );
 			};
 			virtual char* operator() (const char* id )
 			{
 				return (target_.*func_)(id);
 			}
-			MemberCharGetterCB ( T& target,  MemberCharGetterFn func) :
+			MemberCharFromChar ( T& target,  MemberCharFromCharFn func) :
 				target_(target),
 				func_(func)
 				  {
 				  }
 		private:
 			T& target_;
-			MemberCharGetterFn func_;
+			MemberCharFromCharFn func_;
 	};
 	template <class T>
-	class MemberPropGetterCB : public PropGetterCB
+	class MemberPropFromChar : public PropFromChar
 	{
 		public:
-			typedef boost::shared_ptr< MemberPropGetterCB< T > > SPtr;
-			typedef CF::Properties* (T::*MemberPropGetterFn)( const char* id );
-			static SPtr Create( T &target, MemberPropGetterFn func ){
-				return SPtr( new MemberPropGetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberPropFromChar< T > > SPtr;
+			typedef CF::Properties* (T::*MemberPropFromCharFn)( const char* id );
+			static SPtr Create( T &target, MemberPropFromCharFn func ){
+				return SPtr( new MemberPropFromChar(target, func ) );
 			};
 			virtual CF::Properties* operator() (const char* id )
 			{
 				return (target_.*func_)(id);
 			}
-			MemberPropGetterCB ( T& target,  MemberPropGetterFn func) :
+			MemberPropFromChar ( T& target,  MemberPropFromCharFn func) :
 				target_(target),
 				func_(func)
 				  {
 				  }
 		private:
 			T& target_;
-			MemberPropGetterFn func_;
+			MemberPropFromCharFn func_;
 	};
 	template <class T>
-	class MemberDoubleGetterCB : public DoubleGetterCB
+	class MemberDoubleFromChar : public DoubleFromChar
 	{
 		public:
-			typedef boost::shared_ptr< MemberDoubleGetterCB< T > > SPtr;
-			typedef CORBA::Double (T::*MemberDoubleGetterFn)( const char* id );
-			static SPtr Create( T &target, MemberDoubleGetterFn func ){
-				return SPtr( new MemberDoubleGetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberDoubleFromChar< T > > SPtr;
+			typedef CORBA::Double (T::*MemberDoubleFromCharFn)( const char* id );
+			static SPtr Create( T &target, MemberDoubleFromCharFn func ){
+				return SPtr( new MemberDoubleFromChar(target, func ) );
 			};
 			virtual CORBA::Double operator() (const char* id )
 			{
 				return (target_.*func_)(id);
 			}
-			MemberDoubleGetterCB ( T& target,  MemberDoubleGetterFn func) :
+			MemberDoubleFromChar ( T& target,  MemberDoubleFromCharFn func) :
 				target_(target),
 				func_(func)
 				  {
@@ -169,88 +216,88 @@ namespace frontend {
 
 		private:
 			T& target_;
-			MemberDoubleGetterFn func_;
+			MemberDoubleFromCharFn func_;
 	};
 	template <class T>
-	class MemberBooleanGetterCB : public BooleanGetterCB
+	class MemberBooleanFromChar : public BooleanFromChar
 	{
 		public:
-			typedef boost::shared_ptr< MemberBooleanGetterCB< T > > SPtr;
-			typedef CORBA::Boolean (T::*MemberBooleanGetterFn)( const char* id );
-			static SPtr Create( T &target, MemberBooleanGetterFn func ){
-				return SPtr( new MemberBooleanGetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberBooleanFromChar< T > > SPtr;
+			typedef CORBA::Boolean (T::*MemberBooleanFromCharFn)( const char* id );
+			static SPtr Create( T &target, MemberBooleanFromCharFn func ){
+				return SPtr( new MemberBooleanFromChar(target, func ) );
 			};
 			virtual CORBA::Boolean operator() (const char* id )
 			{
 				return (target_.*func_)(id);
 			}
-			MemberBooleanGetterCB ( T& target,  MemberBooleanGetterFn func) :
+			MemberBooleanFromChar ( T& target,  MemberBooleanFromCharFn func) :
 				target_(target),
 				func_(func)
 				  {
 				  }
 		private:
 			T& target_;
-			MemberBooleanGetterFn func_;
+			MemberBooleanFromCharFn func_;
 	};
 	template <class T>
-	class MemberFloatGetterCB : public FloatGetterCB
+	class MemberFloatFromChar : public FloatFromChar
 	{
 		public:
-			typedef boost::shared_ptr< MemberFloatGetterCB< T > > SPtr;
-			typedef CORBA::Float (T::*MemberFloatGetterFn)( const char* id );
-			static SPtr Create( T &target, MemberFloatGetterFn func ){
-				return SPtr( new MemberFloatGetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberFloatFromChar< T > > SPtr;
+			typedef CORBA::Float (T::*MemberFloatFromCharFn)( const char* id );
+			static SPtr Create( T &target, MemberFloatFromCharFn func ){
+				return SPtr( new MemberFloatFromChar(target, func ) );
 			};
 			virtual CORBA::Float operator() (const char* id )
 			{
 				return (target_.*func_)(id);
 			}
-			MemberFloatGetterCB ( T& target,  MemberFloatGetterFn func) :
+			MemberFloatFromChar ( T& target,  MemberFloatFromCharFn func) :
 				target_(target),
 				func_(func)
 				  {
 				  }
 		private:
 			T& target_;
-			MemberFloatGetterFn func_;
+			MemberFloatFromCharFn func_;
 	};
 	template <class T>
-	class MemberLongGetterCB : public LongGetterCB
+	class MemberLongFromChar : public LongFromChar
 	{
 		public:
-			typedef boost::shared_ptr< MemberLongGetterCB< T > > SPtr;
-			typedef CORBA::Long (T::*MemberLongGetterFn)( const char* id );
-			static SPtr Create( T &target, MemberLongGetterFn func ){
-				return SPtr( new MemberLongGetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberLongFromChar< T > > SPtr;
+			typedef CORBA::Long (T::*MemberLongFromCharFn)( const char* id );
+			static SPtr Create( T &target, MemberLongFromCharFn func ){
+				return SPtr( new MemberLongFromChar(target, func ) );
 			};
 			virtual CORBA::Long operator() (const char* id )
 			{
 				return (target_.*func_)(id);
 			}
-			MemberLongGetterCB ( T& target,  MemberLongGetterFn func) :
+			MemberLongFromChar ( T& target,  MemberLongFromCharFn func) :
 				target_(target),
 				func_(func)
 				  {
 				  }
 		private:
 			T& target_;
-			MemberLongGetterFn func_;
+			MemberLongFromCharFn func_;
 	};
 	template <class T>
-	class MemberDoubleSetterCB : public DoubleSetterCB
+	class MemberVoidFromCharDouble : public VoidFromCharDouble
 	{
 		public:
-			typedef boost::shared_ptr< MemberDoubleSetterCB< T > > SPtr;
-			typedef void (T::*MemberDoubleSetterFn)( const char* id, CORBA::Double val );
-			static SPtr Create( T &target, MemberDoubleSetterFn func ){
-				return SPtr( new MemberDoubleSetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberVoidFromCharDouble< T > > SPtr;
+			typedef void (T::*MemberVoidFromCharDoubleFn)( const char* id, CORBA::Double val );
+			static SPtr Create( T &target, MemberVoidFromCharDoubleFn func ){
+				return SPtr( new MemberVoidFromCharDouble(target, func ) );
 			};
 			virtual void operator() (const char* id, CORBA::Double val )
 			{
 				(target_.*func_)(id,val);
 			}
-			MemberDoubleSetterCB ( T& target,  MemberDoubleSetterFn func) :
+			MemberVoidFromCharDouble ( T& target,  MemberVoidFromCharDoubleFn func) :
 				target_(target),
 				func_(func)
 				  {
@@ -258,371 +305,516 @@ namespace frontend {
 
 		private:
 			T& target_;
-			MemberDoubleSetterFn func_;
+			MemberVoidFromCharDoubleFn func_;
 	};
 	template <class T>
-	class MemberBooleanSetterCB : public BooleanSetterCB
+	class MemberVoidFromCharBoolean : public VoidFromCharBoolean
 	{
 		public:
-			typedef boost::shared_ptr< MemberBooleanSetterCB< T > > SPtr;
-			typedef void (T::*MemberBooleanSetterFn)( const char* id, CORBA::Boolean val );
-			static SPtr Create( T &target, MemberBooleanSetterFn func ){
-				return SPtr( new MemberBooleanSetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberVoidFromCharBoolean< T > > SPtr;
+			typedef void (T::*MemberVoidFromCharBooleanFn)( const char* id, CORBA::Boolean val );
+			static SPtr Create( T &target, MemberVoidFromCharBooleanFn func ){
+				return SPtr( new MemberVoidFromCharBoolean(target, func ) );
 			};
 			virtual void operator() (const char* id, CORBA::Boolean val )
 			{
 				(target_.*func_)(id,val);
 			}
-			MemberBooleanSetterCB ( T& target,  MemberBooleanSetterFn func) :
+			MemberVoidFromCharBoolean ( T& target,  MemberVoidFromCharBooleanFn func) :
 				target_(target),
 				func_(func)
 				  {
 				  }
 		private:
 			T& target_;
-			MemberBooleanSetterFn func_;
+			MemberVoidFromCharBooleanFn func_;
 	};
 	template <class T>
-	class MemberFloatSetterCB : public FloatSetterCB
+	class MemberVoidFromCharFloat : public VoidFromCharFloat
 	{
 		public:
-			typedef boost::shared_ptr< MemberFloatSetterCB< T > > SPtr;
-			typedef void (T::*MemberFloatSetterFn)( const char* id, CORBA::Float val );
-			static SPtr Create( T &target, MemberFloatSetterFn func ){
-				return SPtr( new MemberFloatSetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberVoidFromCharFloat< T > > SPtr;
+			typedef void (T::*MemberVoidFromCharFloatFn)( const char* id, CORBA::Float val );
+			static SPtr Create( T &target, MemberVoidFromCharFloatFn func ){
+				return SPtr( new MemberVoidFromCharFloat(target, func ) );
 			};
 			virtual void operator() (const char* id, CORBA::Float val )
 			{
 				(target_.*func_)(id,val);
 			}
-			MemberFloatSetterCB ( T& target,  MemberFloatSetterFn func) :
+			MemberVoidFromCharFloat ( T& target,  MemberVoidFromCharFloatFn func) :
 				target_(target),
 				func_(func)
 				  {
 				  }
 		private:
 			T& target_;
-			MemberFloatSetterFn func_;
+			MemberVoidFromCharFloatFn func_;
 	};
 	template <class T>
-	class MemberLongSetterCB : public LongSetterCB
+	class MemberVoidFromCharLong : public VoidFromCharLong
 	{
 		public:
-			typedef boost::shared_ptr< MemberLongSetterCB< T > > SPtr;
-			typedef void (T::*MemberLongSetterFn)( const char* id, CORBA::Long val );
-			static SPtr Create( T &target, MemberLongSetterFn func ){
-				return SPtr( new MemberLongSetterCB(target, func ) );
+			typedef boost::shared_ptr< MemberVoidFromCharLong< T > > SPtr;
+			typedef void (T::*MemberVoidFromCharLongFn)( const char* id, CORBA::Long val );
+			static SPtr Create( T &target, MemberVoidFromCharLongFn func ){
+				return SPtr( new MemberVoidFromCharLong(target, func ) );
 			};
 			virtual void operator() (const char* id, CORBA::Long val )
 			{
 				(target_.*func_)(id,val);
 			}
-			MemberLongSetterCB ( T& target,  MemberLongSetterFn func) :
+			MemberVoidFromCharLong ( T& target,  MemberVoidFromCharLongFn func) :
 				target_(target),
 				func_(func)
 				  {
 				  }
 		private:
 			T& target_;
-			MemberLongSetterFn func_;
+			MemberVoidFromCharLongFn func_;
 	};
 
-
-	// ----------------------------------------------------------------------------------------
-	// InDigitalTunerPort declaration
-	// ----------------------------------------------------------------------------------------
-	class InDigitalTunerPort : public POA_FRONTEND::DigitalTuner, public Port_Provides_base_impl
+	// for InRFInfoPort, InRFSourcePort
+	template <class T>
+	class MemberCharFromVoid : public CharFromVoid
 	{
 		public:
-			InDigitalTunerPort(std::string port_name,
-				CharGetterCB *newTunerTypeGetterCB = NULL,
-				BooleanGetterCB *newTunerDeviceControlGetterCB = NULL,
-				CharGetterCB *newTunerGroupIdGetterCB = NULL,
-				CharGetterCB *newTunerRfFlowIdGetterCB = NULL,
-				PropGetterCB *newTunerStatusGetterCB = NULL,
-				DoubleGetterCB *newTunerCenterFrequencyGetterCB = NULL,
-				DoubleSetterCB *newTunerCenterFrequencySetterCB = NULL,
-				DoubleGetterCB *newTunerBandwidthGetterCB = NULL,
-				DoubleSetterCB *newTunerBandwidthSetterCB = NULL,
-				BooleanGetterCB *newTunerAgcEnableGetterCB = NULL,
-				BooleanSetterCB *newTunerAgcEnableSetterCB = NULL,
-				FloatGetterCB *newTunerGainGetterCB = NULL,
-				FloatSetterCB *newTunerGainSetterCB = NULL,
-				LongGetterCB *newTunerReferenceSourceGetterCB = NULL,
-				LongSetterCB *newTunerReferenceSourceSetterCB = NULL,
-				BooleanGetterCB *newTunerEnableGetterCB = NULL,
-				BooleanSetterCB *newTunerEnableSetterCB = NULL,
-				DoubleGetterCB *newTunerOutputSampleRateGetterCB = NULL,
-				DoubleSetterCB *newTunerOutputSampleRateSetterCB = NULL);//, USRP_UHD_base *_parent);
-			~InDigitalTunerPort();
+			typedef boost::shared_ptr< MemberCharFromVoid< T > > SPtr;
+			typedef char* (T::*MemberCharFromVoidFn)( void );
+			static SPtr Create( T &target, MemberCharFromVoidFn func ){
+				return SPtr( new MemberCharFromVoid(target, func ) );
+			};
+			virtual char* operator() ( void )
+			{
+				return (target_.*func_)();
+			}
+			MemberCharFromVoid ( T& target,  MemberCharFromVoidFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberCharFromVoidFn func_;
+	};
+	template <class T>
+	class MemberRFInfoPktFromVoid : public RFInfoPktFromVoid
+	{
+		public:
+			typedef boost::shared_ptr< MemberRFInfoPktFromVoid< T > > SPtr;
+			typedef FRONTEND::RFInfoPkt* (T::*MemberRFInfoPktFromVoidFn)( void );
+			static SPtr Create( T &target, MemberRFInfoPktFromVoidFn func ){
+				return SPtr( new MemberRFInfoPktFromVoid(target, func ) );
+			};
+			virtual FRONTEND::RFInfoPkt* operator() ( void )
+			{
+				return (target_.*func_)();
+			}
+			MemberRFInfoPktFromVoid ( T& target,  MemberRFInfoPktFromVoidFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberRFInfoPktFromVoidFn func_;
+	};
+	template <class T>
+	class MemberRFInfoPktSeqFromVoid : public RFInfoPktSeqFromVoid
+	{
+		public:
+			typedef boost::shared_ptr< MemberRFInfoPktSeqFromVoid< T > > SPtr;
+			typedef FRONTEND::RFInfoPktSequence* (T::*MemberRFInfoPktSeqFromVoidFn)( void );
+			static SPtr Create( T &target, MemberRFInfoPktSeqFromVoidFn func ){
+				return SPtr( new MemberRFInfoPktSeqFromVoid(target, func ) );
+			};
+			virtual FRONTEND::RFInfoPktSequence* operator() ( void )
+			{
+				return (target_.*func_)();
+			}
+			MemberRFInfoPktSeqFromVoid ( T& target,  MemberRFInfoPktSeqFromVoidFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberRFInfoPktSeqFromVoidFn func_;
+	};
+	template <class T>
+	class MemberVoidFromChar : public VoidFromChar
+	{
+		public:
+			typedef boost::shared_ptr< MemberVoidFromChar< T > > SPtr;
+			typedef void (T::*MemberVoidFromCharFn)( const char* data );
+			static SPtr Create( T &target, MemberVoidFromCharFn func ){
+				return SPtr( new MemberVoidFromChar(target, func ) );
+			};
+			virtual void operator() (const char* data )
+			{
+				(target_.*func_)(data);
+			}
+			MemberVoidFromChar ( T& target,  MemberVoidFromCharFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberVoidFromCharFn func_;
+	};
+	template <class T>
+	class MemberVoidFromRFInfoPkt : public VoidFromRFInfoPkt
+	{
+		public:
+			typedef boost::shared_ptr< MemberVoidFromRFInfoPkt< T > > SPtr;
+			typedef void (T::*MemberVoidFromRFInfoPktFn)( const FRONTEND::RFInfoPkt& data );
+			static SPtr Create( T &target, MemberVoidFromRFInfoPktFn func ){
+				return SPtr( new MemberVoidFromRFInfoPkt(target, func ) );
+			};
+			virtual void operator() (const FRONTEND::RFInfoPkt& data )
+			{
+				(target_.*func_)(data);
+			}
+			MemberVoidFromRFInfoPkt ( T& target,  MemberVoidFromRFInfoPktFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberVoidFromRFInfoPktFn func_;
+	};
+	template <class T>
+	class MemberVoidFromRFInfoPktSeq : public VoidFromRFInfoPktSeq
+	{
+		public:
+			typedef boost::shared_ptr< MemberVoidFromRFInfoPktSeq< T > > SPtr;
+			typedef void (T::*MemberVoidFromRFInfoPktSeqFn)( const FRONTEND::RFInfoPktSequence& data );
+			static SPtr Create( T &target, MemberVoidFromRFInfoPktSeqFn func ){
+				return SPtr( new MemberVoidFromRFInfoPktSeq(target, func ) );
+			};
+			virtual void operator() (const FRONTEND::RFInfoPktSequence& data )
+			{
+				(target_.*func_)(data);
+			}
+			MemberVoidFromRFInfoPktSeq ( T& target,  MemberVoidFromRFInfoPktSeqFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberVoidFromRFInfoPktSeqFn func_;
+	};
 
-			char* getTunerType(const char* id);
-			CORBA::Boolean getTunerDeviceControl(const char* id);
-			char* getTunerGroupId(const char* id);
-			char* getTunerRfFlowId(const char* id);
-			CF::Properties* getTunerStatus(const char* id);
-			void setTunerCenterFrequency(const char* id, CORBA::Double freq);
-			CORBA::Double getTunerCenterFrequency(const char* id);
-			void setTunerBandwidth(const char* id, CORBA::Double bw);
-			CORBA::Double getTunerBandwidth(const char* id);
-			void setTunerAgcEnable(const char* id, CORBA::Boolean enable);
-			CORBA::Boolean getTunerAgcEnable(const char* id);
-			void setTunerGain(const char* id, CORBA::Float gain);
-			CORBA::Float getTunerGain(const char* id);
-			void setTunerReferenceSource(const char* id, CORBA::Long source);
-			CORBA::Long getTunerReferenceSource(const char* id);
-			void setTunerEnable(const char* id, CORBA::Boolean enable);
-			CORBA::Boolean getTunerEnable(const char* id);
-			void setTunerOutputSampleRate(const char* id, CORBA::Double sr);
-			CORBA::Double getTunerOutputSampleRate(const char* id);
+	/**
+	* Wrap Callback functions as CB objects
+	*/
 
-			// Assign  TunerType callbacks - getters
-			template< typename T > inline
-			  void setTunerTypeGetterCB(T &target, char* (T::*func)( const char* id)  ) {
-				getTunerTypeCB =  boost::make_shared< MemberCharGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerTypeGetterCB(T *target, char* (T::*func)( const char* id)  ) {
-				getTunerTypeCB =  boost::make_shared< MemberCharGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerTypeGetterCB( CharGetterCB *newCB );
-			void   setTunerTypeGetterCB( CharGetterCBFn  newCB );
+	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
+	class StaticCharFromChar : public CharFromChar
+	{
+	public:
+		virtual char* operator() ( const char* id)
+		{
+			return (*func_)(id);
+		}
+		StaticCharFromChar ( CharFromCharFn func) :
+			func_(func)
+		{
+		}
+	private:
+		CharFromCharFn func_;
+	};
 
-			// Assign  TunerDeviceControl callbacks - getters
-			template< typename T > inline
-			  void setTunerDeviceControlGetterCB(T &target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerDeviceControlCB =  boost::make_shared< MemberBooleanGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerDeviceControlGetterCB(T *target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerDeviceControlCB =  boost::make_shared< MemberBooleanGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerDeviceControlGetterCB( BooleanGetterCB *newCB );
-			void   setTunerDeviceControlGetterCB( BooleanGetterCBFn  newCB );
+	class StaticPropFromChar : public PropFromChar
+	{
+	public:
+		virtual CF::Properties* operator() ( const char* id)
+		{
+			return (*func_)(id);
+		}
+		StaticPropFromChar ( PropFromCharFn func) :
+			func_(func)
+		{
+		}
+	private:
+		PropFromCharFn func_;
+	};
 
-			// Assign  TunerGroupId callbacks - getters
-			template< typename T > inline
-			  void setTunerGroupIdGetterCB(T &target, char* (T::*func)( const char* id)  ) {
-				getTunerGroupIdCB =  boost::make_shared< MemberCharGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerGroupIdGetterCB(T *target, char* (T::*func)( const char* id)  ) {
-				getTunerGroupIdCB =  boost::make_shared< MemberCharGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerGroupIdGetterCB( CharGetterCB *newCB );
-			void   setTunerGroupIdGetterCB( CharGetterCBFn  newCB );
+	class StaticDoubleFromChar : public DoubleFromChar
+	{
+	public:
+		virtual CORBA::Double operator() ( const char* id)
+		{
+			return (*func_)(id);
+		}
+		StaticDoubleFromChar ( DoubleFromCharFn func) :
+			func_(func)
+		{
+		}
+	private:
+		DoubleFromCharFn func_;
+	};
 
-			// Assign  TunerRfFlowId callbacks - getters
-			template< typename T > inline
-			  void setTunerRfFlowIdGetterCB(T &target, char* (T::*func)( const char* id)  ) {
-				getTunerRfFlowIdCB =  boost::make_shared< MemberCharGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerRfFlowIdGetterCB(T *target, char* (T::*func)( const char* id)  ) {
-				getTunerRfFlowIdCB =  boost::make_shared< MemberCharGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerRfFlowIdGetterCB( CharGetterCB *newCB );
-			void   setTunerRfFlowIdGetterCB( CharGetterCBFn  newCB );
+	class StaticBooleanFromChar : public BooleanFromChar
+	{
+	public:
+		virtual CORBA::Boolean operator() ( const char* id)
+		{
+			return (*func_)(id);
+		}
+		StaticBooleanFromChar ( BooleanFromCharFn func) :
+			func_(func)
+		{
+		}
+	private:
+		BooleanFromCharFn func_;
+	};
 
-			// Assign  TunerStatus callbacks - getters
-			template< typename T > inline
-			  void setTunerStatusGetterCB(T &target, CF::Properties* (T::*func)( const char* id)  ) {
-				getTunerStatusCB =  boost::make_shared< MemberPropGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerStatusGetterCB(T *target, CF::Properties* (T::*func)( const char* id)  ) {
-				getTunerStatusCB =  boost::make_shared< MemberPropGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerStatusGetterCB( PropGetterCB *newCB );
-			void   setTunerStatusGetterCB( PropGetterCBFn  newCB );
+	class StaticFloatFromChar : public FloatFromChar
+	{
+	public:
+		virtual CORBA::Float operator() ( const char* id)
+		{
+			return (*func_)(id);
+		}
+		StaticFloatFromChar ( FloatFromCharFn func) :
+			func_(func)
+		{
+		}
+	private:
+		FloatFromCharFn func_;
+	};
 
-			// Assign  TunerCenterFrequency callbacks - getters
-			template< typename T > inline
-			  void setTunerCenterFrequencyGetterCB(T &target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerCenterFrequencyCB =  boost::make_shared< MemberDoubleGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerCenterFrequencyGetterCB(T *target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerCenterFrequencyCB =  boost::make_shared< MemberDoubleGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerCenterFrequencyGetterCB( DoubleGetterCB *newCB );
-			void   setTunerCenterFrequencyGetterCB( DoubleGetterCBFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerCenterFrequencySetterCB(T &target, void (T::*func)( const char* id, CORBA::Double freq)  ) {
-				setTunerCenterFrequencyCB =  boost::make_shared< MemberDoubleSetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerCenterFrequencySetterCB(T *target, void (T::*func)( const char* id, CORBA::Double freq)  ) {
-				setTunerCenterFrequencyCB =  boost::make_shared< MemberDoubleSetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerCenterFrequencySetterCB( DoubleSetterCB *newCB );
-			void   setTunerCenterFrequencySetterCB( DoubleSetterCBFn  newCB );
+	class StaticLongFromChar : public LongFromChar
+	{
+	public:
+		virtual CORBA::Long operator() ( const char* id)
+		{
+			return (*func_)(id);
+		}
+		StaticLongFromChar ( LongFromCharFn func) :
+			func_(func)
+		{
+		}
+	private:
+		LongFromCharFn func_;
+	};
 
-			// Assign  TunerBandwidth callbacks - getters
-			template< typename T > inline
-			  void setTunerBandwidthGetterCB(T &target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerBandwidthCB =  boost::make_shared< MemberDoubleGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerBandwidthGetterCB(T *target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerBandwidthCB =  boost::make_shared< MemberDoubleGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerBandwidthGetterCB( DoubleGetterCB *newCB );
-			void   setTunerBandwidthGetterCB( DoubleGetterCBFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerBandwidthSetterCB(T &target, void (T::*func)( const char* id, CORBA::Double bw)  ) {
-				setTunerBandwidthCB =  boost::make_shared< MemberDoubleSetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerBandwidthSetterCB(T *target, void (T::*func)( const char* id, CORBA::Double bw)  ) {
-				setTunerBandwidthCB =  boost::make_shared< MemberDoubleSetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerBandwidthSetterCB( DoubleSetterCB *newCB );
-			void   setTunerBandwidthSetterCB( DoubleSetterCBFn  newCB );
+	class StaticVoidFromCharDouble : public VoidFromCharDouble
+	{
+	public:
+		virtual void operator() ( const char* id, CORBA::Double val)
+		{
+			return (*func_)(id,val);
+		}
+		StaticVoidFromCharDouble ( VoidFromCharDoubleFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromCharDoubleFn func_;
+	};
+	class StaticVoidFromCharBoolean : public VoidFromCharBoolean
+	{
+	public:
+		virtual void operator() ( const char* id, CORBA::Boolean val)
+		{
+			return (*func_)(id,val);
+		}
+		StaticVoidFromCharBoolean ( VoidFromCharBooleanFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromCharBooleanFn func_;
+	};
+	class StaticVoidFromCharFloat : public VoidFromCharFloat
+	{
+	public:
+		virtual void operator() ( const char* id, CORBA::Float val)
+		{
+			return (*func_)(id,val);
+		}
+		StaticVoidFromCharFloat ( VoidFromCharFloatFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromCharFloatFn func_;
+	};
+	class StaticVoidFromCharLong : public VoidFromCharLong
+	{
+	public:
+		virtual void operator() ( const char* id, CORBA::Long val)
+		{
+			return (*func_)(id,val);
+		}
+		StaticVoidFromCharLong ( VoidFromCharLongFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromCharLongFn func_;
+	};
 
-			// Assign  TunerAgcEnable callbacks - getters
-			template< typename T > inline
-			  void setTunerAgcEnableGetterCB(T &target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerAgcEnableCB =  boost::make_shared< MemberBooleanGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerAgcEnableGetterCB(T *target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerAgcEnableCB =  boost::make_shared< MemberBooleanGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerAgcEnableGetterCB( BooleanGetterCB *newCB );
-			void   setTunerAgcEnableGetterCB( BooleanGetterCBFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerAgcEnableSetterCB(T &target, void (T::*func)( const char* id, CORBA::Boolean enable)  ) {
-				setTunerAgcEnableCB =  boost::make_shared< MemberBooleanSetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerAgcEnableSetterCB(T *target, void (T::*func)( const char* id, CORBA::Boolean enable)  ) {
-				setTunerAgcEnableCB =  boost::make_shared< MemberBooleanSetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerAgcEnableSetterCB( BooleanSetterCB *newCB );
-			void   setTunerAgcEnableSetterCB( BooleanSetterCBFn  newCB );
+	// for InRFInfoPort, InRFSourcePort
+	class StaticCharFromVoid : public CharFromVoid
+	{
+	public:
+		virtual char* operator() ( void )
+		{
+			return (*func_)();
+		}
+		StaticCharFromVoid ( CharFromVoidFn func) :
+			func_(func)
+		{
+		}
+	private:
+		CharFromVoidFn func_;
+	};
+	class StaticRFInfoPktFromVoid : public RFInfoPktFromVoid
+	{
+	public:
+		virtual FRONTEND::RFInfoPkt* operator() ( void )
+		{
+			return (*func_)();
+		}
+		StaticRFInfoPktFromVoid ( RFInfoPktFromVoidFn func) :
+			func_(func)
+		{
+		}
+	private:
+		RFInfoPktFromVoidFn func_;
+	};
+	class StaticRFInfoPktSeqFromVoid : public RFInfoPktSeqFromVoid
+	{
+	public:
+		virtual FRONTEND::RFInfoPktSequence* operator() ( void )
+		{
+			return (*func_)();
+		}
+		StaticRFInfoPktSeqFromVoid ( RFInfoPktSeqFromVoidFn func) :
+			func_(func)
+		{
+		}
+	private:
+		RFInfoPktSeqFromVoidFn func_;
+	};
+	class StaticVoidFromChar : public VoidFromChar
+	{
+	public:
+		virtual void operator() ( const char* data)
+		{
+			return (*func_)(data);
+		}
+		StaticVoidFromChar ( VoidFromCharFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromCharFn func_;
+	};
+	class StaticVoidFromRFInfoPkt : public VoidFromRFInfoPkt
+	{
+	public:
+		virtual void operator() ( const FRONTEND::RFInfoPkt& data)
+		{
+			return (*func_)(data);
+		}
+		StaticVoidFromRFInfoPkt ( VoidFromRFInfoPktFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromRFInfoPktFn func_;
+	};
+	class StaticVoidFromRFInfoPktSeq : public VoidFromRFInfoPktSeq
+	{
+	public:
+		virtual void operator() ( const FRONTEND::RFInfoPktSequence& data)
+		{
+			return (*func_)(data);
+		}
+		StaticVoidFromRFInfoPktSeq ( VoidFromRFInfoPktSeqFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromRFInfoPktSeqFn func_;
+	};
 
-			// Assign  TunerGain callbacks - getters
-			template< typename T > inline
-			  void setTunerGainGetterCB(T &target, CORBA::Float (T::*func)( const char* id)  ) {
-				getTunerGainCB =  boost::make_shared< MemberFloatGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerGainGetterCB(T *target, CORBA::Float (T::*func)( const char* id)  ) {
-				getTunerGainCB =  boost::make_shared< MemberFloatGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerGainGetterCB( FloatGetterCB *newCB );
-			void   setTunerGainGetterCB( FloatGetterCBFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerGainSetterCB(T &target, void (T::*func)( const char* id, CORBA::Float gain)  ) {
-				setTunerGainCB =  boost::make_shared< MemberFloatSetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerGainSetterCB(T *target, void (T::*func)( const char* id, CORBA::Float gain)  ) {
-				setTunerGainCB =  boost::make_shared< MemberFloatSetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerGainSetterCB( FloatSetterCB *newCB );
-			void   setTunerGainSetterCB( FloatSetterCBFn  newCB );
+	// ----------------------------------------------------------------------------------------
+	// OutFrontendPort declaration
+	// ----------------------------------------------------------------------------------------
+	template <typename PortType_var, typename PortType>
+	class OutFrontendPort : public Port_Uses_base_impl, public POA_ExtendedCF::QueryablePort
+	{
+	    public:
+			OutFrontendPort(std::string port_name) :
+				Port_Uses_base_impl(port_name)
+			{
+			    recConnectionsRefresh = false;
+			    recConnections.length(0);
+			}
+	        ~OutFrontendPort(){
+	        }
 
-			// Assign  TunerReferenceSource callbacks - getters
-			template< typename T > inline
-			  void setTunerReferenceSourceGetterCB(T &target, CORBA::Long (T::*func)( const char* id)  ) {
-				getTunerReferenceSourceCB =  boost::make_shared< MemberLongGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerReferenceSourceGetterCB(T *target, CORBA::Long (T::*func)( const char* id)  ) {
-				getTunerReferenceSourceCB =  boost::make_shared< MemberLongGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerReferenceSourceGetterCB( LongGetterCB *newCB );
-			void   setTunerReferenceSourceGetterCB( LongGetterCBFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerReferenceSourceSetterCB(T &target, void (T::*func)( const char* id, CORBA::Long source)  ) {
-				setTunerReferenceSourceCB =  boost::make_shared< MemberLongSetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerReferenceSourceSetterCB(T *target, void (T::*func)( const char* id, CORBA::Long source)  ) {
-				setTunerReferenceSourceCB =  boost::make_shared< MemberLongSetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerReferenceSourceSetterCB( LongSetterCB *newCB );
-			void   setTunerReferenceSourceSetterCB( LongSetterCBFn  newCB );
+	        ExtendedCF::UsesConnectionSequence * connections()
+	        {
+	            boost::mutex::scoped_lock lock(updatingPortsLock);   // don't want to process while command information is coming in
+	            if (recConnectionsRefresh) {
+	                recConnections.length(outConnections.size());
+	                for (unsigned int i = 0; i < outConnections.size(); i++) {
+	                    recConnections[i].connectionId = CORBA::string_dup(outConnections[i].second.c_str());
+	                    recConnections[i].port = CORBA::Object::_duplicate(outConnections[i].first);
+	                }
+	                recConnectionsRefresh = false;
+	            }
+	            ExtendedCF::UsesConnectionSequence_var retVal = new ExtendedCF::UsesConnectionSequence(recConnections);
+	            // NOTE: You must delete the object that this function returns!
+	            return retVal._retn();
+	        };
 
-			// Assign  TunerEnable callbacks - getters
-			template< typename T > inline
-			  void setTunerEnableGetterCB(T &target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerEnableCB =  boost::make_shared< MemberBooleanGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerEnableGetterCB(T *target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerEnableCB =  boost::make_shared< MemberBooleanGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerEnableGetterCB( BooleanGetterCB *newCB );
-			void   setTunerEnableGetterCB( BooleanGetterCBFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerEnableSetterCB(T &target, void (T::*func)( const char* id, CORBA::Boolean enable)  ) {
-				setTunerEnableCB =  boost::make_shared< MemberBooleanSetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerEnableSetterCB(T *target, void (T::*func)( const char* id, CORBA::Boolean enable)  ) {
-				setTunerEnableCB =  boost::make_shared< MemberBooleanSetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerEnableSetterCB( BooleanSetterCB *newCB );
-			void   setTunerEnableSetterCB( BooleanSetterCBFn  newCB );
+	        void connectPort(CORBA::Object_ptr connection, const char* connectionId)
+	        {
+	            boost::mutex::scoped_lock lock(updatingPortsLock);   // don't want to process while command information is coming in
+	            PortType_var port = PortType::_narrow(connection);
+	            outConnections.push_back(std::make_pair(port, connectionId));
+	            active = true;
+	            recConnectionsRefresh = true;
+	        };
 
-			// Assign  TunerOutputSampleRate callbacks - getters
-			template< typename T > inline
-			  void setTunerOutputSampleRateGetterCB(T &target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerOutputSampleRateCB =  boost::make_shared< MemberDoubleGetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerOutputSampleRateGetterCB(T *target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerOutputSampleRateCB =  boost::make_shared< MemberDoubleGetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerOutputSampleRateGetterCB( DoubleGetterCB *newCB );
-			void   setTunerOutputSampleRateGetterCB( DoubleGetterCBFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerOutputSampleRateSetterCB(T &target, void (T::*func)( const char* id, CORBA::Double sr)  ) {
-				setTunerOutputSampleRateCB =  boost::make_shared< MemberDoubleSetterCB< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerOutputSampleRateSetterCB(T *target, void (T::*func)( const char* id, CORBA::Double sr)  ) {
-				setTunerOutputSampleRateCB =  boost::make_shared< MemberDoubleSetterCB< T > >( boost::ref(*target), func );
-			};
-			void   setTunerOutputSampleRateSetterCB( DoubleSetterCB *newCB );
-			void   setTunerOutputSampleRateSetterCB( DoubleSetterCBFn  newCB );
+	        void disconnectPort(const char* connectionId)
+	        {
+	            boost::mutex::scoped_lock lock(updatingPortsLock);   // don't want to process while command information is coming in
+	            for (unsigned int i = 0; i < outConnections.size(); i++) {
+	                if (outConnections[i].second == connectionId) {
+	                    outConnections.erase(outConnections.begin() + i);
+	                    break;
+	                }
+	            }
 
-		protected:
-			//USRP_UHD_i *parent;
-			boost::mutex portAccess;
+	            if (outConnections.size() == 0) {
+	                active = false;
+	            }
+	            recConnectionsRefresh = true;
+	        };
 
-			// Callbacks
-			boost::shared_ptr< CharGetterCB > getTunerTypeCB;
-			boost::shared_ptr< BooleanGetterCB > getTunerDeviceControlCB;
-			boost::shared_ptr< CharGetterCB > getTunerGroupIdCB;
-			boost::shared_ptr< CharGetterCB > getTunerRfFlowIdCB;
-			boost::shared_ptr< PropGetterCB > getTunerStatusCB;
-			boost::shared_ptr< DoubleGetterCB > getTunerCenterFrequencyCB;
-			boost::shared_ptr< DoubleSetterCB > setTunerCenterFrequencyCB;
-			boost::shared_ptr< DoubleGetterCB > getTunerBandwidthCB;
-			boost::shared_ptr< DoubleSetterCB > setTunerBandwidthCB;
-			boost::shared_ptr< BooleanGetterCB > getTunerAgcEnableCB;
-			boost::shared_ptr< BooleanSetterCB > setTunerAgcEnableCB;
-			boost::shared_ptr< FloatGetterCB > getTunerGainCB;
-			boost::shared_ptr< FloatSetterCB > setTunerGainCB;
-			boost::shared_ptr< LongGetterCB > getTunerReferenceSourceCB;
-			boost::shared_ptr< LongSetterCB > setTunerReferenceSourceCB;
-			boost::shared_ptr< BooleanGetterCB > getTunerEnableCB;
-			boost::shared_ptr< BooleanSetterCB > setTunerEnableCB;
-			boost::shared_ptr< DoubleGetterCB > getTunerOutputSampleRateCB;
-			boost::shared_ptr< DoubleSetterCB > setTunerOutputSampleRateCB;
+	        std::vector< std::pair<PortType_var, std::string> > _getConnections()
+	        {
+	            return outConnections;
+	        };
+
+	    protected:
+	        std::vector < std::pair<PortType_var, std::string> > outConnections;
+	        ExtendedCF::UsesConnectionSequence recConnections;
+	        bool recConnectionsRefresh;
 	};
 
 } // end of frontend namespace
+
 
 #endif

@@ -132,7 +132,7 @@ namespace frontend {
 			virtual bool is_connectionID_listener_for_streamID(const std::string & streamID, const std::string & connectionID);
 			virtual bool is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr);
 
-			// Configure wideband tuner - gets called during wideband allocation
+			// Configure tuner - gets called during allocation
 			virtual bool setupTuner(size_t tuner_id, const frontend::frontend_tuner_allocation_struct& tuner_req) throw (std::logic_error,FRONTEND::BadParameterException);
 			virtual bool enableTuner(size_t tuner_id, bool enable);
 			virtual bool removeTuner(size_t tuner_id);
