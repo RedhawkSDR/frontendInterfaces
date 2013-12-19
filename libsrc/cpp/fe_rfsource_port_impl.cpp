@@ -11,7 +11,7 @@ namespace frontend {
     		RFInfoPktFromVoid *newCurrentRFInputGetterCB,
     		VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB,
     		VoidFromRFInfoPkt *newCurrentRFInputSetterCB) :
-	Port_Uses_base_impl(port_name),
+	Port_Provides_base_impl(port_name),
 	getAvailableRFInputsCB(),
 	getCurrentRFInputCB(),
 	setAvailableRFInputsCB(),
@@ -63,7 +63,7 @@ namespace frontend {
 		else throw FRONTEND::NotSupportedException("current_rf_input(const ::FRONTEND::RFInfoPkt& data) IS NOT CURRENTLY SUPPORTED");
 	}
 
-	//getRFFlowIdCB
+	//getAvailableRFInputsCB
 	void   InRFSourcePort::setAvailableRFInputsGetterCB( RFInfoPktSeqFromVoid *newCB ){
 		getAvailableRFInputsCB =  boost::shared_ptr< RFInfoPktSeqFromVoid >(newCB, null_deleter());
 	}
@@ -71,7 +71,7 @@ namespace frontend {
 		getAvailableRFInputsCB =  boost::make_shared< StaticRFInfoPktSeqFromVoid >( newCB );
 	}
 
-	//setRFFlowIdCB
+	//setAvailableRFInputsCB
 	void   InRFSourcePort::setAvailableRFInputsSetterCB( VoidFromRFInfoPktSeq *newCB ){
 		setAvailableRFInputsCB =  boost::shared_ptr< VoidFromRFInfoPktSeq >(newCB, null_deleter());
 	}
@@ -79,7 +79,7 @@ namespace frontend {
 		setAvailableRFInputsCB =  boost::make_shared< StaticVoidFromRFInfoPktSeq >( newCB );
 	}
 
-	//getRFInfoPktCB
+	//getCurrentRFInputCB
 	void   InRFSourcePort::setCurrentRFInputGetterCB( RFInfoPktFromVoid *newCB ){
 		getCurrentRFInputCB =  boost::shared_ptr< RFInfoPktFromVoid >(newCB, null_deleter());
 	}
@@ -87,7 +87,7 @@ namespace frontend {
 		getCurrentRFInputCB =  boost::make_shared< StaticRFInfoPktFromVoid >( newCB );
 	}
 
-	//setRFInfoPktCB
+	//setCurrentRFInputCB
 	void   InRFSourcePort::setCurrentRFInputSetterCB( VoidFromRFInfoPkt *newCB ){
 		setCurrentRFInputCB =  boost::shared_ptr< VoidFromRFInfoPkt >(newCB, null_deleter());
 	}

@@ -19,9 +19,9 @@ libfrontend_@FRONTEND_API_VERSION@_la_SOURCES = \
     cpp/fe_gps_port_impl.cpp \
     cpp/fe_navdata_port_impl.cpp \
     cpp/fe_rfinfo_port_impl.cpp \
-    cpp/fe_tuner_impl.cpp \
-    cpp/fe_tuner_port_impl.cpp
-#    cpp/fe_rfsource_port_impl.cpp
+    cpp/fe_rfsource_port_impl.cpp \
+    cpp/fe_tuner_port_impl.cpp \
+    cpp/fe_tuner_impl.cpp
 
 ## Define the list of public header files and their install location.
 library_includedir = $(includedir)/frontend

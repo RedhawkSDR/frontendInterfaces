@@ -12,7 +12,10 @@
 #define CORBA_MAX_TRANSFER_BYTES omniORB::giopMaxMsgSize()
 
 #include <ossie/CF/QueryablePort.h>
+
 #include <FRONTEND/RFInfo.h>
+#include <FRONTEND/GPS.h>
+#include <FRONTEND/NavigationData.h>
 
 
 namespace frontend {
@@ -32,7 +35,7 @@ namespace frontend {
 
 
 	//
-	// Callback signatures to register when functions are called
+	// Callback signatures to register when functions are called (provides ports only)
 	//
 
 	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
@@ -56,6 +59,16 @@ namespace frontend {
 	typedef void (*VoidFromCharFn)( const char* data );
 	typedef void (*VoidFromRFInfoPktFn)( const FRONTEND::RFInfoPkt& data );
 	typedef void (*VoidFromRFInfoPktSeqFn)( const FRONTEND::RFInfoPktSequence& data );
+
+	// for InGPSPort
+	typedef FRONTEND::GPSInfo* (*GPSInfoFromVoidFn)( void );
+	typedef void (*VoidFromGPSInfoFn)( const FRONTEND::GPSInfo& data );
+	typedef FRONTEND::GpsTimePos* (*GpsTimePosFromVoidFn)( void );
+	typedef void (*VoidFromGpsTimePosFn)( const FRONTEND::GpsTimePos& data );
+
+	// for InNavDataPort
+	typedef FRONTEND::NavigationPacket* (*NavPktFromVoidFn)( void );
+	typedef void (*VoidFromNavPktFn)( const FRONTEND::NavigationPacket& data );
 
 	//
 	// Interface definition that will be notified when a function is called
@@ -144,6 +157,41 @@ namespace frontend {
 		public:
 			virtual void operator() ( const FRONTEND::RFInfoPktSequence& data ) = 0;
 			virtual ~VoidFromRFInfoPktSeq() {};
+	};
+
+	// for InGPSPort
+	class GPSInfoFromVoid {
+		public:
+			virtual FRONTEND::GPSInfo* operator() ( void ) = 0;
+			virtual ~GPSInfoFromVoid() {};
+	};
+	class GpsTimePosFromVoid {
+		public:
+			virtual FRONTEND::GpsTimePos* operator() ( void ) = 0;
+			virtual ~GpsTimePosFromVoid() {};
+	};
+	class VoidFromGPSInfo {
+		public:
+			virtual void operator() ( const FRONTEND::GPSInfo& data ) = 0;
+			virtual ~VoidFromGPSInfo() {};
+	};
+	class VoidFromGpsTimePos {
+		public:
+			virtual void operator() ( const FRONTEND::GpsTimePos& data ) = 0;
+			virtual ~VoidFromGpsTimePos() {};
+	};
+
+	// for InNavDataPort
+	class NavPktFromVoid {
+		public:
+			virtual FRONTEND::NavigationPacket* operator() ( void ) = 0;
+			virtual ~NavPktFromVoid() {};
+	};
+
+	class VoidFromNavPkt {
+		public:
+			virtual void operator() ( const FRONTEND::NavigationPacket& data ) = 0;
+			virtual ~VoidFromNavPkt() {};
 	};
 
 	/**
@@ -508,6 +556,142 @@ namespace frontend {
 			MemberVoidFromRFInfoPktSeqFn func_;
 	};
 
+	// for InGPSPort
+	template <class T>
+	class MemberGPSInfoFromVoid : public GPSInfoFromVoid
+	{
+		public:
+			typedef boost::shared_ptr< MemberGPSInfoFromVoid< T > > SPtr;
+			typedef FRONTEND::GPSInfo* (T::*MemberGPSInfoFromVoidFn)( void );
+			static SPtr Create( T &target, MemberGPSInfoFromVoidFn func ){
+				return SPtr( new MemberGPSInfoFromVoid(target, func ) );
+			};
+			virtual FRONTEND::GPSInfo* operator() ( void )
+			{
+				return (target_.*func_)();
+			}
+			MemberGPSInfoFromVoid ( T& target,  MemberGPSInfoFromVoidFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberGPSInfoFromVoidFn func_;
+	};
+	template <class T>
+	class MemberGpsTimePosFromVoid : public GpsTimePosFromVoid
+	{
+		public:
+			typedef boost::shared_ptr< MemberGpsTimePosFromVoid< T > > SPtr;
+			typedef FRONTEND::GpsTimePos* (T::*MemberGpsTimePosFromVoidFn)( void );
+			static SPtr Create( T &target, MemberGpsTimePosFromVoidFn func ){
+				return SPtr( new MemberGpsTimePosFromVoid(target, func ) );
+			};
+			virtual FRONTEND::GpsTimePos* operator() ( void )
+			{
+				return (target_.*func_)();
+			}
+			MemberGpsTimePosFromVoid ( T& target,  MemberGpsTimePosFromVoidFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberGpsTimePosFromVoidFn func_;
+	};
+	template <class T>
+	class MemberVoidFromGPSInfo : public VoidFromGPSInfo
+	{
+		public:
+			typedef boost::shared_ptr< MemberVoidFromGPSInfo< T > > SPtr;
+			typedef void (T::*MemberVoidFromGPSInfoFn)( const FRONTEND::GPSInfo& data );
+			static SPtr Create( T &target, MemberVoidFromGPSInfoFn func ){
+				return SPtr( new MemberVoidFromGPSInfo(target, func ) );
+			};
+			virtual void operator() (const FRONTEND::GPSInfo& data )
+			{
+				(target_.*func_)(data);
+			}
+			MemberVoidFromGPSInfo ( T& target,  MemberVoidFromGPSInfoFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberVoidFromGPSInfoFn func_;
+	};
+	template <class T>
+	class MemberVoidFromGpsTimePos : public VoidFromGpsTimePos
+	{
+		public:
+			typedef boost::shared_ptr< MemberVoidFromGpsTimePos< T > > SPtr;
+			typedef void (T::*MemberVoidFromGpsTimePosFn)( const FRONTEND::GpsTimePos& data );
+			static SPtr Create( T &target, MemberVoidFromGpsTimePosFn func ){
+				return SPtr( new MemberVoidFromGpsTimePos(target, func ) );
+			};
+			virtual void operator() (const FRONTEND::GpsTimePos& data )
+			{
+				(target_.*func_)(data);
+			}
+			MemberVoidFromGpsTimePos ( T& target,  MemberVoidFromGpsTimePosFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberVoidFromGpsTimePosFn func_;
+	};
+
+	// for InNavDataPort
+	template <class T>
+	class MemberNavPktFromVoid : public NavPktFromVoid
+	{
+		public:
+			typedef boost::shared_ptr< MemberNavPktFromVoid< T > > SPtr;
+			typedef FRONTEND::NavigationPacket* (T::*MemberNavPktFromVoidFn)( void );
+			static SPtr Create( T &target, MemberNavPktFromVoidFn func ){
+				return SPtr( new MemberNavPktFromVoid(target, func ) );
+			};
+			virtual FRONTEND::NavigationPacket* operator() ( void )
+			{
+				return (target_.*func_)();
+			}
+			MemberNavPktFromVoid ( T& target,  MemberNavPktFromVoidFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberNavPktFromVoidFn func_;
+	};
+	template <class T>
+	class MemberVoidFromNavPkt : public VoidFromNavPkt
+	{
+		public:
+			typedef boost::shared_ptr< MemberVoidFromNavPkt< T > > SPtr;
+			typedef void (T::*MemberVoidFromNavPktFn)( const FRONTEND::NavigationPacket& data );
+			static SPtr Create( T &target, MemberVoidFromNavPktFn func ){
+				return SPtr( new MemberVoidFromNavPkt(target, func ) );
+			};
+			virtual void operator() (const FRONTEND::NavigationPacket& data )
+			{
+				(target_.*func_)(data);
+			}
+			MemberVoidFromNavPkt ( T& target,  MemberVoidFromNavPktFn func) :
+				target_(target),
+				func_(func)
+				  {
+				  }
+		private:
+			T& target_;
+			MemberVoidFromNavPktFn func_;
+	};
+
 	/**
 	* Wrap Callback functions as CB objects
 	*/
@@ -744,6 +928,94 @@ namespace frontend {
 		}
 	private:
 		VoidFromRFInfoPktSeqFn func_;
+	};
+
+	// for InGPSPort
+	class StaticGPSInfoFromVoid : public GPSInfoFromVoid
+	{
+	public:
+		virtual FRONTEND::GPSInfo* operator() ( void )
+		{
+			return (*func_)();
+		}
+		StaticGPSInfoFromVoid ( GPSInfoFromVoidFn func) :
+			func_(func)
+		{
+		}
+	private:
+		GPSInfoFromVoidFn func_;
+	};
+	class StaticGpsTimePosFromVoid : public GpsTimePosFromVoid
+	{
+	public:
+		virtual FRONTEND::GpsTimePos* operator() ( void )
+		{
+			return (*func_)();
+		}
+		StaticGpsTimePosFromVoid ( GpsTimePosFromVoidFn func) :
+			func_(func)
+		{
+		}
+	private:
+		GpsTimePosFromVoidFn func_;
+	};
+	class StaticVoidFromGPSInfo : public VoidFromGPSInfo
+	{
+	public:
+		virtual void operator() ( const FRONTEND::GPSInfo& data)
+		{
+			return (*func_)(data);
+		}
+		StaticVoidFromGPSInfo ( VoidFromGPSInfoFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromGPSInfoFn func_;
+	};
+	class StaticVoidFromGpsTimePos : public VoidFromGpsTimePos
+	{
+	public:
+		virtual void operator() ( const FRONTEND::GpsTimePos& data)
+		{
+			return (*func_)(data);
+		}
+		StaticVoidFromGpsTimePos ( VoidFromGpsTimePosFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromGpsTimePosFn func_;
+	};
+
+	// for InNavDataPort
+	class StaticNavPktFromVoid : public NavPktFromVoid
+	{
+	public:
+		virtual FRONTEND::NavigationPacket* operator() ( void )
+		{
+			return (*func_)();
+		}
+		StaticNavPktFromVoid ( NavPktFromVoidFn func) :
+			func_(func)
+		{
+		}
+	private:
+		NavPktFromVoidFn func_;
+	};
+	class StaticVoidFromNavPkt : public VoidFromNavPkt
+	{
+	public:
+		virtual void operator() ( const FRONTEND::NavigationPacket& data)
+		{
+			return (*func_)(data);
+		}
+		StaticVoidFromNavPkt ( VoidFromNavPktFn func) :
+			func_(func)
+		{
+		}
+	private:
+		VoidFromNavPktFn func_;
 	};
 
 	// ----------------------------------------------------------------------------------------
