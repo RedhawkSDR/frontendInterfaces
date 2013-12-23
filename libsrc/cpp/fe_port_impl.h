@@ -17,6 +17,8 @@
 #include <FRONTEND/GPS.h>
 #include <FRONTEND/NavigationData.h>
 
+#include "fe_base.h"
+
 
 namespace frontend {
 
@@ -1025,14 +1027,20 @@ namespace frontend {
 	class OutFrontendPort : public Port_Uses_base_impl, public POA_ExtendedCF::QueryablePort
 	{
 	    public:
-			OutFrontendPort(std::string port_name) :
-				Port_Uses_base_impl(port_name)
+			OutFrontendPort(std::string port_name,
+                                        LOGGER_PTR logger) :
+				Port_Uses_base_impl(port_name),
+                                logger(logger)
 			{
 			    recConnectionsRefresh = false;
 			    recConnections.length(0);
 			}
 	        ~OutFrontendPort(){
 	        }
+
+                void setLogger(LOGGER_PTR newLogger){
+                    logger = newLogger;
+                }
 
 	        ExtendedCF::UsesConnectionSequence * connections()
 	        {
@@ -1084,6 +1092,8 @@ namespace frontend {
 	        std::vector < std::pair<PortType_var, std::string> > outConnections;
 	        ExtendedCF::UsesConnectionSequence recConnections;
 	        bool recConnectionsRefresh;
+
+                LOGGER_PTR logger;
 	};
 
 } // end of frontend namespace

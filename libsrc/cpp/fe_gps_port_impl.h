@@ -14,6 +14,7 @@ namespace frontend {
 	{
 	    public:
 	        InGPSPort(std::string port_name,
+                                LOGGER_PTR logger,
 	        		GPSInfoFromVoid *newGPSInfoGetterCB = NULL,
 	        		GpsTimePosFromVoid *newGpsTimePosGetterCB = NULL,
 	        		VoidFromGPSInfo *newGPSInfoSetterCB = NULL,
@@ -24,6 +25,7 @@ namespace frontend {
 	        void gps_info(const FRONTEND::GPSInfo& data);
 	        FRONTEND::GpsTimePos* gps_time_pos();
 	        void gps_time_pos(const FRONTEND::GpsTimePos& data);
+	        void setLogger(LOGGER_PTR newLogger);
 
 			// Assign gps_info callbacks - getters
 			template< typename T > inline
@@ -75,6 +77,7 @@ namespace frontend {
 
 	    protected:
 	        boost::mutex portAccess;
+                LOGGER_PTR logger;
 
 			// Callbacks
 			boost::shared_ptr< GPSInfoFromVoid > getGPSInfoCB;
@@ -89,7 +92,7 @@ namespace frontend {
 	class OutGPSPort : OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>
 	{
 	    public:
-	        OutGPSPort(std::string port_name);
+	        OutGPSPort(std::string port_name, LOGGER_PTR logger);
 	        ~OutGPSPort();
 
 	        FRONTEND::GPSInfo* gps_info();

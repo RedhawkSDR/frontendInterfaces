@@ -1,5 +1,6 @@
 
 #include "fe_navdata_port_impl.h"
+#include "fe_log.h"
 
 namespace frontend {
 
@@ -54,8 +55,10 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutNavDataPort definition
 	// ----------------------------------------------------------------------------------------
-	OutNavDataPort::OutNavDataPort(std::string port_name) :
-			OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>::OutFrontendPort(port_name)
+	OutNavDataPort::OutNavDataPort(std::string port_name,
+                                       LOGGER_PTR logger) :
+			OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>::OutFrontendPort(port_name,
+                                                                                                  logger)
 		{
 		}
 

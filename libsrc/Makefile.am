@@ -34,7 +34,8 @@ library_include_HEADERS = \
 	cpp/fe_tuner_impl.h \
         cpp/fe_tuner_impl.cpp \
 	cpp/fe_tuner_port_impl.h \
-	cpp/fe_tuner_struct_props.h
+	cpp/fe_tuner_struct_props.h \
+        cpp/fe_base.h
 
 ## The generated configuration header is installed in its own subdirectory of
 ## $(libdir).  The reason for this is that the configuration information put

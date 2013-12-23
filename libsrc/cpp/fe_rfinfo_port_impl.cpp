@@ -1,5 +1,6 @@
 
 #include "fe_rfinfo_port_impl.h"
+#include "fe_log.h"
 
 namespace frontend {
 
@@ -7,11 +8,13 @@ namespace frontend {
 	// InRFInfoPort definition
 	// ----------------------------------------------------------------------------------------
 	InRFInfoPort::InRFInfoPort(std::string port_name,
+                LOGGER_PTR logger,
     		CharFromVoid *newRFFlowIdGetterCB,
     		RFInfoPktFromVoid *newRFInfoPktGetterCB,
     		VoidFromChar *newRFFlowIdSetterCB,
     		VoidFromRFInfoPkt *newRFInfoPktSetterCB):
 	Port_Provides_base_impl(port_name),
+        logger(logger),
 	getRFFlowIdCB(),
 	getRFInfoPktCB(),
 	setRFFlowIdCB(),
@@ -34,6 +37,11 @@ namespace frontend {
 	InRFInfoPort::~InRFInfoPort()
 	{
 	}
+
+	void InRFInfoPort::setLogger(LOGGER_PTR newLogger)
+	{
+            logger = newLogger;
+        }
 
 	char* InRFInfoPort::rf_flow_id()
 	{
@@ -102,8 +110,10 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutRFInfoPort definition
 	// ----------------------------------------------------------------------------------------
-	OutRFInfoPort::OutRFInfoPort(std::string port_name) :
-		OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>::OutFrontendPort(port_name){
+	OutRFInfoPort::OutRFInfoPort(std::string port_name,
+                                     LOGGER_PTR logger) :
+		OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>::OutFrontendPort(port_name,
+                                                                                        logger){
 	}
 	OutRFInfoPort::~OutRFInfoPort(){
 	}

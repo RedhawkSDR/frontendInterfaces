@@ -14,6 +14,7 @@ namespace frontend {
 	{
 	    public:
 	        InRFInfoPort(std::string port_name,
+                                LOGGER_PTR logger,
 	        		CharFromVoid *newRFFlowIdGetterCB = NULL,
 	        		RFInfoPktFromVoid *newRFInfoPktGetterCB = NULL,
 	        		VoidFromChar *newRFFlowIdSetterCB = NULL,
@@ -24,6 +25,7 @@ namespace frontend {
 	        void rf_flow_id(const char* data);
 	        FRONTEND::RFInfoPkt* rfinfo_pkt();
 	        void rfinfo_pkt(const FRONTEND::RFInfoPkt& data);
+	        void setLogger(LOGGER_PTR newLogger);
 
 			// Assign rf_flow_id callbacks - getters
 			template< typename T > inline
@@ -75,6 +77,7 @@ namespace frontend {
 
 	    protected:
 	        boost::mutex portAccess;
+                LOGGER_PTR logger;
 
 			// Callbacks
 			boost::shared_ptr< CharFromVoid > getRFFlowIdCB;
@@ -89,7 +92,7 @@ namespace frontend {
 	class OutRFInfoPort : public OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>
 	{
 	    public:
-	        OutRFInfoPort(std::string port_name);
+	        OutRFInfoPort(std::string port_name, LOGGER_PTR logger);
 	        ~OutRFInfoPort();
 
 	        char* rf_flow_id();

@@ -4,6 +4,8 @@
 #include "fe_port_impl.h"
 
 #include <FRONTEND/TunerControl.h>
+#include <fe_base.h>
+
 
 namespace frontend {
 
@@ -14,6 +16,7 @@ namespace frontend {
 	{
 		public:
 			InFrontendTunerPort(std::string port_name,
+                                LOGGER_PTR logger,
 				CharFromChar *newTunerTypeGetterCB = NULL,
 				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
 				CharFromChar *newTunerGroupIdGetterCB = NULL,
@@ -87,6 +90,8 @@ namespace frontend {
 			void   setTunerStatusGetterCB( PropFromChar *newCB );
 			void   setTunerStatusGetterCB( PropFromCharFn  newCB );
 
+                        void   setLogger(LOGGER_PTR newLogger);
+
 		protected:
 			boost::mutex portAccess;
 
@@ -96,6 +101,9 @@ namespace frontend {
 			boost::shared_ptr< CharFromChar > getTunerGroupIdCB;
 			boost::shared_ptr< CharFromChar > getTunerRfFlowIdCB;
 			boost::shared_ptr< PropFromChar > getTunerStatusCB;
+
+                        LOGGER_PTR logger;
+
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -105,6 +113,7 @@ namespace frontend {
 	{
 		public:
 			InAnalogTunerPort(std::string port_name,
+                                LOGGER_PTR logger,
 				CharFromChar *newTunerTypeGetterCB = NULL,
 				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
 				CharFromChar *newTunerGroupIdGetterCB = NULL,
@@ -275,6 +284,7 @@ namespace frontend {
 			void   setTunerEnableSetterCB( VoidFromCharBoolean *newCB );
 			void   setTunerEnableSetterCB( VoidFromCharBooleanFn  newCB );
 
+
 		protected:
 
 			// Callbacks
@@ -290,6 +300,7 @@ namespace frontend {
 			boost::shared_ptr< VoidFromCharLong > setTunerReferenceSourceCB;
 			boost::shared_ptr< BooleanFromChar > getTunerEnableCB;
 			boost::shared_ptr< VoidFromCharBoolean > setTunerEnableCB;
+
 	};
 
 
@@ -300,6 +311,7 @@ namespace frontend {
 	{
 		public:
 			InDigitalTunerPort(std::string port_name,
+                                LOGGER_PTR logger,
 				CharFromChar *newTunerTypeGetterCB = NULL,
 				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
 				CharFromChar *newTunerGroupIdGetterCB = NULL,
@@ -352,6 +364,7 @@ namespace frontend {
 			// Callbacks
 			boost::shared_ptr< DoubleFromChar > getTunerOutputSampleRateCB;
 			boost::shared_ptr< VoidFromCharDouble > setTunerOutputSampleRateCB;
+
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -360,7 +373,8 @@ namespace frontend {
 	class OutFrontendTunerPort : public OutFrontendPort<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner>
 	{
 	    public:
-			OutFrontendTunerPort(std::string port_name);
+			OutFrontendTunerPort(std::string port_name,
+                                             LOGGER_PTR logger);
 	        ~OutFrontendTunerPort();
 
 	        char* getTunerType(const char* id);
@@ -368,6 +382,10 @@ namespace frontend {
 	        char* getTunerGroupId(const char* id);
 	        char* getTunerRfFlowId(const char* id);
 	        CF::Properties* getTunerStatus(const char* id);
+                void setLogger(LOGGER_PTR newLogger);
+
+            protected:
+                LOGGER_PTR logger;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -376,7 +394,8 @@ namespace frontend {
 	class OutAnalogTunerPort : public OutFrontendPort<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner>
 	{
 	    public:
-	    	OutAnalogTunerPort(std::string port_name);
+                OutAnalogTunerPort(std::string port_name,
+                                   LOGGER_PTR logger);
 	        ~OutAnalogTunerPort();
 
 	        char* getTunerType(const char* id);
@@ -405,7 +424,8 @@ namespace frontend {
 	class OutDigitalTunerPort : public OutFrontendPort<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner>
 	{
 	    public:
-			OutDigitalTunerPort(std::string port_name);
+			OutDigitalTunerPort(std::string port_name,
+                                            LOGGER_PTR logger);
 	        ~OutDigitalTunerPort();
 
 	        char* getTunerType(const char* id);

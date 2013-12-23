@@ -59,7 +59,7 @@ namespace frontend {
 	class OutNavDataPort : public OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>
 	{
 	    public:
-	        OutNavDataPort(std::string port_name);
+	        OutNavDataPort(std::string port_name, LOGGER_PTR logger);
 	        ~OutNavDataPort();
 
 	        FRONTEND::NavigationPacket* nav_packet();

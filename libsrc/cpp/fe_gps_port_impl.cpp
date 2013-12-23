@@ -1,5 +1,6 @@
 
 #include "fe_gps_port_impl.h"
+#include "fe_log.h"
 
 namespace frontend {
 
@@ -7,11 +8,13 @@ namespace frontend {
 	// InGPSPort definition
 	// ----------------------------------------------------------------------------------------
 	InGPSPort::InGPSPort(std::string port_name,
+                LOGGER_PTR logger,
     		GPSInfoFromVoid *newGPSInfoGetterCB,
     		GpsTimePosFromVoid *newGpsTimePosGetterCB,
     		VoidFromGPSInfo *newGPSInfoSetterCB,
     		VoidFromGpsTimePos *newGpsTimePosSetterCB) :
 	Port_Provides_base_impl(port_name),
+        logger(logger),
 	getGPSInfoCB(),
 	getGpsTimePosCB(),
 	setGPSInfoCB(),
@@ -34,6 +37,10 @@ namespace frontend {
 	InGPSPort::~InGPSPort()
 	{
 	}
+
+    void InGPSPort::setLogger(LOGGER_PTR newLogger){
+        logger = newLogger;
+    }
 
     FRONTEND::GPSInfo* InGPSPort::gps_info(){
 		boost::mutex::scoped_lock lock(portAccess);
@@ -92,8 +99,10 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutGPSPort definition
 	// ----------------------------------------------------------------------------------------
-	OutGPSPort::OutGPSPort(std::string port_name) :
-		OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>::OutFrontendPort(port_name)
+	OutGPSPort::OutGPSPort(std::string port_name,
+                               LOGGER_PTR logger) :
+		OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>::OutFrontendPort(port_name, 
+                                                                                  logger)
 	{
 	}
 

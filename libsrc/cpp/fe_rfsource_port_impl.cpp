@@ -1,5 +1,6 @@
 
 #include "fe_rfsource_port_impl.h"
+#include "fe_log.h"
 
 namespace frontend {
 
@@ -7,11 +8,13 @@ namespace frontend {
 	// InRFSourcePort definition
 	// ----------------------------------------------------------------------------------------
 	InRFSourcePort::InRFSourcePort(std::string port_name,
+                LOGGER_PTR logger,
     		RFInfoPktSeqFromVoid *newAvailableRFInputsGetterCB,
     		RFInfoPktFromVoid *newCurrentRFInputGetterCB,
     		VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB,
     		VoidFromRFInfoPkt *newCurrentRFInputSetterCB) :
 	Port_Provides_base_impl(port_name),
+        logger(logger),
 	getAvailableRFInputsCB(),
 	getCurrentRFInputCB(),
 	setAvailableRFInputsCB(),
@@ -34,6 +37,11 @@ namespace frontend {
 	InRFSourcePort::~InRFSourcePort()
 	{
 	}
+
+	void InRFSourcePort::setLogger(LOGGER_PTR newLogger)
+        {
+            logger = newLogger;
+        }
 
     FRONTEND::RFInfoPktSequence* InRFSourcePort::available_rf_inputs()
 	{
@@ -98,8 +106,10 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutRFSourcePort definition
 	// ----------------------------------------------------------------------------------------
-	OutRFSourcePort::OutRFSourcePort(std::string port_name) :
-		OutFrontendPort<FRONTEND::RFSource_var,FRONTEND::RFSource>::OutFrontendPort(port_name)
+	OutRFSourcePort::OutRFSourcePort(std::string port_name,
+                                         LOGGER_PTR logger) :
+		OutFrontendPort<FRONTEND::RFSource_var,FRONTEND::RFSource>::OutFrontendPort(port_name,
+                                                                                            logger)
 	{
 	}
 

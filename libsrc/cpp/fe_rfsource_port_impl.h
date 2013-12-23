@@ -14,6 +14,7 @@ namespace frontend {
 	{
 	    public:
 	        InRFSourcePort(std::string port_name,
+                                LOGGER_PTR logger,
 	        		RFInfoPktSeqFromVoid *newAvailableRFInputsGetterCB = NULL,
 	        		RFInfoPktFromVoid *newCurrentRFInputGetterCB = NULL,
 	        		VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB = NULL,
@@ -24,6 +25,8 @@ namespace frontend {
 	        void available_rf_inputs(const FRONTEND::RFInfoPktSequence& data);
 	        FRONTEND::RFInfoPkt* current_rf_input();
 	        void current_rf_input(const FRONTEND::RFInfoPkt& data);
+
+                void setLogger(LOGGER_PTR newLogger);
 
 			// Assign available_rf_inputs callbacks - getters
 			template< typename T > inline
@@ -75,6 +78,7 @@ namespace frontend {
 
 	    protected:
 	        boost::mutex portAccess;
+                LOGGER_PTR logger;
 
 			// Callbacks
 			boost::shared_ptr< RFInfoPktSeqFromVoid > getAvailableRFInputsCB;
@@ -89,7 +93,7 @@ namespace frontend {
 	class OutRFSourcePort : public OutFrontendPort<FRONTEND::RFSource_var,FRONTEND::RFSource>
 	{
 	    public:
-	        OutRFSourcePort(std::string port_name);
+	        OutRFSourcePort(std::string port_name, LOGGER_PTR logger);
 	        ~OutRFSourcePort();
 
 	        FRONTEND::RFInfoPktSequence* available_rf_inputs();
