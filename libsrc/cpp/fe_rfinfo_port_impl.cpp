@@ -8,6 +8,31 @@ namespace frontend {
 	// InRFInfoPort definition
 	// ----------------------------------------------------------------------------------------
 	InRFInfoPort::InRFInfoPort(std::string port_name,
+    		CharFromVoid *newRFFlowIdGetterCB,
+    		RFInfoPktFromVoid *newRFInfoPktGetterCB,
+    		VoidFromChar *newRFFlowIdSetterCB,
+    		VoidFromRFInfoPkt *newRFInfoPktSetterCB):
+	Port_Provides_base_impl(port_name),
+	getRFFlowIdCB(),
+	getRFInfoPktCB(),
+	setRFFlowIdCB(),
+	setRFInfoPktCB()
+	{
+		if ( newRFFlowIdGetterCB ) {
+			getRFFlowIdCB = boost::shared_ptr< CharFromVoid >( newRFFlowIdGetterCB, null_deleter());
+		}
+		if ( newRFInfoPktGetterCB ) {
+			getRFInfoPktCB = boost::shared_ptr< RFInfoPktFromVoid >( newRFInfoPktGetterCB, null_deleter());
+		}
+		if ( newRFFlowIdSetterCB ) {
+			setRFFlowIdCB = boost::shared_ptr< VoidFromChar >( newRFFlowIdSetterCB, null_deleter());
+		}
+		if ( newRFInfoPktSetterCB ) {
+			setRFInfoPktCB = boost::shared_ptr< VoidFromRFInfoPkt >( newRFInfoPktSetterCB, null_deleter());
+		}
+	}
+
+	InRFInfoPort::InRFInfoPort(std::string port_name,
                 LOGGER_PTR logger,
     		CharFromVoid *newRFFlowIdGetterCB,
     		RFInfoPktFromVoid *newRFInfoPktGetterCB,
@@ -110,13 +135,23 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutRFInfoPort definition
 	// ----------------------------------------------------------------------------------------
+	OutRFInfoPort::OutRFInfoPort(std::string port_name) :
+		OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>::OutFrontendPort(port_name){
+	}
+
 	OutRFInfoPort::OutRFInfoPort(std::string port_name,
                                      LOGGER_PTR logger) :
 		OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>::OutFrontendPort(port_name,
                                                                                         logger){
 	}
+
 	OutRFInfoPort::~OutRFInfoPort(){
 	}
+
+	void OutRFInfoPort::setLogger(LOGGER_PTR newLogger)
+	{
+            logger = newLogger;
+        }
 
 	char* OutRFInfoPort::rf_flow_id(){
 	    char* retval;

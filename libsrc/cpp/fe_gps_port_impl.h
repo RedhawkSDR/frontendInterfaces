@@ -14,11 +14,16 @@ namespace frontend {
 	{
 	    public:
 	        InGPSPort(std::string port_name,
-                                LOGGER_PTR logger,
-	        		GPSInfoFromVoid *newGPSInfoGetterCB = NULL,
-	        		GpsTimePosFromVoid *newGpsTimePosGetterCB = NULL,
-	        		VoidFromGPSInfo *newGPSInfoSetterCB = NULL,
-	        		VoidFromGpsTimePos *newGpsTimePosSetterCB = NULL);
+                          GPSInfoFromVoid *newGPSInfoGetterCB = NULL,
+                          GpsTimePosFromVoid *newGpsTimePosGetterCB = NULL,
+                          VoidFromGPSInfo *newGPSInfoSetterCB = NULL,
+                          VoidFromGpsTimePos *newGpsTimePosSetterCB = NULL);
+	        InGPSPort(std::string port_name,
+                          LOGGER_PTR logger,
+                          GPSInfoFromVoid *newGPSInfoGetterCB = NULL,
+                          GpsTimePosFromVoid *newGpsTimePosGetterCB = NULL,
+                          VoidFromGPSInfo *newGPSInfoSetterCB = NULL,
+                          VoidFromGpsTimePos *newGpsTimePosSetterCB = NULL);
 	        ~InGPSPort();
 
 	        FRONTEND::GPSInfo* gps_info();
@@ -92,6 +97,7 @@ namespace frontend {
 	class OutGPSPort : OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>
 	{
 	    public:
+	        OutGPSPort(std::string port_name);
 	        OutGPSPort(std::string port_name, LOGGER_PTR logger);
 	        ~OutGPSPort();
 
@@ -99,6 +105,10 @@ namespace frontend {
 	        void gps_info(const FRONTEND::GPSInfo& data);
 	        FRONTEND::GpsTimePos* gps_time_pos();
 	        void gps_time_pos(const FRONTEND::GpsTimePos& data);
+	        void setLogger(LOGGER_PTR newLogger);
+
+	    protected:
+                LOGGER_PTR logger;
 	};
 
 } // end of frontend namespace

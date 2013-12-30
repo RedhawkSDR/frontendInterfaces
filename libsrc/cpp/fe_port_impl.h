@@ -1027,6 +1027,12 @@ namespace frontend {
 	class OutFrontendPort : public Port_Uses_base_impl, public POA_ExtendedCF::QueryablePort
 	{
 	    public:
+			OutFrontendPort(std::string port_name) :
+				Port_Uses_base_impl(port_name)
+			{
+			    recConnectionsRefresh = false;
+			    recConnections.length(0);
+			}
 			OutFrontendPort(std::string port_name,
                                         LOGGER_PTR logger) :
 				Port_Uses_base_impl(port_name),

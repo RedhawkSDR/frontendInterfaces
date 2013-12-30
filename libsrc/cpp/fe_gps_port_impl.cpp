@@ -8,11 +8,36 @@ namespace frontend {
 	// InGPSPort definition
 	// ----------------------------------------------------------------------------------------
 	InGPSPort::InGPSPort(std::string port_name,
-                LOGGER_PTR logger,
-    		GPSInfoFromVoid *newGPSInfoGetterCB,
-    		GpsTimePosFromVoid *newGpsTimePosGetterCB,
-    		VoidFromGPSInfo *newGPSInfoSetterCB,
-    		VoidFromGpsTimePos *newGpsTimePosSetterCB) :
+                             GPSInfoFromVoid *newGPSInfoGetterCB,
+                             GpsTimePosFromVoid *newGpsTimePosGetterCB,
+                             VoidFromGPSInfo *newGPSInfoSetterCB,
+                             VoidFromGpsTimePos *newGpsTimePosSetterCB) :
+	Port_Provides_base_impl(port_name),
+	getGPSInfoCB(),
+	getGpsTimePosCB(),
+	setGPSInfoCB(),
+	setGpsTimePosCB()
+	{
+		if ( newGPSInfoGetterCB ) {
+			getGPSInfoCB = boost::shared_ptr< GPSInfoFromVoid >( newGPSInfoGetterCB, null_deleter());
+		}
+		if ( newGpsTimePosGetterCB ) {
+			getGpsTimePosCB = boost::shared_ptr< GpsTimePosFromVoid >( newGpsTimePosGetterCB, null_deleter());
+		}
+		if ( newGPSInfoSetterCB ) {
+			setGPSInfoCB = boost::shared_ptr< VoidFromGPSInfo >( newGPSInfoSetterCB, null_deleter());
+		}
+		if ( newGpsTimePosSetterCB ) {
+			setGpsTimePosCB = boost::shared_ptr< VoidFromGpsTimePos >( newGpsTimePosSetterCB, null_deleter());
+		}
+	}
+
+	InGPSPort::InGPSPort(std::string port_name,
+                             LOGGER_PTR logger,
+                             GPSInfoFromVoid *newGPSInfoGetterCB,
+                             GpsTimePosFromVoid *newGpsTimePosGetterCB,
+                             VoidFromGPSInfo *newGPSInfoSetterCB,
+                             VoidFromGpsTimePos *newGpsTimePosSetterCB) :
 	Port_Provides_base_impl(port_name),
         logger(logger),
 	getGPSInfoCB(),
@@ -99,6 +124,11 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutGPSPort definition
 	// ----------------------------------------------------------------------------------------
+	OutGPSPort::OutGPSPort(std::string port_name) :
+		OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>::OutFrontendPort(port_name)
+	{
+	}
+
 	OutGPSPort::OutGPSPort(std::string port_name,
                                LOGGER_PTR logger) :
 		OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>::OutFrontendPort(port_name, 
@@ -109,6 +139,10 @@ namespace frontend {
 	OutGPSPort::~OutGPSPort()
 	{
 	}
+
+        void OutGPSPort::setLogger(LOGGER_PTR newLogger){
+            logger = newLogger;
+        }
 
 	FRONTEND::GPSInfo* OutGPSPort::gps_info()
 	{

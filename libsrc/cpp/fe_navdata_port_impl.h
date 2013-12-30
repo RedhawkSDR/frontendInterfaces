@@ -14,12 +14,17 @@ namespace frontend {
 	{
 	    public:
 	        InNavDataPort(std::string port_name,
-	    			NavPktFromVoid *newNavPktGetterCB = NULL,
-	    			VoidFromNavPkt *newNavPktSetterCB = NULL);
+                              NavPktFromVoid *newNavPktGetterCB = NULL,
+                              VoidFromNavPkt *newNavPktSetterCB = NULL);
+	        InNavDataPort(std::string port_name,
+                              LOGGER_PTR logger,
+                              NavPktFromVoid *newNavPktGetterCB = NULL,
+                              VoidFromNavPkt *newNavPktSetterCB = NULL);
 	        ~InNavDataPort();
 
 	        FRONTEND::NavigationPacket* nav_packet();
 	        void nav_packet(const FRONTEND::NavigationPacket& data);
+                void setLogger(LOGGER_PTR newLogger);
 
 			// Assign current_rf_input callbacks - getters
 			template< typename T > inline
@@ -47,6 +52,7 @@ namespace frontend {
 
 	    protected:
 	        boost::mutex portAccess;
+                LOGGER_PTR logger;
 
 			// Callbacks
 			boost::shared_ptr< NavPktFromVoid > getNavPktCB;
@@ -59,11 +65,17 @@ namespace frontend {
 	class OutNavDataPort : public OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>
 	{
 	    public:
+	        OutNavDataPort(std::string port_name);
 	        OutNavDataPort(std::string port_name, LOGGER_PTR logger);
 	        ~OutNavDataPort();
 
 	        FRONTEND::NavigationPacket* nav_packet();
 	        void nav_packet(const FRONTEND::NavigationPacket& data);
+                void setLogger(LOGGER_PTR newLogger);
+
+	    protected:
+                LOGGER_PTR logger;
+
 	};
 
 } // end of frontend namespace

@@ -8,6 +8,36 @@ namespace frontend {
 	// InFrontendTunerPort definition
 	// ----------------------------------------------------------------------------------------
 	InFrontendTunerPort::InFrontendTunerPort(std::string port_name,
+			CharFromChar *newTunerTypeGetterCB,
+			BooleanFromChar *newTunerDeviceControlGetterCB,
+			CharFromChar *newTunerGroupIdGetterCB,
+			CharFromChar *newTunerRfFlowIdGetterCB,
+			PropFromChar *newTunerStatusGetterCB):
+	Port_Provides_base_impl(port_name),
+	getTunerTypeCB(),
+	getTunerDeviceControlCB(),
+	getTunerGroupIdCB(),
+	getTunerRfFlowIdCB(),
+	getTunerStatusCB()
+	{
+		if ( newTunerTypeGetterCB ) {
+			getTunerTypeCB = boost::shared_ptr< CharFromChar >( newTunerTypeGetterCB, null_deleter());
+		}
+		if ( newTunerDeviceControlGetterCB ) {
+			getTunerDeviceControlCB = boost::shared_ptr< BooleanFromChar >( newTunerDeviceControlGetterCB, null_deleter());
+		}
+		if ( newTunerGroupIdGetterCB ) {
+			getTunerGroupIdCB = boost::shared_ptr< CharFromChar >( newTunerGroupIdGetterCB, null_deleter());
+		}
+		if ( newTunerRfFlowIdGetterCB ) {
+			getTunerRfFlowIdCB = boost::shared_ptr< CharFromChar >( newTunerRfFlowIdGetterCB, null_deleter());
+		}
+		if ( newTunerStatusGetterCB ) {
+			getTunerStatusCB = boost::shared_ptr< PropFromChar >( newTunerStatusGetterCB, null_deleter());
+		}
+	}
+
+	InFrontendTunerPort::InFrontendTunerPort(std::string port_name,
                         LOGGER_PTR logger,
 			CharFromChar *newTunerTypeGetterCB,
 			BooleanFromChar *newTunerDeviceControlGetterCB,
@@ -153,6 +183,81 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// InAnalogTunerPort definition
 	// ----------------------------------------------------------------------------------------
+	InAnalogTunerPort::InAnalogTunerPort(std::string port_name,
+			CharFromChar *newTunerTypeGetterCB,
+			BooleanFromChar *newTunerDeviceControlGetterCB,
+			CharFromChar *newTunerGroupIdGetterCB,
+			CharFromChar *newTunerRfFlowIdGetterCB,
+			PropFromChar *newTunerStatusGetterCB,
+			DoubleFromChar *newTunerCenterFrequencyGetterCB,
+			VoidFromCharDouble *newTunerCenterFrequencySetterCB,
+			DoubleFromChar *newTunerBandwidthGetterCB,
+			VoidFromCharDouble *newTunerBandwidthSetterCB,
+			BooleanFromChar *newTunerAgcEnableGetterCB,
+			VoidFromCharBoolean *newTunerAgcEnableSetterCB,
+			FloatFromChar *newTunerGainGetterCB,
+			VoidFromCharFloat *newTunerGainSetterCB,
+			LongFromChar *newTunerReferenceSourceGetterCB,
+			VoidFromCharLong *newTunerReferenceSourceSetterCB,
+			BooleanFromChar *newTunerEnableGetterCB,
+			VoidFromCharBoolean *newTunerEnableSetterCB):
+	InFrontendTunerPort(port_name,
+			newTunerTypeGetterCB,
+			newTunerDeviceControlGetterCB,
+			newTunerGroupIdGetterCB,
+			newTunerRfFlowIdGetterCB,
+			newTunerStatusGetterCB),
+	getTunerCenterFrequencyCB(),
+	setTunerCenterFrequencyCB(),
+	getTunerBandwidthCB(),
+	setTunerBandwidthCB(),
+	getTunerAgcEnableCB(),
+	setTunerAgcEnableCB(),
+	getTunerGainCB(),
+	setTunerGainCB(),
+	getTunerReferenceSourceCB(),
+	setTunerReferenceSourceCB(),
+	getTunerEnableCB(),
+	setTunerEnableCB()
+	{
+		if ( newTunerCenterFrequencyGetterCB ) {
+			getTunerCenterFrequencyCB = boost::shared_ptr< DoubleFromChar >( newTunerCenterFrequencyGetterCB, null_deleter());
+		}
+		if ( newTunerCenterFrequencySetterCB ) {
+			setTunerCenterFrequencyCB = boost::shared_ptr< VoidFromCharDouble >( newTunerCenterFrequencySetterCB, null_deleter());
+		}
+		if ( newTunerBandwidthGetterCB ) {
+			getTunerBandwidthCB = boost::shared_ptr< DoubleFromChar >( newTunerBandwidthGetterCB, null_deleter());
+		}
+		if ( newTunerBandwidthSetterCB ) {
+			setTunerBandwidthCB = boost::shared_ptr< VoidFromCharDouble >( newTunerBandwidthSetterCB, null_deleter());
+		}
+		if ( newTunerAgcEnableGetterCB ) {
+			getTunerAgcEnableCB = boost::shared_ptr< BooleanFromChar >( newTunerAgcEnableGetterCB, null_deleter());
+		}
+		if ( newTunerAgcEnableSetterCB ) {
+			setTunerAgcEnableCB = boost::shared_ptr< VoidFromCharBoolean >( newTunerAgcEnableSetterCB, null_deleter());
+		}
+		if ( newTunerGainGetterCB ) {
+			getTunerGainCB = boost::shared_ptr< FloatFromChar >( newTunerGainGetterCB, null_deleter());
+		}
+		if ( newTunerGainSetterCB ) {
+			setTunerGainCB = boost::shared_ptr< VoidFromCharFloat >( newTunerGainSetterCB, null_deleter());
+		}
+		if ( newTunerReferenceSourceGetterCB ) {
+			getTunerReferenceSourceCB = boost::shared_ptr< LongFromChar >( newTunerReferenceSourceGetterCB, null_deleter());
+		}
+		if ( newTunerReferenceSourceSetterCB ) {
+			setTunerReferenceSourceCB = boost::shared_ptr< VoidFromCharLong >( newTunerReferenceSourceSetterCB, null_deleter());
+		}
+		if ( newTunerEnableGetterCB ) {
+			getTunerEnableCB = boost::shared_ptr< BooleanFromChar >( newTunerEnableGetterCB, null_deleter());
+		}
+		if ( newTunerEnableSetterCB ) {
+			setTunerEnableCB = boost::shared_ptr< VoidFromCharBoolean >( newTunerEnableSetterCB, null_deleter());
+		}
+	}
+
 	InAnalogTunerPort::InAnalogTunerPort(std::string port_name,
                         LOGGER_PTR logger,
 			CharFromChar *newTunerTypeGetterCB,
@@ -514,6 +619,55 @@ namespace frontend {
 	// InDigitalTunerPort definition
 	// ----------------------------------------------------------------------------------------
 	InDigitalTunerPort::InDigitalTunerPort(std::string port_name,
+			CharFromChar *newTunerTypeGetterCB,
+			BooleanFromChar *newTunerDeviceControlGetterCB,
+			CharFromChar *newTunerGroupIdGetterCB,
+			CharFromChar *newTunerRfFlowIdGetterCB,
+			PropFromChar *newTunerStatusGetterCB,
+			DoubleFromChar *newTunerCenterFrequencyGetterCB,
+			VoidFromCharDouble *newTunerCenterFrequencySetterCB,
+			DoubleFromChar *newTunerBandwidthGetterCB,
+			VoidFromCharDouble *newTunerBandwidthSetterCB,
+			BooleanFromChar *newTunerAgcEnableGetterCB,
+			VoidFromCharBoolean *newTunerAgcEnableSetterCB,
+			FloatFromChar *newTunerGainGetterCB,
+			VoidFromCharFloat *newTunerGainSetterCB,
+			LongFromChar *newTunerReferenceSourceGetterCB,
+			VoidFromCharLong *newTunerReferenceSourceSetterCB,
+			BooleanFromChar *newTunerEnableGetterCB,
+			VoidFromCharBoolean *newTunerEnableSetterCB,
+			DoubleFromChar *newTunerOutputSampleRateGetterCB,
+			VoidFromCharDouble *newTunerOutputSampleRateSetterCB):
+	InAnalogTunerPort(port_name,
+			newTunerTypeGetterCB,
+			newTunerDeviceControlGetterCB,
+			newTunerGroupIdGetterCB,
+			newTunerRfFlowIdGetterCB,
+			newTunerStatusGetterCB,
+			newTunerCenterFrequencyGetterCB,
+			newTunerCenterFrequencySetterCB,
+			newTunerBandwidthGetterCB,
+			newTunerBandwidthSetterCB,
+			newTunerAgcEnableGetterCB,
+			newTunerAgcEnableSetterCB,
+			newTunerGainGetterCB,
+			newTunerGainSetterCB,
+			newTunerReferenceSourceGetterCB,
+			newTunerReferenceSourceSetterCB,
+			newTunerEnableGetterCB,
+			newTunerEnableSetterCB),
+	getTunerOutputSampleRateCB(),
+	setTunerOutputSampleRateCB()
+	{
+		if ( newTunerOutputSampleRateGetterCB ) {
+			getTunerOutputSampleRateCB = boost::shared_ptr< DoubleFromChar >( newTunerOutputSampleRateGetterCB, null_deleter());
+		}
+		if ( newTunerOutputSampleRateSetterCB ) {
+			setTunerOutputSampleRateCB = boost::shared_ptr< VoidFromCharDouble >( newTunerOutputSampleRateSetterCB, null_deleter());
+		}
+	}
+
+	InDigitalTunerPort::InDigitalTunerPort(std::string port_name,
                         LOGGER_PTR logger,
 			CharFromChar *newTunerTypeGetterCB,
 			BooleanFromChar *newTunerDeviceControlGetterCB,
@@ -620,6 +774,11 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutFrontendTunerPort definition
 	// ----------------------------------------------------------------------------------------
+	OutFrontendTunerPort::OutFrontendTunerPort(std::string port_name) :
+		OutFrontendPort<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner>::OutFrontendPort(port_name)
+	{
+	}
+
 	OutFrontendTunerPort::OutFrontendTunerPort(std::string port_name,
                                                    LOGGER_PTR logger) :
 		OutFrontendPort<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner>::OutFrontendPort(port_name,
@@ -738,6 +897,11 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutAnalogTunerPort definition
 	// ----------------------------------------------------------------------------------------
+	OutAnalogTunerPort::OutAnalogTunerPort(std::string port_name) :
+		OutFrontendPort<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner>::OutFrontendPort(port_name)
+	{
+	}
+
 	OutAnalogTunerPort::OutAnalogTunerPort(std::string port_name,
                                                LOGGER_PTR logger) :
 		OutFrontendPort<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner>::OutFrontendPort(port_name,
@@ -1086,6 +1250,11 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutDigitalTunerPort definition
 	// ----------------------------------------------------------------------------------------
+	OutDigitalTunerPort::OutDigitalTunerPort(std::string port_name) :
+		OutFrontendPort<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner>::OutFrontendPort(port_name)
+	{
+	}
+
 	OutDigitalTunerPort::OutDigitalTunerPort(std::string port_name,
                                                  LOGGER_PTR logger) :
 		OutFrontendPort<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner>::OutFrontendPort(port_name,

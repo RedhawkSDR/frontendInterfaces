@@ -14,11 +14,16 @@ namespace frontend {
 	{
 	    public:
 	        InRFInfoPort(std::string port_name,
-                                LOGGER_PTR logger,
-	        		CharFromVoid *newRFFlowIdGetterCB = NULL,
-	        		RFInfoPktFromVoid *newRFInfoPktGetterCB = NULL,
-	        		VoidFromChar *newRFFlowIdSetterCB = NULL,
-	        		VoidFromRFInfoPkt *newRFInfoPktSetterCB = NULL);
+                             CharFromVoid *newRFFlowIdGetterCB = NULL,
+                             RFInfoPktFromVoid *newRFInfoPktGetterCB = NULL,
+                             VoidFromChar *newRFFlowIdSetterCB = NULL,
+                             VoidFromRFInfoPkt *newRFInfoPktSetterCB = NULL);
+	        InRFInfoPort(std::string port_name,
+                             LOGGER_PTR logger,
+                             CharFromVoid *newRFFlowIdGetterCB = NULL,
+                             RFInfoPktFromVoid *newRFInfoPktGetterCB = NULL,
+                             VoidFromChar *newRFFlowIdSetterCB = NULL,
+                             VoidFromRFInfoPkt *newRFInfoPktSetterCB = NULL);
 	        ~InRFInfoPort();
 
 	        char* rf_flow_id();
@@ -92,6 +97,7 @@ namespace frontend {
 	class OutRFInfoPort : public OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>
 	{
 	    public:
+	        OutRFInfoPort(std::string port_name);
 	        OutRFInfoPort(std::string port_name, LOGGER_PTR logger);
 	        ~OutRFInfoPort();
 
@@ -99,6 +105,10 @@ namespace frontend {
 	        void rf_flow_id(char* data);
 	        FRONTEND::RFInfoPkt* rfinfo_pkt();
 	        void rfinfo_pkt(FRONTEND::RFInfoPkt data);
+	        void setLogger(LOGGER_PTR newLogger);
+
+	    protected:
+                LOGGER_PTR logger;
 
 	};
 

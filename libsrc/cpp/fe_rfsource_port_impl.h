@@ -14,11 +14,16 @@ namespace frontend {
 	{
 	    public:
 	        InRFSourcePort(std::string port_name,
-                                LOGGER_PTR logger,
-	        		RFInfoPktSeqFromVoid *newAvailableRFInputsGetterCB = NULL,
-	        		RFInfoPktFromVoid *newCurrentRFInputGetterCB = NULL,
-	        		VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB = NULL,
-	        		VoidFromRFInfoPkt *newCurrentRFInputSetterCB = NULL);
+                               RFInfoPktSeqFromVoid *newAvailableRFInputsGetterCB = NULL,
+                               RFInfoPktFromVoid *newCurrentRFInputGetterCB = NULL,
+                               VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB = NULL,
+                               VoidFromRFInfoPkt *newCurrentRFInputSetterCB = NULL);
+	        InRFSourcePort(std::string port_name,
+                               LOGGER_PTR logger,
+                               RFInfoPktSeqFromVoid *newAvailableRFInputsGetterCB = NULL,
+                               RFInfoPktFromVoid *newCurrentRFInputGetterCB = NULL,
+                               VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB = NULL,
+                               VoidFromRFInfoPkt *newCurrentRFInputSetterCB = NULL);
 	        ~InRFSourcePort();
 
 	        FRONTEND::RFInfoPktSequence* available_rf_inputs();
@@ -93,6 +98,7 @@ namespace frontend {
 	class OutRFSourcePort : public OutFrontendPort<FRONTEND::RFSource_var,FRONTEND::RFSource>
 	{
 	    public:
+	        OutRFSourcePort(std::string port_name);
 	        OutRFSourcePort(std::string port_name, LOGGER_PTR logger);
 	        ~OutRFSourcePort();
 
@@ -100,6 +106,10 @@ namespace frontend {
 	        void available_rf_inputs(const FRONTEND::RFInfoPktSequence& data);
 	        FRONTEND::RFInfoPkt* current_rf_input();
 	        void current_rf_input(const FRONTEND::RFInfoPkt& data);
+                void setLogger(LOGGER_PTR newLogger);
+
+	    protected:
+                LOGGER_PTR logger;
 	};
 
 } // end of frontend namespace

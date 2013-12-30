@@ -16,6 +16,12 @@ namespace frontend {
 	{
 		public:
 			InFrontendTunerPort(std::string port_name,
+				CharFromChar *newTunerTypeGetterCB = NULL,
+				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
+				CharFromChar *newTunerGroupIdGetterCB = NULL,
+				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
+				PropFromChar *newTunerStatusGetterCB = NULL);
+			InFrontendTunerPort(std::string port_name,
                                 LOGGER_PTR logger,
 				CharFromChar *newTunerTypeGetterCB = NULL,
 				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
@@ -112,6 +118,24 @@ namespace frontend {
 	class InAnalogTunerPort : public virtual POA_FRONTEND::AnalogTuner, public InFrontendTunerPort
 	{
 		public:
+			InAnalogTunerPort(std::string port_name,
+				CharFromChar *newTunerTypeGetterCB = NULL,
+				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
+				CharFromChar *newTunerGroupIdGetterCB = NULL,
+				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
+				PropFromChar *newTunerStatusGetterCB = NULL,
+				DoubleFromChar *newTunerCenterFrequencyGetterCB = NULL,
+				VoidFromCharDouble *newTunerCenterFrequencySetterCB = NULL,
+				DoubleFromChar *newTunerBandwidthGetterCB = NULL,
+				VoidFromCharDouble *newTunerBandwidthSetterCB = NULL,
+				BooleanFromChar *newTunerAgcEnableGetterCB = NULL,
+				VoidFromCharBoolean *newTunerAgcEnableSetterCB = NULL,
+				FloatFromChar *newTunerGainGetterCB = NULL,
+				VoidFromCharFloat *newTunerGainSetterCB = NULL,
+				LongFromChar *newTunerReferenceSourceGetterCB = NULL,
+				VoidFromCharLong *newTunerReferenceSourceSetterCB = NULL,
+				BooleanFromChar *newTunerEnableGetterCB = NULL,
+				VoidFromCharBoolean *newTunerEnableSetterCB = NULL);
 			InAnalogTunerPort(std::string port_name,
                                 LOGGER_PTR logger,
 				CharFromChar *newTunerTypeGetterCB = NULL,
@@ -311,6 +335,26 @@ namespace frontend {
 	{
 		public:
 			InDigitalTunerPort(std::string port_name,
+				CharFromChar *newTunerTypeGetterCB = NULL,
+				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
+				CharFromChar *newTunerGroupIdGetterCB = NULL,
+				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
+				PropFromChar *newTunerStatusGetterCB = NULL,
+				DoubleFromChar *newTunerCenterFrequencyGetterCB = NULL,
+				VoidFromCharDouble *newTunerCenterFrequencySetterCB = NULL,
+				DoubleFromChar *newTunerBandwidthGetterCB = NULL,
+				VoidFromCharDouble *newTunerBandwidthSetterCB = NULL,
+				BooleanFromChar *newTunerAgcEnableGetterCB = NULL,
+				VoidFromCharBoolean *newTunerAgcEnableSetterCB = NULL,
+				FloatFromChar *newTunerGainGetterCB = NULL,
+				VoidFromCharFloat *newTunerGainSetterCB = NULL,
+				LongFromChar *newTunerReferenceSourceGetterCB = NULL,
+				VoidFromCharLong *newTunerReferenceSourceSetterCB = NULL,
+				BooleanFromChar *newTunerEnableGetterCB = NULL,
+				VoidFromCharBoolean *newTunerEnableSetterCB = NULL,
+				DoubleFromChar *newTunerOutputSampleRateGetterCB = NULL,
+				VoidFromCharDouble *newTunerOutputSampleRateSetterCB = NULL);//, USRP_UHD_base *_parent);
+			InDigitalTunerPort(std::string port_name,
                                 LOGGER_PTR logger,
 				CharFromChar *newTunerTypeGetterCB = NULL,
 				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
@@ -373,6 +417,7 @@ namespace frontend {
 	class OutFrontendTunerPort : public OutFrontendPort<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner>
 	{
 	    public:
+			OutFrontendTunerPort(std::string port_name);
 			OutFrontendTunerPort(std::string port_name,
                                              LOGGER_PTR logger);
 	        ~OutFrontendTunerPort();
@@ -394,6 +439,7 @@ namespace frontend {
 	class OutAnalogTunerPort : public OutFrontendPort<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner>
 	{
 	    public:
+                OutAnalogTunerPort(std::string port_name);
                 OutAnalogTunerPort(std::string port_name,
                                    LOGGER_PTR logger);
 	        ~OutAnalogTunerPort();
@@ -424,6 +470,7 @@ namespace frontend {
 	class OutDigitalTunerPort : public OutFrontendPort<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner>
 	{
 	    public:
+			OutDigitalTunerPort(std::string port_name);
 			OutDigitalTunerPort(std::string port_name,
                                             LOGGER_PTR logger);
 	        ~OutDigitalTunerPort();

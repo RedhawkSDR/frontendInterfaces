@@ -22,9 +22,30 @@ namespace frontend {
 		}
 	}
 
+	InNavDataPort::InNavDataPort(std::string port_name,
+                LOGGER_PTR logger,
+		NavPktFromVoid *newNavPktGetterCB,
+		VoidFromNavPkt *newNavPktSetterCB) :
+	Port_Provides_base_impl(port_name),
+	logger(logger),
+	getNavPktCB(),
+	setNavPktCB()
+	{
+		if ( newNavPktGetterCB ) {
+			getNavPktCB = boost::shared_ptr< NavPktFromVoid >( newNavPktGetterCB, null_deleter());
+		}
+		if ( newNavPktSetterCB ) {
+			setNavPktCB = boost::shared_ptr< VoidFromNavPkt >( newNavPktSetterCB, null_deleter());
+		}
+	}
+
 	InNavDataPort::~InNavDataPort()
 	{
 	}
+
+    void InNavDataPort::setLogger(LOGGER_PTR newLogger){
+        logger = newLogger;
+    }
 
     FRONTEND::NavigationPacket* InNavDataPort::nav_packet(){
 		boost::mutex::scoped_lock lock(portAccess);
@@ -55,6 +76,11 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutNavDataPort definition
 	// ----------------------------------------------------------------------------------------
+	OutNavDataPort::OutNavDataPort(std::string port_name) :
+			OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>::OutFrontendPort(port_name)
+		{
+		}
+
 	OutNavDataPort::OutNavDataPort(std::string port_name,
                                        LOGGER_PTR logger) :
 			OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>::OutFrontendPort(port_name,
@@ -65,6 +91,10 @@ namespace frontend {
 	OutNavDataPort::~OutNavDataPort()
 		{
 		}
+
+        void OutNavDataPort::setLogger(LOGGER_PTR newLogger){
+            logger = newLogger;
+        }
 
 	FRONTEND::NavigationPacket* OutNavDataPort::nav_packet()
 	{

@@ -8,11 +8,36 @@ namespace frontend {
 	// InRFSourcePort definition
 	// ----------------------------------------------------------------------------------------
 	InRFSourcePort::InRFSourcePort(std::string port_name,
-                LOGGER_PTR logger,
-    		RFInfoPktSeqFromVoid *newAvailableRFInputsGetterCB,
-    		RFInfoPktFromVoid *newCurrentRFInputGetterCB,
-    		VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB,
-    		VoidFromRFInfoPkt *newCurrentRFInputSetterCB) :
+                                       RFInfoPktSeqFromVoid *newAvailableRFInputsGetterCB,
+                                       RFInfoPktFromVoid *newCurrentRFInputGetterCB,
+                                       VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB,
+                                       VoidFromRFInfoPkt *newCurrentRFInputSetterCB) :
+	Port_Provides_base_impl(port_name),
+	getAvailableRFInputsCB(),
+	getCurrentRFInputCB(),
+	setAvailableRFInputsCB(),
+	setCurrentRFInputCB()
+	{
+		if ( newAvailableRFInputsGetterCB ) {
+			getAvailableRFInputsCB = boost::shared_ptr< RFInfoPktSeqFromVoid >( newAvailableRFInputsGetterCB, null_deleter());
+		}
+		if ( newCurrentRFInputGetterCB ) {
+			getCurrentRFInputCB = boost::shared_ptr< RFInfoPktFromVoid >( newCurrentRFInputGetterCB, null_deleter());
+		}
+		if ( newAvailableRFInputsSetterCB ) {
+			setAvailableRFInputsCB = boost::shared_ptr< VoidFromRFInfoPktSeq >( newAvailableRFInputsSetterCB, null_deleter());
+		}
+		if ( newCurrentRFInputSetterCB ) {
+			setCurrentRFInputCB = boost::shared_ptr< VoidFromRFInfoPkt >( newCurrentRFInputSetterCB, null_deleter());
+		}
+	}
+
+	InRFSourcePort::InRFSourcePort(std::string port_name,
+                                       LOGGER_PTR logger,
+                                       RFInfoPktSeqFromVoid *newAvailableRFInputsGetterCB,
+                                       RFInfoPktFromVoid *newCurrentRFInputGetterCB,
+                                       VoidFromRFInfoPktSeq *newAvailableRFInputsSetterCB,
+                                       VoidFromRFInfoPkt *newCurrentRFInputSetterCB) :
 	Port_Provides_base_impl(port_name),
         logger(logger),
 	getAvailableRFInputsCB(),
@@ -106,6 +131,11 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutRFSourcePort definition
 	// ----------------------------------------------------------------------------------------
+	OutRFSourcePort::OutRFSourcePort(std::string port_name) :
+		OutFrontendPort<FRONTEND::RFSource_var,FRONTEND::RFSource>::OutFrontendPort(port_name)
+	{
+	}
+
 	OutRFSourcePort::OutRFSourcePort(std::string port_name,
                                          LOGGER_PTR logger) :
 		OutFrontendPort<FRONTEND::RFSource_var,FRONTEND::RFSource>::OutFrontendPort(port_name,
@@ -116,6 +146,11 @@ namespace frontend {
 	OutRFSourcePort::~OutRFSourcePort()
 	{
 	}
+
+	void OutRFSourcePort::setLogger(LOGGER_PTR newLogger)
+        {
+            logger = newLogger;
+        }
 
 	FRONTEND::RFInfoPktSequence* OutRFSourcePort::available_rf_inputs()
 	{
