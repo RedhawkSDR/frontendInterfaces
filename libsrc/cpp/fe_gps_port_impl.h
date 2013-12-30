@@ -94,7 +94,7 @@ namespace frontend {
 	// ----------------------------------------------------------------------------------------
 	// OutGPSPort declaration
 	// ----------------------------------------------------------------------------------------
-	class OutGPSPort : OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>
+	class OutGPSPort : public OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>
 	{
 	    public:
 	        OutGPSPort(std::string port_name);
