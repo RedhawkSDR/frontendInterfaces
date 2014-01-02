@@ -70,7 +70,7 @@ clean-python:
 ###############################################################################
 # Java
 
-if !HAVE_JAVASUPPORT
+if HAVE_JAVASUPPORT
 
 JAVA_DIR := java
 JAVA_SRCDIR := $(JAVA_DIR)/src
@@ -80,7 +80,18 @@ BINARY_JAR := $(JAVA_DIR)/frontend.jar
 SOURCE_JAR := $(JAVA_DIR)/frontend.src.jar
 
 JAVA_SRCS := \
-InRFInfoPort.java
+InGPSPort.java \
+OutGPSPort.java \
+GPSListener.java \
+InNavDataPort.java \
+OutNavDataPort.java \
+NavDataListener.java \
+InRFInfoPort.java \
+OutRFInfoPort.java \
+RFInfoListener.java \
+InRFSourcePort.java \
+OutRFSourcePort.java \
+RFSourceListener.java
 JAVA_SRCS_ABS := $(addprefix $(JAVA_SRCDIR)/frontend/, $(JAVA_SRCS))
 
 javalibdir = $(prefix)/lib
@@ -103,7 +114,7 @@ $(SOURCE_JAR): $(JAVA_DIR)/java.files $(JAVA_DIR)/META-INF/MANIFEST.MF.src
 	$(JAR) cmf $(JAVA_DIR)/META-INF/MANIFEST.MF.src $(SOURCE_JAR) -C $(JAVA_SRCDIR) .
 
 clean-java:
-	rm -rf $(JAVA_BINDIR) $(BINARY_JAR)
+	rm -rf $(JAVA_BINDIR) $(BINARY_JAR) $(SOURCE_JAR)
 
 else
 
