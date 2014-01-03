@@ -34,14 +34,12 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
         this.outConnections = new HashMap<String, RFInfoOperations>();
     }
 
-    protected RFInfoOperations narrow(org.omg.CORBA.Object connection)
-    {
+    protected RFInfoOperations narrow(org.omg.CORBA.Object connection) {
         RFInfoOperations ops = RFInfoHelper.narrow(connection);
         return ops;
     }
 
-    public void connectPort(final org.omg.CORBA.Object connection, final String connectionId) throws CF.PortPackage.InvalidPort, CF.PortPackage.OccupiedPort
-    {
+    public void connectPort(final org.omg.CORBA.Object connection, final String connectionId) throws CF.PortPackage.InvalidPort, CF.PortPackage.OccupiedPort {
         try {
             synchronized (this.updatingPortsLock) {
                 super.connectPort(connection, connectionId);
@@ -63,8 +61,7 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
         }
     }
 
-    public String rf_flow_id()
-    {
+    public String rf_flow_id() {
         String retval = "";
 
         synchronized(updatingPortsLock){
@@ -77,8 +74,7 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
         return retval;
     }
 
-    public void rf_flow_id(String data)
-    {
+    public void rf_flow_id(String data) {
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (RFInfoOperations p : this.outConnections.values()) {
@@ -86,11 +82,9 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
                 }
             }
         }
-        return;
     }
 
-    public RFInfoPkt rfinfo_pkt()
-    {
+    public RFInfoPkt rfinfo_pkt() {
         RFInfoPkt retval = null;
 
         synchronized(updatingPortsLock){
@@ -103,8 +97,7 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
         return retval;
     }
 
-    public void rfinfo_pkt(RFInfoPkt data)
-    {
+    public void rfinfo_pkt(RFInfoPkt data) {
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (RFInfoOperations p : this.outConnections.values()) {
@@ -112,7 +105,6 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
                 }
             }
         }
-        return;
     }
 
     public void setLogger( Logger newLogger ) {

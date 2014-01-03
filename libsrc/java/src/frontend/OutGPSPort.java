@@ -87,16 +87,15 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
                 }
             }
         }
-        return;
     }
 
-    public FRONTEND.GpsTimePos gps_time_pos()
+    public GpsTimePos gps_time_pos()
     {
-        FRONTEND.GpsTimePos retval = null;
+        GpsTimePos retval = null;
 
         synchronized(this.updatingPortsLock) { 
             if (this.active) {
-                for (FRONTEND.GPSOperations p : this.outConnections.values()) {
+                for (GPSOperations p : this.outConnections.values()) {
                     retval = p.gps_time_pos();
                 }
             }
@@ -104,16 +103,15 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
         return retval;
     }
 
-    public void gps_time_pos(FRONTEND.GpsTimePos data)
+    public void gps_time_pos(GpsTimePos data)
     {
         synchronized(this.updatingPortsLock) {
             if (this.active) {
-                for (FRONTEND.GPSOperations p : this.outConnections.values()) {
+                for (GPSOperations p : this.outConnections.values()) {
                     p.gps_time_pos(data);
                 }
             }
         }
-        return;
     }
 
     public void setLogger( Logger newLogger ) {

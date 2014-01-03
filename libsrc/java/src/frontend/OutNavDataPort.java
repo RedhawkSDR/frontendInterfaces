@@ -86,7 +86,6 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
                 }
             }
         }
-        return;
     }
 
     public void setLogger( Logger newLogger ) {

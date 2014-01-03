@@ -80,6 +80,15 @@ BINARY_JAR := $(JAVA_DIR)/frontend.jar
 SOURCE_JAR := $(JAVA_DIR)/frontend.src.jar
 
 JAVA_SRCS := \
+InAnalogTunerPort.java \
+OutAnalogTunerPort.java \
+AnalogTunerListener.java \
+InDigitalTunerPort.java \
+OutDigitalTunerPort.java \
+DigitalTunerListener.java \
+InFrontendTunerPort.java \
+OutFrontendTunerPort.java \
+FrontendTunerListener.java \
 InGPSPort.java \
 OutGPSPort.java \
 GPSListener.java \

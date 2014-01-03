@@ -32,40 +32,52 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
         this.portAccess = new Object();
     }
 
-    public String rf_flow_id()
-    {
+    public String rf_flow_id() {
         synchronized(this.portAccess){
             if ( rfInfoListener != null ){ 
                 return rfInfoListener.getRFFlowId();
             } else { 
+                if (this.logger != null){
+                    logger.error("InRFInfoPort rf_flow_id() callback listener not defined.");
+                }
                 return null;
             }
         }
     }
 
-    public void rf_flow_id(String data)
-    {
+    public void rf_flow_id(String data) {
         synchronized(this.portAccess){
-            if ( rfInfoListener != null) rfInfoListener.setRFFlowId(data);
+            if ( rfInfoListener != null) {
+                rfInfoListener.setRFFlowId(data);
+            } else { 
+                if (this.logger != null){
+                    logger.error("InRFInfoPort rf_flow_id(String data) callback listener not defined.");
+                }
+            }
         }
     }
 
-    public RFInfoPkt rfinfo_pkt()
-    {
+    public RFInfoPkt rfinfo_pkt() {
         synchronized(this.portAccess){
             if ( rfInfoListener != null) {
                 return (rfInfoListener.getRFInfoPkt());
             } else { 
+                if (this.logger != null){
+                    logger.error("InRFInfoPort rfinfo_pkt() callback listener not defined.");
+                }
                 return null;
             }
         }
     }
 
-    public void rfinfo_pkt(RFInfoPkt data)
-    {
+    public void rfinfo_pkt(RFInfoPkt data) {
         synchronized(this.portAccess){
             if ( rfInfoListener != null) {
                 rfInfoListener.setRFInfoPkt(data);
+            } else { 
+                if (this.logger != null){
+                    logger.error("InRFInfoPort rfinfo_pkt(RFInfoPkt data) callback listener not defined.");
+                }
             }
         }
     }

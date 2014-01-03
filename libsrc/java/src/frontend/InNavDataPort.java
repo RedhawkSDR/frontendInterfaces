@@ -41,16 +41,22 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
             if ( navDataListener != null ) {
                 return navDataListener.getNavPkt();
             } else {
+                if (this.logger != null){
+                    logger.error("InNavDataPort nav_packet() callback listener not defined");
+                }
                 return null;
             }
         }
     }
 
-    public void nav_packet(NavigationPacket data)
-    {
+    public void nav_packet(NavigationPacket data) {
         synchronized(this.portAccess){
             if ( navDataListener != null) {
                 navDataListener.setNavPkt(data);
+            } else {
+                if (this.logger != null){
+                    logger.error("InNavDataPort nav_packet(NavigationPacket data) callback listener not defined");
+                }
             }
         }
     }

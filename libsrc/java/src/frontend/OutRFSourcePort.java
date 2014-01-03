@@ -34,14 +34,12 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
         this.outConnections = new HashMap<String, RFSourceOperations>();
     }
 
-    protected RFSourceOperations narrow(org.omg.CORBA.Object connection)
-    {
+    protected RFSourceOperations narrow(org.omg.CORBA.Object connection) {
         RFSourceOperations ops = RFSourceHelper.narrow(connection);
         return ops;
     }
 
-    public void connectPort(final org.omg.CORBA.Object connection, final String connectionId) throws CF.PortPackage.InvalidPort, CF.PortPackage.OccupiedPort
-    {
+    public void connectPort(final org.omg.CORBA.Object connection, final String connectionId) throws CF.PortPackage.InvalidPort, CF.PortPackage.OccupiedPort {
         try {
             synchronized (this.updatingPortsLock) {
                 super.connectPort(connection, connectionId);
@@ -63,8 +61,7 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
         }
     }
 
-    public RFInfoPkt[] available_rf_inputs()
-    {
+    public RFInfoPkt[] available_rf_inputs() {
         RFInfoPkt[] retval = null;
 
         synchronized(updatingPortsLock){
@@ -77,8 +74,7 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
         return retval;
     }
 
-    public void available_rf_inputs(RFInfoPkt[] data)
-    {
+    public void available_rf_inputs(RFInfoPkt[] data) {
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (RFSourceOperations p : this.outConnections.values()) {
@@ -86,11 +82,9 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
                 }
             }
         }
-        return;
     }
 
-    public RFInfoPkt current_rf_input()
-    {
+    public RFInfoPkt current_rf_input() {
         RFInfoPkt retval = null;
 
         synchronized(updatingPortsLock){
@@ -103,8 +97,7 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
         return retval;
     }
 
-    public void current_rf_input(RFInfoPkt data)
-    {
+    public void current_rf_input(RFInfoPkt data) {
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (RFSourceOperations p : this.outConnections.values()) {
@@ -112,7 +105,6 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
                 }
             }
         }
-        return;
     }
 
     public void setLogger( Logger newLogger ) {

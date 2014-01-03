@@ -33,42 +33,52 @@ public class InGPSPort extends FRONTEND.GPSPOA {
         this.portAccess = new Object();
     }
 
-    public GPSInfo gps_info()
-    {
+    public GPSInfo gps_info() {
         synchronized(this.portAccess){
             if ( gpsListener != null ) {
                 return gpsListener.getGPSInfo();
             } else {
+                if (this.logger != null){
+                    logger.error("InGPSPort gps_info() callback listener not defined");
+                }
                 return null;
             }
         }
     }
 
-    public void gps_info(GPSInfo data)
-    {
+    public void gps_info(GPSInfo data) {
         synchronized(this.portAccess){
             if ( gpsListener != null) {
                 gpsListener.setGPSInfo(data);
+            } else {
+                if (this.logger != null){
+                    logger.error("InGPSPort gps_info(GPSInfo data) callback listener not defined");
+                }
             }
         }
     }
 
-    public GpsTimePos gps_time_pos()
-    {
+    public GpsTimePos gps_time_pos() {
         synchronized(this.portAccess){
             if ( gpsListener != null) {
                 return (gpsListener.getGpsTimePos());
             } else {
+                if (this.logger != null){
+                    logger.error("InGPSPort gps_time_pos() callback listener not defined");
+                }
                 return null;
             }
         }
     }
 
-    public void gps_time_pos(GpsTimePos data)
-    {
+    public void gps_time_pos(GpsTimePos data) {
         synchronized(this.portAccess){
             if ( gpsListener != null) {
                 gpsListener.setGpsTimePos(data);
+            } else {
+                if (this.logger != null){
+                    logger.error("InGPSPort gps_time_pos(GpsTimePos data) callback listener not defined");
+                }
             }
         }
     }
