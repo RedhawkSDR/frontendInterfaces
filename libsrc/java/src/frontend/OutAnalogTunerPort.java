@@ -1,4 +1,4 @@
-package fei_device_java.java.ports;
+package frontend;
 
 import org.apache.log4j.Logger;
 import java.util.HashMap;
