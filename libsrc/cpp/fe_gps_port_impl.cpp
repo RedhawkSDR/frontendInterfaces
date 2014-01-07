@@ -74,12 +74,12 @@ namespace frontend {
     }
     void InGPSPort::gps_info(const FRONTEND::GPSInfo& data){
 		boost::mutex::scoped_lock lock(portAccess);
-		if ( setGPSInfoCB ) return (*setGPSInfoCB)(data);
+		if ( setGPSInfoCB ) (*setGPSInfoCB)(data);
 		else throw FRONTEND::NotSupportedException("gps_info(const FRONTEND::GPSInfo& data) IS NOT CURRENTLY SUPPORTED");
     }
     FRONTEND::GpsTimePos* InGPSPort::gps_time_pos(){
 		boost::mutex::scoped_lock lock(portAccess);
-		if ( getGpsTimePosCB ) (*getGpsTimePosCB)();
+		if ( getGpsTimePosCB ) return (*getGpsTimePosCB)();
 		else throw FRONTEND::NotSupportedException("gps_time_pos() IS NOT CURRENTLY SUPPORTED");
     }
     void InGPSPort::gps_time_pos(const FRONTEND::GpsTimePos& data){

@@ -145,72 +145,189 @@ namespace frontend {
 		try{
 			for (ii = 0; ii < capacities.length(); ++ii) {
 				const std::string id = (const char*) capacities[ii].id;
-				if (id != "FRONTEND::tuner_allocation" && id != "FRONTEND::listener_allocation")
-					throw CF::Device::InvalidCapacity("UNKNOWN ALLOCATION PROPERTY", capacities);
+				if (id != "FRONTEND::tuner_allocation" && id != "FRONTEND::listener_allocation"){
+					//TODO: add back log messages
+					std::cout<<"allocateCapacity: UNKNOWN ALLOCATION PROPERTY1: "<<id<<std::endl;
+					throw CF::Device::InvalidCapacity("UNKNOWN ALLOCATION PROPERTY1", capacities);
+				}
 				PropertyInterface* property = getPropertyFromId(id);
-				if(!property)
+				if(!property){
+					//TODO: add back log messages
+					std::cout<<"allocateCapacity: UNKNOWN PROPERTY"<<std::endl;
 					throw CF::Device::InvalidCapacity("UNKNOWN PROPERTY", capacities);
+				}
 				try{
 					property->setValue(capacities[ii].value);
 				}
 				catch(const std::logic_error &e){
+					//TODO: add back log messages
+					std::cout<<"allocateCapacity: COULD NOT PARSE CAPACITY"<<std::endl;
 					throw CF::Device::InvalidCapacity("COULD NOT PARSE CAPACITY", capacities);
 				};
 				if (id == "FRONTEND::tuner_allocation"){
 
-					if(!_valid_tuner_type(frontend_tuner_allocation.tuner_type))
+					if(!_valid_tuner_type(frontend_tuner_allocation.tuner_type)){
+						//TODO: add back log messages
+						std::cout<<"allocateCapacity: UNKNOWN FRONTEND TUNER TYPE"<<std::endl;
 						throw CF::Device::InvalidCapacity("UNKNOWN FRONTEND TUNER TYPE", capacities);
+					}
 
 					// Check allocation_id
 					if (frontend_tuner_allocation.allocation_id.empty()) {
+						//TODO: add back log messages
+						std::cout<<"allocateCapacity: MISSING ALLOCATION_ID"<<std::endl;
 						throw CF::Device::InvalidCapacity("MISSING ALLOCATION_ID", capacities);
 					}
 					// Check if allocation ID has already been used
-					if(getTunerMapping(frontend_tuner_allocation.allocation_id) >= 0)
+					if(getTunerMapping(frontend_tuner_allocation.allocation_id) >= 0){
+						//TODO: add back log messages
+						std::cout<<"allocateCapacity: ALLOCATION_ID ALREADY IN USE"<<std::endl;
 						throw CF::Device::InvalidCapacity("ALLOCATION_ID ALREADY IN USE", capacities);
+					}
 
 					// Check if available tuner (if not requesting device control, this is all that's needed to add listener)
 					long tuner_id = addTunerMapping(frontend_tuner_allocation);
 					if (tuner_id < 0) {
 						char msg[512];
 						sprintf(msg,"NO AVAILABLE TUNER");
+						//TODO: add back log messages
+						std::cout<<"allocateCapacity: NO AVAILABLE TUNER"<<std::endl;
 						throw std::logic_error(msg);
 					}
 
 					// Initialize the tuner (only if requesting device control)
 					if (frontend_tuner_allocation.device_control){
-						bool success = false;
-						//try{
-							success = setupTuner(tuner_id, frontend_tuner_allocation);
-						//}
-						//catch(const std::logic_error &e) {
-						//	throw e;
-						//}
-						//catch(FRONTEND::BadParameterException &e) {
-						//	throw e;
-						//};
-						if (!success){
+
+						{
+							exclusive_lock lock(* (tunerChannels[tuner_id].lock));
+							if(!frontend_tuner_allocation.group_id.empty() && frontend_tuner_allocation.group_id != tunerChannels[tuner_id].frontend_status->group_id ){
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: CANNOT ALLOCATE A TUNER WITH THAT GROUP ID"<<std::endl;
+								throw FRONTEND::BadParameterException("CAN NOT ALLOCATE A TUNER WITH THAT GROUP ID!");
+							}
+
+							if(!frontend_tuner_allocation.rf_flow_id.empty() && frontend_tuner_allocation.rf_flow_id != tunerChannels[tuner_id].frontend_status->rf_flow_id ){
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: CANNOT ALLOCATE A TUNER WITH THAT RF FLOW ID"<<std::endl;
+								throw FRONTEND::BadParameterException(("CAN NOT ALLOCATE A TUNER WITH RF FLOW ID = " + frontend_tuner_allocation.rf_flow_id + " !").c_str());
+							}
+
+							//Check Validity
+							if (!_valid_center_frequency(frontend_tuner_allocation.center_frequency,tuner_id)){
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: INVALID FREQUENCY"<<std::endl;
+								throw FRONTEND::BadParameterException("allocateCapacity(): INVALID FREQUENCY");
+							}
+							if (!_valid_bandwidth(frontend_tuner_allocation.bandwidth,tuner_id)){
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: INVALID BANDWIDTH"<<std::endl;
+								throw FRONTEND::BadParameterException("allocateCapacity(): INVALID BANDWIDTH");
+							}
+							if (!_valid_sample_rate(frontend_tuner_allocation.sample_rate,tuner_id)){
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: INVALID RATE"<<std::endl;
+								throw FRONTEND::BadParameterException("allocateCapacity(): INVALID RATE");
+							}
+
+							try {
+								_dev_set_all(frontend_tuner_allocation.center_frequency,
+											 frontend_tuner_allocation.bandwidth,
+											 frontend_tuner_allocation.sample_rate,
+											 tuner_id);
+								//_dev_set_center_frequency(frontend_tuner_allocation.center_frequency,tuner_id);
+								//_dev_set_bandwidth(frontend_tuner_allocation.bandwidth,tuner_id);
+								//_dev_set_sample_rate(frontend_tuner_allocation.sample_rate,tuner_id);
+							}
+							catch(...){
+								char msg[512];
+								sprintf(msg,"allocateCapacity(%d): failed when configuring device hardware",int(tuner_id));
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: failed when configuring device hardware"<<std::endl;
+								throw std::logic_error(msg);
+							};
+
+							try {
+								_dev_get_all(tunerChannels[tuner_id].frontend_status->center_frequency,
+											 tunerChannels[tuner_id].frontend_status->bandwidth,
+											 tunerChannels[tuner_id].frontend_status->sample_rate,
+											 tuner_id);
+								//tunerChannels[tuner_id].frontend_status->center_frequency = _dev_get_center_frequency(tuner_id);
+								//tunerChannels[tuner_id].frontend_status->bandwidth = _dev_get_bandwidth(tuner_id);
+								//tunerChannels[tuner_id].frontend_status->sample_rate = _dev_get_sample_rate(tuner_id);
+							}
+							catch(...){
+								char msg[512];
+								sprintf(msg,"allocateCapacity(%d): failed when querying device hardware",int(tuner_id));
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: failed when querying device hardware"<<std::endl;
+								throw std::logic_error(msg);
+							};
+
+							// Only check non-TX when bandwidth was not set to don't care
+							if( (tunerChannels[tuner_id].frontend_status->tuner_type != "TX" && frontend_tuner_allocation.bandwidth != 0.0) &&
+								(tunerChannels[tuner_id].frontend_status->bandwidth < frontend_tuner_allocation.bandwidth ||
+								tunerChannels[tuner_id].frontend_status->bandwidth > frontend_tuner_allocation.bandwidth+frontend_tuner_allocation.bandwidth * frontend_tuner_allocation.bandwidth_tolerance/100.0 )){
+								char msg[512];
+								sprintf(msg,"allocateCapacity(%d): returned bw \"%f\" does not meet tolerance criteria of \"%f + %f percent\". ",int(tuner_id),
+										tunerChannels[tuner_id].frontend_status->bandwidth,frontend_tuner_allocation.bandwidth,frontend_tuner_allocation.bandwidth_tolerance);
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: did not meet BW tolerance"<<std::endl;
+								throw std::logic_error(msg);
+							}
+							// always check TX, but only check non-TX when sample_rate was not set to don't care)
+							if( (tunerChannels[tuner_id].frontend_status->tuner_type == "TX" || frontend_tuner_allocation.sample_rate != 0.0) &&
+								(tunerChannels[tuner_id].frontend_status->sample_rate < frontend_tuner_allocation.sample_rate ||
+								tunerChannels[tuner_id].frontend_status->sample_rate > frontend_tuner_allocation.sample_rate+frontend_tuner_allocation.sample_rate * frontend_tuner_allocation.sample_rate_tolerance/100.0 )){
+								char msg[512];
+								sprintf(msg,"allocateCapacity(%d): returned sample rate \"%f\" does not meet tolerance criteria of \"%f + %f percent\". ",int(tuner_id),
+										tunerChannels[tuner_id].frontend_status->sample_rate,frontend_tuner_allocation.sample_rate,frontend_tuner_allocation.sample_rate_tolerance);
+								//TODO: add back log messages
+								std::cout<<"allocateCapacity: did not meet sample rate tolerance"<<std::endl;
+								throw std::logic_error(msg);
+							}
+						} // release tuner lock
+
+						// enable tuner after successful allocation
+						try {
+							enableTuner(tuner_id,true);
+						} catch(...){
 							char msg[512];
-							sprintf(msg,"SETUP TUNER FAILED");
+							sprintf(msg,"FAILED TO ENABLE TUNER AFTER ALLOCATION");
+							//TODO: add back log messages
+							std::cout<<"allocateCapacity: FAILED TO ENABLE TUNER AFTER ALLOCATION"<<std::endl;
 							throw std::logic_error(msg);
 						}
 					}
 				}
 				else if (id == "FRONTEND::listener_allocation") {
 					// Check validity of allocation_id's
-					if (frontend_listener_allocation.existing_allocation_id.empty())
+					if (frontend_listener_allocation.existing_allocation_id.empty()){
+						//TODO: add back log messages
+						std::cout<<"allocateCapacity: MISSING EXISTING ALLOCATION ID"<<std::endl;
 						throw CF::Device::InvalidCapacity("MISSING EXISTING ALLOCATION ID", capacities);
-					if (frontend_listener_allocation.listener_allocation_id.empty())
+					}
+					if (frontend_listener_allocation.listener_allocation_id.empty()){
+						//TODO: add back log messages
+						std::cout<<"allocateCapacity: MISSING LISTENER ALLOCATION ID"<<std::endl;
 						throw CF::Device::InvalidCapacity("MISSING LISTENER ALLOCATION ID", capacities);
+					}
 					// Check if listener allocation ID has already been used
-					if(getTunerMapping(frontend_listener_allocation.listener_allocation_id) >= 0)
+					if(getTunerMapping(frontend_listener_allocation.listener_allocation_id) >= 0){
+						//TODO: add back log messages
+						std::cout<<"allocateCapacity: LISTENER ALLOCATION ID ALREADY IN USE"<<std::endl;
 						throw CF::Device::InvalidCapacity("LISTENER ALLOCATION ID ALREADY IN USE", capacities);
+					}
 
-					if(addTunerMapping(frontend_listener_allocation) < 0)
+					if(addTunerMapping(frontend_listener_allocation) < 0){
+						//TODO: add back log messages
+						std::cout<<"allocateCapacity: UNKNOWN CONTROL ALLOCATION ID"<<std::endl;
 						throw FRONTEND::BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
+					}
 				}
 				else {
-					throw CF::Device::InvalidCapacity("UNKNOWN ALLOCATION PROPERTY", capacities);
+					//TODO: add back log messages
+					std::cout<<"allocateCapacity: UNKNOWN ALLOCATION PROPERTY2"<<std::endl;
+					throw CF::Device::InvalidCapacity("UNKNOWN ALLOCATION PROPERTY2", capacities);
 				}
 			}
 		}
@@ -293,77 +410,6 @@ namespace frontend {
 	/*****************************************************************/
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::setupTuner(size_t tuner_id, const frontend::frontend_tuner_allocation_struct& tuner_req) throw (std::logic_error,FRONTEND::BadParameterException) {
-		if(tuner_req.allocation_id != tunerChannels[tuner_id].control_allocation_id)
-			return false;
-
-		// If the freq has changed (change in stream) or the tuner is disabled, then set it as disabled
-		indivTuner<TunerStatusStructType>* tuner_curr = &tunerChannels[tuner_id];
-		bool isTunerEnabled = tuner_curr->frontend_status->enabled;
-		if (!isTunerEnabled || tuner_curr->frontend_status->center_frequency != tuner_req.center_frequency)
-			enableTuner(tuner_id, false); // TODO: is this a generic thing we can assume is desired when changing any tuner device?
-		{
-			exclusive_lock lock(* (tuner_curr->lock));
-			if(!tuner_req.group_id.empty() && tuner_req.group_id != tuner_curr->frontend_status->group_id ){
-				throw FRONTEND::BadParameterException("CAN NOT ALLOCATE A TUNER WITH THAT GROUP ID!");
-			}
-
-			if(!tuner_req.rf_flow_id.empty() && tuner_req.rf_flow_id != tuner_curr->frontend_status->rf_flow_id ){
-				throw FRONTEND::BadParameterException(("CAN NOT ALLOCATE A TUNER WITH RF FLOW ID = " + tuner_req.rf_flow_id + " !").c_str());
-			}
-
-			//Check Validity
-			if (!_valid_center_frequency(tuner_req.center_frequency,tuner_id))
-				throw FRONTEND::BadParameterException("setupTuner(): INVALID FREQUENCY");
-			if (!_valid_gain(tuner_curr->frontend_status->gain,tuner_id))
-				throw FRONTEND::BadParameterException("setupTuner(): INVALID GAIN");
-			if (!_valid_bandwidth(tuner_req.bandwidth,tuner_id))
-				throw FRONTEND::BadParameterException("setupTuner(): INVALID BANDWIDTH");
-			if (!_valid_sample_rate(tuner_req.sample_rate,tuner_id))
-				throw FRONTEND::BadParameterException("setupTuner(): INVALID RATE");
-
-			_dev_set_all(tuner_req.center_frequency,tuner_req.bandwidth,tuner_req.sample_rate,tuner_curr->frontend_status->gain,tuner_id);
-			//_dev_set_center_frequency(tuner_req.center_frequency,tuner_id);
-			//_dev_set_bandwidth(tuner_req.bandwidth,tuner_id);
-			//_dev_set_sample_rate(tuner_req.sample_rate,tuner_id);
-			//_dev_set_gain(tuner_curr->frontend_status->gain,tuner_id);
-
-			_dev_get_all(tuner_curr->frontend_status->center_frequency,
-						 tuner_curr->frontend_status->bandwidth,
-						 tuner_curr->frontend_status->sample_rate,
-						 tuner_curr->frontend_status->gain,
-					     tuner_id);
-			//tuner_curr->frontend_status->center_frequency = _dev_get_center_frequency(tuner_id);
-			//tuner_curr->frontend_status->bandwidth = _dev_get_bandwidth(tuner_id);
-			//tuner_curr->frontend_status->sample_rate = _dev_get_sample_rate(tuner_id);
-			//tuner_curr->frontend_status->gain = _dev_get_gain(tuner_id);
-
-			// Only check non-TX when bandwidth was not set to don't care
-			if( (tuner_curr->frontend_status->tuner_type != "TX" && tuner_req.bandwidth != 0.0) &&
-				(tuner_curr->frontend_status->bandwidth < tuner_req.bandwidth ||
-				tuner_curr->frontend_status->bandwidth > tuner_req.bandwidth+tuner_req.bandwidth * tuner_req.bandwidth_tolerance/100.0 )){
-				char msg[512];
-				sprintf(msg,"setupTuner(%d): returned bw \"%f\" does not meet tolerance criteria of \"%f + %f percent\". ",int(tuner_id), tuner_curr->frontend_status->bandwidth,tuner_req.bandwidth,tuner_req.bandwidth_tolerance);
-				throw std::logic_error(msg);
-			}
-			// always check TX, but only check non-TX when sample_rate was not set to don't care)
-			if( (tuner_curr->frontend_status->tuner_type == "TX" || tuner_req.sample_rate != 0.0) &&
-				(tuner_curr->frontend_status->sample_rate < tuner_req.sample_rate ||
-				tuner_curr->frontend_status->sample_rate > tuner_req.sample_rate+tuner_req.sample_rate * tuner_req.sample_rate_tolerance/100.0 )){
-				char msg[512];
-				sprintf(msg,"setupTuner(%d): returned sample rate \"%f\" does not meet tolerance criteria of \"%f + %f percent\". ",int(tuner_id), tuner_curr->frontend_status->sample_rate,tuner_req.sample_rate,tuner_req.sample_rate_tolerance);
-				throw std::logic_error(msg);
-			}
-		}
-
-		//TODO - should we catch exceptions here, enable tuner if necessary, and re-throw exception?
-		// otherwise, setting invalid gain value will disable tuner, etc. - is that desired behavior?
-		if (isTunerEnabled)
-			enableTuner(tuner_id, true);
-		return true;
-	}
-
-	template < typename TunerStatusStructType >
 	bool Tuner_impl<TunerStatusStructType>::removeTuner(size_t tuner_id) {
 		enableTuner(tuner_id, false);
 		tunerChannels[tuner_id].reset();
@@ -382,8 +428,10 @@ namespace frontend {
 		if (!prev_enabled && enable) {
 			configureTunerSRI(& tunerChannels[tuner_id].sri,
 					tunerChannels[tuner_id].frontend_status->center_frequency,
+					tunerChannels[tuner_id].frontend_status->bandwidth,
 					tunerChannels[tuner_id].frontend_status->sample_rate,
-					1,
+					//tunerChannels[tuner_id].frontend_status->complex, --> "complex" is optional, can't assume it's there
+					1, // TODO - assumes complex data, override enableTuner function if necessary
 					tunerChannels[tuner_id].frontend_status->rf_flow_id);
 			streamID_to_tunerID.insert(std::make_pair(std::string(tunerChannels[tuner_id].sri.streamID), tuner_id));
 			_dev_enable(tuner_id);

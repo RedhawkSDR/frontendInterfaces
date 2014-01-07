@@ -93,7 +93,7 @@ namespace frontend {
 				frontend_status->bandwidth = 0.0;
 				frontend_status->sample_rate = 0.0;
 				frontend_status->complex = true;
-				frontend_status->enabled = true;
+				frontend_status->enabled = false;
 			}
 		}
 	};
@@ -133,7 +133,6 @@ namespace frontend {
 			virtual bool is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr);
 
 			// Configure tuner - gets called during allocation
-			virtual bool setupTuner(size_t tuner_id, const frontend::frontend_tuner_allocation_struct& tuner_req) throw (std::logic_error,FRONTEND::BadParameterException);
 			virtual bool enableTuner(size_t tuner_id, bool enable);
 			virtual bool removeTuner(size_t tuner_id);
 
@@ -168,22 +167,19 @@ namespace frontend {
 			virtual bool _valid_center_frequency(double req_freq, size_t tuner_id) = 0;
 			virtual bool _valid_bandwidth(double req_bw, size_t tuner_id) = 0;
 			virtual bool _valid_sample_rate(double req_sr, size_t tuner_id) = 0;
-			virtual bool _valid_gain(double req_gain, size_t tuner_id) = 0;
 
 			virtual bool _dev_enable(size_t tuner_id) = 0;
 			virtual bool _dev_disable(size_t tuner_id) = 0;
 
-			virtual bool _dev_set_all(double req_freq, double req_bw, double req_sr, double req_gain, size_t tuner_id) = 0;
+			virtual bool _dev_set_all(double req_freq, double req_bw, double req_sr, size_t tuner_id) = 0;
 			virtual bool _dev_set_center_frequency(double req_freq, size_t tuner_id) = 0;
 			virtual bool _dev_set_bandwidth(double req_bw, size_t tuner_id) = 0;
 			virtual bool _dev_set_sample_rate(double req_sr, size_t tuner_id) = 0;
-			virtual bool _dev_set_gain(double req_gain, size_t tuner_id) = 0;
 
-			virtual bool _dev_get_all(double &freq, double &bw, double &sr, double &gain, size_t tuner_id) = 0;
+			virtual bool _dev_get_all(double &freq, double &bw, double &sr, size_t tuner_id) = 0;
 			virtual double _dev_get_center_frequency(size_t tuner_id) = 0;
 			virtual double _dev_get_bandwidth(size_t tuner_id) = 0;
 			virtual double _dev_get_sample_rate(size_t tuner_id) = 0;
-			virtual double _dev_get_gain(size_t tuner_id) = 0;
 
 			////////////////////////////
 			// Other helper functions //
@@ -196,19 +192,6 @@ namespace frontend {
 		        }
 		        return req_rate;
 		    }
-
-			inline frontend::frontend_tuner_allocation_struct feAlloc_from_feStatus(size_t tuner_id){
-				frontend::frontend_tuner_allocation_struct newStruct;
-				newStruct.tuner_type= tunerChannels[tuner_id].frontend_status->tuner_type;
-				newStruct.allocation_id= tunerChannels[tuner_id].control_allocation_id;
-				newStruct.center_frequency= tunerChannels[tuner_id].frontend_status->center_frequency;
-				newStruct.bandwidth= tunerChannels[tuner_id].frontend_status->bandwidth;
-				newStruct.sample_rate= tunerChannels[tuner_id].frontend_status->sample_rate;
-				newStruct.device_control= true;
-				newStruct.group_id = tunerChannels[tuner_id].frontend_status->group_id;
-				newStruct.rf_flow_id= tunerChannels[tuner_id].frontend_status->rf_flow_id;
-				return newStruct;
-			}
 
 			template <typename CORBAXX> bool addModifyKeyword(BULKIO::StreamSRI *sri, CORBA::String_member id, CORBAXX myValue, bool addOnly = false) {
 				CORBA::Any value;
@@ -230,7 +213,7 @@ namespace frontend {
 				return true;
 			}
 
-			virtual void configureTunerSRI(BULKIO::StreamSRI *sri, double frequency, double sample_rate, short mode, std::string rf_flow_id) {
+			virtual void configureTunerSRI(BULKIO::StreamSRI *sri, double frequency, double bandwidth, double sample_rate, short mode, std::string rf_flow_id) {
 				if (sri == NULL)
 					return;
 
@@ -257,7 +240,7 @@ namespace frontend {
 				addModifyKeyword<CORBA::Double > (sri, "COL_RF", CORBA::Double(centerFreq));
 				addModifyKeyword<CORBA::Double > (sri, "CHAN_RF", CORBA::Double(centerFreq));
 				addModifyKeyword<std::string> (sri,"FRONTEND::RF_FLOW_ID",rf_flow_id);
-				addModifyKeyword<CORBA::Double> (sri,"FRONTEND::BANDWIDTH", CORBA::Double(sample_rate)); //TODO: for now, just set bw = sample rate
+				addModifyKeyword<CORBA::Double> (sri,"FRONTEND::BANDWIDTH", CORBA::Double(bandwidth));
 				addModifyKeyword<std::string> (sri,"FRONTEND::DEVICE_ID",std::string(identifier()));
 			}
 
