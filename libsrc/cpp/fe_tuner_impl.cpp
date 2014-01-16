@@ -430,8 +430,7 @@ namespace frontend {
 					tunerChannels[tuner_id].frontend_status->center_frequency,
 					tunerChannels[tuner_id].frontend_status->bandwidth,
 					tunerChannels[tuner_id].frontend_status->sample_rate,
-					//tunerChannels[tuner_id].frontend_status->complex, --> "complex" is optional, can't assume it's there
-					1, // TODO - assumes complex data, override enableTuner function if necessary
+					tunerChannels[tuner_id].complex,
 					tunerChannels[tuner_id].frontend_status->rf_flow_id);
 			streamID_to_tunerID.insert(std::make_pair(std::string(tunerChannels[tuner_id].sri.streamID), tuner_id));
 			_dev_enable(tuner_id);
