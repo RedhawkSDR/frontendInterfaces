@@ -20,9 +20,9 @@
 
 #ifdef TRACE_ENABLE
 #define TRACE_ENTER(logger, method)                                             \
-    LOG_TRACE(logger, "ENTER bulkio::" << method << " [" << __FILE__ << ":" << __LINE__ << "]")
+    LOG_TRACE(logger, "ENTER frontend::" << method << " [" << __FILE__ << ":" << __LINE__ << "]")
 #define TRACE_EXIT(logger, method)                                              \
-    LOG_TRACE(logger, "EXIT bulkio::" << method << " [" << __FILE__ << ":" << __LINE__ << "]")
+    LOG_TRACE(logger, "EXIT frontend::" << method << " [" << __FILE__ << ":" << __LINE__ << "]")
 #else
 #define TRACE_ENTER(logger, method )
 #define TRACE_EXIT(logger, method )
