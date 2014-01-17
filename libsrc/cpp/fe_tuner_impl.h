@@ -76,10 +76,12 @@ namespace frontend {
 	template < typename TunerStatusStructType >
 	struct indivTuner {
 		indivTuner(){
+			complex = true;
 			frontend_status = NULL;
 			lock = NULL;
 		}
 		BULKIO::StreamSRI sri;
+		bool complex; // needed for configuring SRI
 		boost::mutex *lock;
 		std::string control_allocation_id;
 		TunerStatusStructType* frontend_status;
@@ -92,7 +94,6 @@ namespace frontend {
 				frontend_status->center_frequency = 0.0;
 				frontend_status->bandwidth = 0.0;
 				frontend_status->sample_rate = 0.0;
-				frontend_status->complex = true;
 				frontend_status->enabled = false;
 			}
 		}
