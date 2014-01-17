@@ -48,7 +48,7 @@ library_include_HEADERS = \
 ## in _HEADERS variables are normally included in the distribution, but the
 ## configuration header file is generated at configure time and should not be
 ## shipped with the source tarball.
-#bulkio_libincludedir = $(libdir)/bulkio-$(FRONTEND_API_VERSION)/include
+#frontend_libincludedir = $(libdir)/frontend-$(FRONTEND_API_VERSION)/include
 
 libfrontend_@FRONTEND_API_VERSION@_la_CXXFLAGS = -Wall -I./cpp -DLOGGING $(FRONTEND_INF_INCLUDES) $(BOOST_CPPFLAGS) $(OMNIORB_CFLAGS) $(OSSIE_CFLAGS)
 
@@ -75,7 +75,7 @@ if HAVE_JAVASUPPORT
 JAVA_DIR := java
 JAVA_SRCDIR := $(JAVA_DIR)/src
 JAVA_BINDIR := $(JAVA_DIR)/bin
-CLASSPATH := $(OSSIE_HOME)/lib/CFInterfaces.jar:$(OSSIE_HOME)/lib/ossie.jar:$(OSSIE_HOME)/lib/log4j-1.2.15.jar:$(top_builddir)/FRONTENDInterfaces.jar
+CLASSPATH := $(OSSIE_HOME)/lib/CFInterfaces.jar:$(OSSIE_HOME)/lib/ossie.jar:$(OSSIE_HOME)/lib/log4j-1.2.15.jar:$(OSSIE_HOME)/lib/BULKIOInterfaces.jar:$(top_builddir)/FRONTENDInterfaces.jar:
 BINARY_JAR := $(JAVA_DIR)/frontend.jar
 SOURCE_JAR := $(JAVA_DIR)/frontend.src.jar
 
@@ -100,7 +100,9 @@ OutRFInfoPort.java \
 RFInfoListener.java \
 InRFSourcePort.java \
 OutRFSourcePort.java \
-RFSourceListener.java
+RFSourceListener.java \
+FrontendTunerStructProps.java \
+FrontendTunerImpl.java
 JAVA_SRCS_ABS := $(addprefix $(JAVA_SRCDIR)/frontend/, $(JAVA_SRCS))
 
 javalibdir = $(prefix)/lib
