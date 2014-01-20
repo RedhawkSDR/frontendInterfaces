@@ -605,9 +605,9 @@ public abstract class FrontendTunerImpl<TunerStatusStructType extends frontend.F
     protected abstract boolean _dev_set_bandwidth(double req_bw, int tuner_id);
     protected abstract boolean _dev_set_sample_rate(double req_sr, int tuner_id);
     protected abstract boolean _dev_get_all(double freq, double bw, double sr, int tuner_id);
-    protected abstract boolean _dev_get_center_frequency(int tuner_id);
-    protected abstract boolean _dev_get_bandwidth(int tuner_id);
-    protected abstract boolean _dev_get_sample_rate(int tuner_id);
+    protected abstract double _dev_get_center_frequency(int tuner_id);
+    protected abstract double _dev_get_bandwidth(int tuner_id);
+    protected abstract double _dev_get_sample_rate(int tuner_id);
    
     ////////////////////////////
     // Other helper functions //
