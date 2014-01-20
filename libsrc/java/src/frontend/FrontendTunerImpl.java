@@ -1,3 +1,5 @@
+package frontend;
+
 import BULKIO.StreamSRI;
 import CF.AggregateDevice;
 import CF.DataType;
