@@ -61,10 +61,10 @@ public abstract class FrontendTunerImpl<TunerStatusStructType extends frontend.F
             }
         }
 
-        BULKIO.StreamSRI sri;
-        Object lock;
-        String control_allocation_id;
-        T frontend_status;
+        public BULKIO.StreamSRI sri;
+        public Object lock;
+        public String control_allocation_id;
+        public T frontend_status;
     }
 
 
