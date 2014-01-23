@@ -187,10 +187,12 @@ namespace frontend {
 			////////////////////////////
 
 		    virtual double optimize_rate(const double& req_rate, const double& max_rate, const double& min_rate){
-		        for(size_t dec = size_t(max_rate/min_rate); dec >= 1; dec--){
-		            if(max_rate/double(dec) >= req_rate)
-		                return max_rate/double(dec);
-		        }
+		        //for(size_t dec = size_t(max_rate/min_rate); dec >= 1; dec--){
+		        //    if(max_rate/double(dec) >= req_rate)
+		        //        return max_rate/double(dec);
+		        //}
+		    	if(req_rate < min_rate)
+		    		return min_rate;
 		        return req_rate;
 		    }
 
