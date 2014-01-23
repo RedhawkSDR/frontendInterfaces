@@ -1,10 +1,13 @@
 package frontend;
 
 import frontend.AnalogTunerListener;
+import FRONTEND.FrontendException;
+import FRONTEND.BadParameterException;
+import FRONTEND.NotSupportedException;
 
 public interface DigitalTunerListener extends AnalogTunerListener {
 
-    public void setTunerOutputSampleRate(String id, double sr);
+    public void fe_setTunerOutputSampleRate(String id, double sr) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public double getTunerOutputSampleRate(String id);
+    public double fe_getTunerOutputSampleRate(String id) throws FrontendException, BadParameterException, NotSupportedException;
 }

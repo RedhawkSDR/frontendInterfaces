@@ -1,15 +1,18 @@
 package frontend;
 
 import FRONTEND.RFInfoPkt;
+import FRONTEND.FrontendException;
+import FRONTEND.BadParameterException;
+import FRONTEND.NotSupportedException;
 
 public interface RFInfoListener {
 
-    public String getRFFlowId();
+    public String fe_getRFFlowId() throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setRFFlowId(String data);
+    public void fe_setRFFlowId(String data) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public RFInfoPkt getRFInfoPkt();
+    public RFInfoPkt fe_getRFInfoPkt() throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setRFInfoPkt(RFInfoPkt data);
+    public void fe_setRFInfoPkt(RFInfoPkt data) throws FrontendException, BadParameterException, NotSupportedException;
 
 }

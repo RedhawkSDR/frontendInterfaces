@@ -1,15 +1,18 @@
 package frontend;
 
 import FRONTEND.RFInfoPkt;
+import FRONTEND.FrontendException;
+import FRONTEND.BadParameterException;
+import FRONTEND.NotSupportedException;
 
 public interface RFSourceListener {
 
-    public RFInfoPkt[] getAvailableRFInputs();
+    public RFInfoPkt[] fe_getAvailableRFInputs() throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setAvailableRFInputs(RFInfoPkt[] data);
+    public void fe_setAvailableRFInputs(RFInfoPkt[] data) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public RFInfoPkt getCurrentRFInput();
+    public RFInfoPkt fe_getCurrentRFInput() throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setCurrentRFInput(RFInfoPkt data);
+    public void fe_setCurrentRFInput(RFInfoPkt data) throws FrontendException, BadParameterException, NotSupportedException;
 
 }

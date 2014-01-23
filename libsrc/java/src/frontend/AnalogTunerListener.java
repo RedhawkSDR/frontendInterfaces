@@ -1,30 +1,33 @@
 package frontend;
 
 import frontend.FrontendTunerListener;
+import FRONTEND.FrontendException;
+import FRONTEND.BadParameterException;
+import FRONTEND.NotSupportedException;
 
 public interface AnalogTunerListener extends FrontendTunerListener {
 
-    public void setTunerCenterFrequency(String id, double freq);
+    public void fe_setTunerCenterFrequency(String id, double freq) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public double getTunerCenterFrequency(String id);
+    public double fe_getTunerCenterFrequency(String id) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setTunerBandwidth(String id, double bw);
+    public void fe_setTunerBandwidth(String id, double bw) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public double getTunerBandwidth(String id);
+    public double fe_getTunerBandwidth(String id) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setTunerAgcEnable(String id, boolean enable);
+    public void fe_setTunerAgcEnable(String id, boolean enable) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public boolean getTunerAgcEnable(String id);
+    public boolean fe_getTunerAgcEnable(String id) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setTunerGain(String id, float gain);
+    public void fe_setTunerGain(String id, float gain) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public float getTunerGain(String id);
+    public float fe_getTunerGain(String id) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setTunerReferenceSource(String id, int source);
+    public void fe_setTunerReferenceSource(String id, int source) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public int getTunerReferenceSource(String id);
+    public int fe_getTunerReferenceSource(String id) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public void setTunerEnable(String id, boolean enable);
+    public void fe_setTunerEnable(String id, boolean enable) throws FrontendException, BadParameterException, NotSupportedException;
 
-    public boolean getTunerEnable(String id);
+    public boolean fe_getTunerEnable(String id) throws FrontendException, BadParameterException, NotSupportedException;
 }

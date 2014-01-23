@@ -102,7 +102,7 @@ InRFSourcePort.java \
 OutRFSourcePort.java \
 RFSourceListener.java \
 FrontendTunerStructProps.java \
-FrontendTunerImpl.java
+FrontendTunerDevice.java
 JAVA_SRCS_ABS := $(addprefix $(JAVA_SRCDIR)/frontend/, $(JAVA_SRCS))
 
 javalibdir = $(prefix)/lib

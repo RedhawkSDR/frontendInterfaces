@@ -35,28 +35,41 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
         this.portAccess = new Object();
     }
 
-    public NavigationPacket nav_packet()
-    {
+    public NavigationPacket nav_packet() {
         synchronized(this.portAccess){
-            if ( navDataListener != null ) {
-                return navDataListener.getNavPkt();
-            } else {
-                if (this.logger != null){
-                    logger.error("InNavDataPort nav_packet() callback listener not defined");
+            try{
+                if ( navDataListener != null ) {
+                    return navDataListener.fe_getNavPkt();
+                } else {
+                    if (this.logger != null){
+                        logger.error("InNavDataPort nav_packet() callback listener not defined");
+                    }
                 }
-                return null;
+            }catch(Exception e){
+                if (this.logger != null){
+                    logger.error("InNavDataPort nav_packet() exception " + e.getMessage());
+                }
+                System.out.println("InNavDataPort nav_packet() exception " + e.getMessage());
             }
+            return null;
         }
     }
 
-    public void nav_packet(NavigationPacket data) {
+    public void nav_packet(NavigationPacket data){
         synchronized(this.portAccess){
-            if ( navDataListener != null) {
-                navDataListener.setNavPkt(data);
-            } else {
-                if (this.logger != null){
-                    logger.error("InNavDataPort nav_packet(NavigationPacket data) callback listener not defined");
+            try{
+                if ( navDataListener != null) {
+                    navDataListener.fe_setNavPkt(data);
+                } else {
+                    if (this.logger != null){
+                        logger.error("InNavDataPort nav_packet(NavigationPacket data) callback listener not defined");
+                    }
                 }
+            }catch(Exception e){
+                if (this.logger != null){
+                    logger.error("InNavDataPort nav_packet(NavigationPacket data) exception " + e.getMessage());
+                }
+                System.out.println("InNavDataPort nav_packet(NavigationPacket data) exception " + e.getMessage());
             }
         }
     }

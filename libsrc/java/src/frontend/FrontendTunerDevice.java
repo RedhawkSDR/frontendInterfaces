@@ -35,7 +35,7 @@ import org.ossie.properties.StringProperty;
 import org.ossie.properties.StructProperty;
 import org.ossie.properties.StructSequenceProperty;
 
-public abstract class FrontendTunerImpl<TunerStatusStructType extends frontend.FrontendTunerStructProps.default_frontend_tuner_status_struct_struct> extends Device {
+public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend.FrontendTunerStructProps.default_frontend_tuner_status_struct_struct> extends Device {
 
     public enum timeTypes{
         J1970,
@@ -133,12 +133,12 @@ public abstract class FrontendTunerImpl<TunerStatusStructType extends frontend.F
 
     protected List<indivTuner<TunerStatusStructType>> tunerChannels; 
 
-    public FrontendTunerImpl(DeviceManager devMgr, String compId, String label, String softwareProfile, ORB orb, POA poa) throws InvalidObjectReference, ServantNotActive, WrongPolicy, CF.DevicePackage.InvalidCapacity {
+    public FrontendTunerDevice(DeviceManager devMgr, String compId, String label, String softwareProfile, ORB orb, POA poa) throws InvalidObjectReference, ServantNotActive, WrongPolicy, CF.DevicePackage.InvalidCapacity {
         super(devMgr,compId,label,softwareProfile,orb,poa);
         construct();
     }
  
-    public FrontendTunerImpl(DeviceManager devMgr, AggregateDevice compositeDevice, String compId, String label, String softwareProfile, ORB orb, POA poa) throws InvalidObjectReference, ServantNotActive, WrongPolicy, CF.DevicePackage.InvalidCapacity {
+    public FrontendTunerDevice(DeviceManager devMgr, AggregateDevice compositeDevice, String compId, String label, String softwareProfile, ORB orb, POA poa) throws InvalidObjectReference, ServantNotActive, WrongPolicy, CF.DevicePackage.InvalidCapacity {
         super(devMgr,compositeDevice,compId,label,softwareProfile,orb,poa);
         construct();
     }
@@ -613,12 +613,8 @@ public abstract class FrontendTunerImpl<TunerStatusStructType extends frontend.F
     // Other helper functions //
     ////////////////////////////
     protected double optimize_rate(final double req_rate, final double max_rate, final double min_rate){
-        long dec = (long)(max_rate/min_rate);
-        do {
-            if (max_rate/(double)dec >= req_rate)
-                return max_rate/(double)dec;
-            dec--;
-        } while (dec >= 1);
+        if (req_rate < min_rate)
+            return min_rate;
         return req_rate;
     }
 

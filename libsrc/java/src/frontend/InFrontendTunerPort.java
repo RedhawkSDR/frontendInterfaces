@@ -35,68 +35,108 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
     }
 
 
-    public String getTunerType(String id) throws FrontendException, BadParameterException, NotSupportedException {
+    public String getTunerType(String id) {
         synchronized(this.portAccess){
-            if ( frontendTunerListener != null ){
-                return frontendTunerListener.getTunerType(id);
-            } else {
-                if (this.logger != null){
-                    logger.error("InFrontendTunerPort getTunerType(String id) callback listener not defined");
+            try{
+                if ( frontendTunerListener != null ){
+                    return frontendTunerListener.fe_getTunerType(id);
+                } else {
+                    if (this.logger != null){
+                        logger.error("InFrontendTunerPort getTunerType(String id) callback listener not defined");
+                    }
+                    throw new FrontendException("InFrontendTunerPort getTunerType(String id) callback listener not defined");
                 }
-                throw new FrontendException("InFrontendTunerPort getTunerType(String id) callback listener not defined");
+            }catch(Exception e){
+                if (this.logger != null){
+                    logger.error("InFrontendTunerPort getTunerType(String id) exception " + e.getMessage());
+                }
+                System.out.println("InFrontendTunerPort getTunerType(String id) exception " + e.getMessage());
             }
+            return null;
         }
     }
 
-    public boolean getTunerDeviceControl(String id) throws FrontendException, BadParameterException, NotSupportedException {
+    public boolean getTunerDeviceControl(String id) {
         synchronized(this.portAccess){
-            if ( frontendTunerListener != null ){
-                return frontendTunerListener.getTunerDeviceControl(id);
-            } else {
-                if (this.logger != null){
-                    logger.error("InFrontendTunerPort getTunerDeviceControl(String id) callback listener not defined");
+            try{
+                if ( frontendTunerListener != null ){
+                    return frontendTunerListener.fe_getTunerDeviceControl(id);
+                } else {
+                    if (this.logger != null){
+                        logger.error("InFrontendTunerPort getTunerDeviceControl(String id) callback listener not defined");
+                    }
+                    throw new FrontendException("InFrontendTunerPort getTunerDeviceControl(String id) callback listener not defined");
                 }
-                throw new FrontendException("InFrontendTunerPort getTunerDeviceControl(String id) callback listener not defined");
+            }catch(Exception e){
+                if (this.logger != null){
+                    logger.error("InFrontendTunerPort getTunerDeviceControl(String id) exception " + e.getMessage());
+                }
+                System.out.println("InFrontendTunerPort getTunerDeviceControl(String id) exception " + e.getMessage());
             }
+            return false;
         }
     }
 
-    public String getTunerGroupId(String id) throws FrontendException, BadParameterException, NotSupportedException {
+    public String getTunerGroupId(String id) {
         synchronized(this.portAccess){
-            if ( frontendTunerListener != null ){
-                return frontendTunerListener.getTunerGroupId(id);
-            } else {
-                if (this.logger != null){
-                    logger.error("InFrontendTunerPort getTunerGroupId(String id) callback listener not defined");
+            try{
+                if ( frontendTunerListener != null ){
+                    return frontendTunerListener.fe_getTunerGroupId(id);
+                } else {
+                    if (this.logger != null){
+                        logger.error("InFrontendTunerPort getTunerGroupId(String id) callback listener not defined");
+                    }
+                    throw new FrontendException("InFrontendTunerPort getTunerGroupId(String id) callback listener not defined");
                 }
-                throw new FrontendException("InFrontendTunerPort getTunerGroupId(String id) callback listener not defined");
+            }catch(Exception e){
+                if (this.logger != null){
+                    logger.error("InFrontendTunerPort getTunerGroupId(String id) exception " + e.getMessage());
+                }
+                System.out.println("InFrontendTunerPort getTunerGroupId(String id) exception " + e.getMessage());
             }
+            return null;
         }
     }
 
-    public String getTunerRfFlowId(String id) throws FrontendException, BadParameterException, NotSupportedException {
+    public String getTunerRfFlowId(String id) {
         synchronized(this.portAccess){
-            if ( frontendTunerListener != null ){
-                return frontendTunerListener.getTunerRfFlowId(id);
-            } else {
-                if (this.logger != null){
-                    logger.error("InFrontendTunerPort getTunerRfFlowId(String id) callback listener not defined");
+            try{
+                if ( frontendTunerListener != null ){
+                    return frontendTunerListener.fe_getTunerRfFlowId(id);
+                } else {
+                    if (this.logger != null){
+                        logger.error("InFrontendTunerPort getTunerRfFlowId(String id) callback listener not defined");
+                    }
+                    throw new FrontendException("InFrontendTunerPort getTunerRfFlowId(String id) callback listener not defined");
                 }
-                throw new FrontendException("InFrontendTunerPort getTunerRfFlowId(String id) callback listener not defined");
+            }catch(Exception e){
+                if (this.logger != null){
+                    logger.error("InFrontendTunerPort getTunerRfFlowId(String id) exception " + e.getMessage());
+                }
+                System.out.println("InFrontendTunerPort getTunerRfFlowId(String id) exception " + e.getMessage());
             }
+            return null;
         }
     }
 
-    public CF.DataType[] getTunerStatus(String id) throws FrontendException, BadParameterException, NotSupportedException {
+    public CF.DataType[] getTunerStatus(String id) {
         synchronized(this.portAccess){
-            if ( frontendTunerListener != null ){
-                return frontendTunerListener.getTunerStatus(id);
-            } else {
-                if (this.logger != null){
-                    logger.error("InFrontendTunerPort getTunerStatus(String id) callback listener not defined");
+            try{
+                if ( frontendTunerListener != null ){
+                    return frontendTunerListener.fe_getTunerStatus(id);
+                } else {
+                    if (this.logger != null){
+                        logger.error("InFrontendTunerPort getTunerStatus(String id) callback listener not defined");
+                    }
+                    throw new FrontendException("InFrontendTunerPort getTunerStatus(String id) callback listener not defined");
                 }
-                throw new FrontendException("InFrontendTunerPort getTunerStatus(String id) callback listener not defined");
+            }catch(Exception e){
+                if (this.logger != null){
+                    logger.error("InFrontendTunerPort getTunerStatus(String id) exception " + e.getMessage());
+                }
+                System.out.println("InFrontendTunerPort getTunerStatus(String id) exception " + e.getMessage());
             }
+            return null;
         }
     }
 
