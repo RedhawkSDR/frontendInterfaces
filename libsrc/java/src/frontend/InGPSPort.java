@@ -1,9 +1,9 @@
 package frontend;
 
-import FRONTEND.GPSInfo;
 import FRONTEND.GpsTimePos;
+import FRONTEND.GPSInfo;
+import frontend.GPSDelegate;
 import org.apache.log4j.Logger;
-import frontend.GPSListener;
 
 public class InGPSPort extends FRONTEND.GPSPOA {
 
@@ -13,22 +13,22 @@ public class InGPSPort extends FRONTEND.GPSPOA {
 
     protected Object portAccess = null;
 
-    protected GPSListener gpsListener = null;    
+    protected GPSDelegate delegate = null;    
 
     public InGPSPort( String portName) {
         this( portName, null, null);
     }
 
     public InGPSPort( String portName,
-                         GPSListener listener) {
-        this( portName, listener, null);
+                         GPSDelegate d) {
+        this( portName, d, null);
     }
 
     public InGPSPort( String portName,
-                         GPSListener listener,
+                         GPSDelegate d,
                          Logger logger) {
         this.name = portName;
-        this.gpsListener = listener;
+        this.delegate = d;
         this.logger = logger;
         this.portAccess = new Object();
     }
@@ -36,11 +36,11 @@ public class InGPSPort extends FRONTEND.GPSPOA {
     public GPSInfo gps_info() {
         synchronized(this.portAccess){
             try{
-                if ( gpsListener != null ) {
-                    return gpsListener.fe_getGPSInfo();
+                if ( delegate != null ) {
+                    return delegate.fe_getGPSInfo();
                 } else {
                     if (this.logger != null){
-                        logger.error("InGPSPort gps_info() callback listener not defined");
+                        logger.error("InGPSPort gps_info() callback delegate not defined");
                     }
                 }
             }catch(Exception e){
@@ -56,11 +56,11 @@ public class InGPSPort extends FRONTEND.GPSPOA {
     public void gps_info(GPSInfo data) {
         synchronized(this.portAccess){
             try{
-                if ( gpsListener != null) {
-                    gpsListener.fe_setGPSInfo(data);
+                if ( delegate != null) {
+                    delegate.fe_setGPSInfo(data);
                 } else {
                     if (this.logger != null){
-                        logger.error("InGPSPort gps_info(GPSInfo data) callback listener not defined");
+                        logger.error("InGPSPort gps_info(GPSInfo data) callback delegate not defined");
                     }
                 }
             }catch(Exception e){
@@ -75,11 +75,11 @@ public class InGPSPort extends FRONTEND.GPSPOA {
     public GpsTimePos gps_time_pos() {
         synchronized(this.portAccess){
             try{
-                if ( gpsListener != null) {
-                    return (gpsListener.fe_getGpsTimePos());
+                if ( delegate != null) {
+                    return (delegate.fe_getGpsTimePos());
                 } else {
                     if (this.logger != null){
-                        logger.error("InGPSPort gps_time_pos() callback listener not defined");
+                        logger.error("InGPSPort gps_time_pos() callback delegate not defined");
                     }
                 }
             }catch(Exception e){
@@ -95,11 +95,11 @@ public class InGPSPort extends FRONTEND.GPSPOA {
     public void gps_time_pos(GpsTimePos data) {
         synchronized(this.portAccess){
             try{
-                if ( gpsListener != null) {
-                    gpsListener.fe_setGpsTimePos(data);
+                if ( delegate != null) {
+                    delegate.fe_setGpsTimePos(data);
                 } else {
                     if (this.logger != null){
-                        logger.error("InGPSPort gps_time_pos(GpsTimePos data) callback listener not defined");
+                        logger.error("InGPSPort gps_time_pos(GpsTimePos data) callback delegate not defined");
                     }
                 }
             }catch(Exception e){
@@ -111,8 +111,8 @@ public class InGPSPort extends FRONTEND.GPSPOA {
         }
     }
 
-    public void setGPSListener( GPSListener newListener ) {
-        gpsListener = newListener;
+    public void setDelegate( GPSDelegate d ) {
+        delegate = d;
     }
 
     public void setLogger( Logger newLogger ) {

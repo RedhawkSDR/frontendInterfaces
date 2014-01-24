@@ -5,7 +5,7 @@ import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
 
-public interface RFSourceListener {
+public interface RFSourceDelegate {
 
     public RFInfoPkt[] fe_getAvailableRFInputs() throws FrontendException, BadParameterException, NotSupportedException;
 

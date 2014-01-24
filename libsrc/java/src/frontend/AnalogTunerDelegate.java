@@ -1,11 +1,11 @@
 package frontend;
 
-import frontend.FrontendTunerListener;
+import frontend.FrontendTunerDelegate;
 import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
 
-public interface AnalogTunerListener extends FrontendTunerListener {
+public interface AnalogTunerDelegate extends FrontendTunerDelegate {
 
     public void fe_setTunerCenterFrequency(String id, double freq) throws FrontendException, BadParameterException, NotSupportedException;
 

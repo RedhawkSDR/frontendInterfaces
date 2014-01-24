@@ -1,11 +1,11 @@
 package frontend;
 
-import frontend.AnalogTunerListener;
+import frontend.AnalogTunerDelegate;
 import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
 
-public interface DigitalTunerListener extends AnalogTunerListener {
+public interface DigitalTunerDelegate extends AnalogTunerDelegate {
 
     public void fe_setTunerOutputSampleRate(String id, double sr) throws FrontendException, BadParameterException, NotSupportedException;
 

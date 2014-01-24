@@ -1,7 +1,7 @@
 package frontend;
 
 import FRONTEND.NavigationPacket;
-import frontend.NavDataListener;
+import frontend.NavDataDelegate;
 import org.apache.log4j.Logger;
 
 // ----------------------------------------------------------------------------------------
@@ -15,22 +15,22 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
 
     protected Object portAccess = null;
 
-    protected NavDataListener navDataListener = null;
+    protected NavDataDelegate delegate = null;
 
     public InNavDataPort( String portName){
         this( portName, null, null);
     }
 
     public InNavDataPort( String portName,
-                          NavDataListener listener){
-        this( portName, listener, null);
+                          NavDataDelegate d){
+        this( portName, d, null);
     }
 
     public InNavDataPort( String portName,
-                          NavDataListener listener,
+                          NavDataDelegate d,
                           Logger logger){
         this.name = portName;
-        this.navDataListener = listener;
+        this.delegate = d;
         this.logger = logger;
         this.portAccess = new Object();
     }
@@ -38,11 +38,11 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
     public NavigationPacket nav_packet() {
         synchronized(this.portAccess){
             try{
-                if ( navDataListener != null ) {
-                    return navDataListener.fe_getNavPkt();
+                if ( delegate != null ) {
+                    return delegate.fe_getNavPkt();
                 } else {
                     if (this.logger != null){
-                        logger.error("InNavDataPort nav_packet() callback listener not defined");
+                        logger.error("InNavDataPort nav_packet() callback delegate not defined");
                     }
                 }
             }catch(Exception e){
@@ -58,11 +58,11 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
     public void nav_packet(NavigationPacket data){
         synchronized(this.portAccess){
             try{
-                if ( navDataListener != null) {
-                    navDataListener.fe_setNavPkt(data);
+                if ( delegate != null) {
+                    delegate.fe_setNavPkt(data);
                 } else {
                     if (this.logger != null){
-                        logger.error("InNavDataPort nav_packet(NavigationPacket data) callback listener not defined");
+                        logger.error("InNavDataPort nav_packet(NavigationPacket data) callback delegate not defined");
                     }
                 }
             }catch(Exception e){
@@ -74,8 +74,8 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
         }
     }
 
-    public void setNavDataListener( NavDataListener newListener ) {
-        navDataListener = newListener;
+    public void setDelegate( NavDataDelegate d ) {
+        delegate = d;
     }
 
     public void setLogger( Logger newLogger ) {

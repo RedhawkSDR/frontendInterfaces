@@ -4,7 +4,7 @@ import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
 
-public interface FrontendTunerListener {
+public interface FrontendTunerDelegate {
 
     public String fe_getTunerType(String id) throws FrontendException, BadParameterException, NotSupportedException;
 

@@ -6,7 +6,7 @@ import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
 
-public interface GPSListener {
+public interface GPSDelegate {
 
     public GPSInfo fe_getGPSInfo() throws FrontendException, BadParameterException, NotSupportedException;
 

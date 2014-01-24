@@ -1,8 +1,8 @@
 package frontend;
 
+import frontend.RFInfoDelegate;
 import FRONTEND.RFInfoPkt;
 import org.apache.log4j.Logger;
-import frontend.RFInfoListener;
 
 public class InRFInfoPort extends FRONTEND.RFInfoPOA {
 
@@ -12,22 +12,22 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
 
     protected Object portAccess = null;
 
-    protected RFInfoListener rfInfoListener = null;    
+    protected RFInfoDelegate delegate = null;    
 
     public InRFInfoPort( String portName) {
         this( portName, null, null);
     }
 
     public InRFInfoPort( String portName,
-                         RFInfoListener listener) {
-        this( portName, listener, null);
+                         RFInfoDelegate d) {
+        this( portName, d, null);
     }
 
     public InRFInfoPort( String portName,
-                         RFInfoListener listener,
+                         RFInfoDelegate d,
                          Logger logger) {
         this.name = portName;
-        this.rfInfoListener = listener;
+        this.delegate = d;
         this.logger = logger;
         this.portAccess = new Object();
     }
@@ -35,11 +35,11 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
     public String rf_flow_id() {
         synchronized(this.portAccess){
             try{
-                if ( rfInfoListener != null ){ 
-                    return rfInfoListener.fe_getRFFlowId();
+                if ( delegate != null ){ 
+                    return delegate.fe_getRFFlowId();
                 } else { 
                     if (this.logger != null){
-                        logger.error("InRFInfoPort rf_flow_id() callback listener not defined.");
+                        logger.error("InRFInfoPort rf_flow_id() callback delegate not defined.");
                     }
                 }
             }catch(Exception e){
@@ -55,11 +55,11 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
     public void rf_flow_id(String data) {
         synchronized(this.portAccess){
             try{
-                if ( rfInfoListener != null) {
-                    rfInfoListener.fe_setRFFlowId(data);
+                if ( delegate != null) {
+                    delegate.fe_setRFFlowId(data);
                 } else { 
                     if (this.logger != null){
-                        logger.error("InRFInfoPort rf_flow_id(String data) callback listener not defined.");
+                        logger.error("InRFInfoPort rf_flow_id(String data) callback delegate not defined.");
                     }
                 }
             }catch(Exception e){
@@ -74,11 +74,11 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
     public RFInfoPkt rfinfo_pkt() {
         synchronized(this.portAccess){
             try{
-                if ( rfInfoListener != null) {
-                    return (rfInfoListener.fe_getRFInfoPkt());
+                if ( delegate != null) {
+                    return (delegate.fe_getRFInfoPkt());
                 } else { 
                     if (this.logger != null){
-                        logger.error("InRFInfoPort rfinfo_pkt() callback listener not defined.");
+                        logger.error("InRFInfoPort rfinfo_pkt() callback delegate not defined.");
                     }
                     return null;
                 }
@@ -95,11 +95,11 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
     public void rfinfo_pkt(RFInfoPkt data) {
         synchronized(this.portAccess){
             try{
-                if ( rfInfoListener != null) {
-                    rfInfoListener.fe_setRFInfoPkt(data);
+                if ( delegate != null) {
+                    delegate.fe_setRFInfoPkt(data);
                 } else { 
                     if (this.logger != null){
-                        logger.error("InRFInfoPort rfinfo_pkt(RFInfoPkt data) callback listener not defined.");
+                        logger.error("InRFInfoPort rfinfo_pkt(RFInfoPkt data) callback delegate not defined.");
                     }
                 }
             }catch(Exception e){
@@ -111,8 +111,8 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
         }
     }
 
-    public void setRFInfoListener( RFInfoListener newListener ) {
-        rfInfoListener = newListener;
+    public void setDelegate( RFInfoDelegate d ) {
+        delegate = d;
     }
 
     public void setLogger( Logger newLogger ) {

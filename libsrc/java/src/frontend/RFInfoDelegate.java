@@ -5,7 +5,7 @@ import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
 
-public interface RFInfoListener {
+public interface RFInfoDelegate {
 
     public String fe_getRFFlowId() throws FrontendException, BadParameterException, NotSupportedException;
 

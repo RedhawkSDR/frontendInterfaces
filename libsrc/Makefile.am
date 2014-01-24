@@ -82,25 +82,25 @@ SOURCE_JAR := $(JAVA_DIR)/frontend.src.jar
 JAVA_SRCS := \
 InAnalogTunerPort.java \
 OutAnalogTunerPort.java \
-AnalogTunerListener.java \
+AnalogTunerDelegate.java \
 InDigitalTunerPort.java \
 OutDigitalTunerPort.java \
-DigitalTunerListener.java \
+DigitalTunerDelegate.java \
 InFrontendTunerPort.java \
 OutFrontendTunerPort.java \
-FrontendTunerListener.java \
+FrontendTunerDelegate.java \
 InGPSPort.java \
 OutGPSPort.java \
-GPSListener.java \
+GPSDelegate.java \
 InNavDataPort.java \
 OutNavDataPort.java \
-NavDataListener.java \
+NavDataDelegate.java \
 InRFInfoPort.java \
 OutRFInfoPort.java \
-RFInfoListener.java \
+RFInfoDelegate.java \
 InRFSourcePort.java \
 OutRFSourcePort.java \
-RFSourceListener.java \
+RFSourceDelegate.java \
 FrontendTunerStructProps.java \
 FrontendTunerDevice.java
 JAVA_SRCS_ABS := $(addprefix $(JAVA_SRCDIR)/frontend/, $(JAVA_SRCS))

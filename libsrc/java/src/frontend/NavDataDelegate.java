@@ -5,7 +5,7 @@ import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
 
-public interface NavDataListener {
+public interface NavDataDelegate {
 
     public NavigationPacket fe_getNavPkt() throws FrontendException, BadParameterException, NotSupportedException; 
 

@@ -1,8 +1,8 @@
 package frontend;
 
 import FRONTEND.RFInfoPkt;
+import frontend.RFSourceDelegate;
 import org.apache.log4j.Logger;
-import frontend.RFSourceListener;
 
 public class InRFSourcePort extends FRONTEND.RFSourcePOA {
 
@@ -12,22 +12,22 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
 
     protected Object portAccess = null;
 
-    protected RFSourceListener rfSourceListener = null;    
+    protected RFSourceDelegate delegate = null;    
 
     public InRFSourcePort( String portName) {
         this( portName, null, null);
     }
 
     public InRFSourcePort( String portName,
-                         RFSourceListener listener) {
-        this( portName, listener, null);
+                         RFSourceDelegate d) {
+        this( portName, d, null);
     }
 
     public InRFSourcePort( String portName,
-                         RFSourceListener listener,
+                         RFSourceDelegate d,
                          Logger logger) {
         this.name = portName;
-        this.rfSourceListener = listener;
+        this.delegate = d;
         this.logger = logger;
         this.portAccess = new Object();
     }
@@ -35,11 +35,11 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
     public RFInfoPkt[] available_rf_inputs() {
         synchronized(this.portAccess){
             try{
-                if ( rfSourceListener != null ){ 
-                    return rfSourceListener.fe_getAvailableRFInputs();
+                if ( delegate != null ){ 
+                    return delegate.fe_getAvailableRFInputs();
                 } else {
                     if (this.logger != null){
-                        logger.error("InRFSourcePort available_rf_inputs() callback listener not defined.");
+                        logger.error("InRFSourcePort available_rf_inputs() callback delegate not defined.");
                     }
                 }
             }catch(Exception e){
@@ -55,11 +55,11 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
     public void available_rf_inputs(RFInfoPkt[] data) {
         synchronized(this.portAccess){
             try{
-                if ( rfSourceListener != null){ 
-                    rfSourceListener.fe_setAvailableRFInputs(data);
+                if ( delegate != null){ 
+                    delegate.fe_setAvailableRFInputs(data);
                 } else {
                     if (this.logger != null){
-                        logger.error("InRFSourcePort available_rf_inputs(RFInfoPkt[] data) callback listener not defined.");
+                        logger.error("InRFSourcePort available_rf_inputs(RFInfoPkt[] data) callback delegate not defined.");
                     }
                 }
             }catch(Exception e){
@@ -74,11 +74,11 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
     public RFInfoPkt current_rf_input() {
         synchronized(this.portAccess){
             try{
-                if ( rfSourceListener != null){
-                    return (rfSourceListener.fe_getCurrentRFInput());
+                if ( delegate != null){
+                    return (delegate.fe_getCurrentRFInput());
                 } else {
                     if (this.logger != null){
-                        logger.error("InRFSourcePort current_rf_input() callback listener not defined.");
+                        logger.error("InRFSourcePort current_rf_input() callback delegate not defined.");
                     }
                 }
             }catch(Exception e){
@@ -94,11 +94,11 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
     public void current_rf_input(RFInfoPkt data) {
         synchronized(this.portAccess){
             try{
-                if ( rfSourceListener != null) {
-                    rfSourceListener.fe_setCurrentRFInput(data);
+                if ( delegate != null) {
+                    delegate.fe_setCurrentRFInput(data);
                 } else {
                     if (this.logger != null){
-                        logger.error("InRFSourcePort current_rf_input(RFInfoPkt data) callback listener not defined.");
+                        logger.error("InRFSourcePort current_rf_input(RFInfoPkt data) callback delegate not defined.");
                     }
                 }
             }catch(Exception e){
@@ -110,8 +110,8 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
         }
     }
 
-    public void setRFSourceListener( RFSourceListener newListener ) {
-        rfSourceListener = newListener;
+    public void setDelegate( RFSourceDelegate d ) {
+        delegate = d;
     }
 
     public void setLogger( Logger newLogger ) {
