@@ -104,14 +104,14 @@ namespace frontend {
 	//////////////////////////////////
 
 	template < typename TunerStatusStructType >
-	class Tuner_impl : public Device_impl
+	class FrontendTunerDevice : public Device_impl
 	{
 		public:
-			Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl);
-			Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, char *compDev);
-			Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities);
-			Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities, char *compDev);
-			~Tuner_impl();
+			FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl);
+			FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, char *compDev);
+			FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities);
+			FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities, char *compDev);
+			~FrontendTunerDevice();
 
 			// this is implemented in the generated base class once all properties are known
 			virtual void loadProperties();

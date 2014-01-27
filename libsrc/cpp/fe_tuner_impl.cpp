@@ -3,42 +3,42 @@
 namespace frontend {
 
 	template < typename TunerStatusStructType >
-	Tuner_impl<TunerStatusStructType>::Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl) :
+	FrontendTunerDevice<TunerStatusStructType>::FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl) :
 		Device_impl(devMgr_ior, id, lbl, sftwrPrfl)
 	{
 		construct();
 	}
 
 	template < typename TunerStatusStructType >
-	Tuner_impl<TunerStatusStructType>::Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, char *compDev) :
+	FrontendTunerDevice<TunerStatusStructType>::FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, char *compDev) :
 		Device_impl(devMgr_ior, id, lbl, sftwrPrfl, compDev)
 	{
 		construct();
 	}
 
 	template < typename TunerStatusStructType >
-	Tuner_impl<TunerStatusStructType>::Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities) :
+	FrontendTunerDevice<TunerStatusStructType>::FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities) :
 		Device_impl(devMgr_ior, id, lbl, sftwrPrfl, capacities)
 	{
 		construct();
 	}
 
 	template < typename TunerStatusStructType >
-	Tuner_impl<TunerStatusStructType>::Tuner_impl(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities, char *compDev) :
+	FrontendTunerDevice<TunerStatusStructType>::FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, CF::Properties capacities, char *compDev) :
 		Device_impl(devMgr_ior, id, lbl, sftwrPrfl, capacities, compDev)
 	{
 		construct();
 	}
 
 	template < typename TunerStatusStructType >
-	void Tuner_impl<TunerStatusStructType>::construct()
+	void FrontendTunerDevice<TunerStatusStructType>::construct()
 	{
 		Resource_impl::_started = false;
 		loadProperties();
 	}
 
 	template < typename TunerStatusStructType >
-	Tuner_impl<TunerStatusStructType>::~Tuner_impl()
+	FrontendTunerDevice<TunerStatusStructType>::~FrontendTunerDevice()
 	{
 		for (size_t tuner_id = 0; tuner_id < tunerChannels.size(); tuner_id++) {
 			if (tunerChannels[tuner_id].lock != NULL)
@@ -53,7 +53,7 @@ namespace frontend {
 	*******************************************************************************************/
 
     template < typename TunerStatusStructType >
-    void Tuner_impl<TunerStatusStructType>::loadProperties()
+    void FrontendTunerDevice<TunerStatusStructType>::loadProperties()
     {
         addProperty(device_kind,
                     "FRONTEND::TUNER",
@@ -102,7 +102,7 @@ namespace frontend {
     }
 
 	template < typename TunerStatusStructType >
-	std::string Tuner_impl<TunerStatusStructType>::create_allocation_id_csv(size_t tuner_id){
+	std::string FrontendTunerDevice<TunerStatusStructType>::create_allocation_id_csv(size_t tuner_id){
 		std::string alloc_id_csv = "";
 		// ensure control allocation_id is first in list
 		if (!tunerChannels[tuner_id].control_allocation_id.empty())
@@ -122,7 +122,7 @@ namespace frontend {
 	/* Allocation/Deallocation of Capacity                           */
 	/*****************************************************************/
 	template < typename TunerStatusStructType >
-	CF::Device::UsageType Tuner_impl<TunerStatusStructType>::updateUsageState() {
+	CF::Device::UsageType FrontendTunerDevice<TunerStatusStructType>::updateUsageState() {
 		size_t tunerAllocated = 0;
 		for (size_t tuner_id = 0; tuner_id < tunerChannels.size(); tuner_id++) {
 			if (!tunerChannels[tuner_id].control_allocation_id.empty())
@@ -139,7 +139,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	CORBA::Boolean Tuner_impl<TunerStatusStructType>::allocateCapacity(const CF::Properties & capacities)
+	CORBA::Boolean FrontendTunerDevice<TunerStatusStructType>::allocateCapacity(const CF::Properties & capacities)
 	throw (CORBA::SystemException, CF::Device::InvalidCapacity, CF::Device::InvalidState) {
 		CORBA::ULong ii;
 		try{
@@ -359,7 +359,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	void Tuner_impl<TunerStatusStructType>::deallocateCapacity(const CF::Properties & capacities)
+	void FrontendTunerDevice<TunerStatusStructType>::deallocateCapacity(const CF::Properties & capacities)
 	throw (CORBA::SystemException, CF::Device::InvalidCapacity, CF::Device::InvalidState) {
 		for (CORBA::ULong ii = 0; ii < capacities.length(); ++ii) {
 			try{
@@ -410,14 +410,14 @@ namespace frontend {
 	/*****************************************************************/
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::removeTuner(size_t tuner_id) {
+	bool FrontendTunerDevice<TunerStatusStructType>::removeTuner(size_t tuner_id) {
 		enableTuner(tuner_id, false);
 		tunerChannels[tuner_id].reset();
 		return true;
 	}
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::enableTuner(size_t tuner_id, bool enable) {
+	bool FrontendTunerDevice<TunerStatusStructType>::enableTuner(size_t tuner_id, bool enable) {
 		// Lock the tuner
 		exclusive_lock lock(*(tunerChannels[tuner_id].lock));
 
@@ -453,7 +453,7 @@ namespace frontend {
 	////////////////////////////
 
 	template < typename TunerStatusStructType >
-	long Tuner_impl<TunerStatusStructType>::addTunerMapping(const frontend::frontend_tuner_allocation_struct & frontend_alloc) {
+	long FrontendTunerDevice<TunerStatusStructType>::addTunerMapping(const frontend::frontend_tuner_allocation_struct & frontend_alloc) {
 		long NO_VALID_TUNER = -1;
 		exclusive_lock lock(allocationID_MappingLock);
 
@@ -492,7 +492,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	long Tuner_impl<TunerStatusStructType>::addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listener_alloc){
+	long FrontendTunerDevice<TunerStatusStructType>::addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listener_alloc){
 		long NO_VALID_TUNER = -1;
 		exclusive_lock lock(allocationID_MappingLock);
 
@@ -511,7 +511,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	long Tuner_impl<TunerStatusStructType>::getTunerMapping(std::string allocation_id) {
+	long FrontendTunerDevice<TunerStatusStructType>::getTunerMapping(std::string allocation_id) {
 		long NO_VALID_TUNER = -1;
 		exclusive_lock lock(allocationID_MappingLock);
 
@@ -524,7 +524,7 @@ namespace frontend {
 
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::removeTunerMapping(std::string allocation_id) {
+	bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(std::string allocation_id) {
 		exclusive_lock lock(allocationID_MappingLock);
 		if(allocationID_to_tunerID.erase(allocation_id) > 0)
 			return true;
@@ -533,7 +533,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::removeTunerMapping(size_t tuner_id) {
+	bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(size_t tuner_id) {
 		long cnt = 0;
 		exclusive_lock lock(allocationID_MappingLock);
 		for(string_number_mapping::iterator it = allocationID_to_tunerID.begin(); it != allocationID_to_tunerID.end(); it++){
@@ -546,7 +546,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::is_connectionID_valid_for_tunerID(const size_t & tuner_id, const std::string & connectionID) {
+	bool FrontendTunerDevice<TunerStatusStructType>::is_connectionID_valid_for_tunerID(const size_t & tuner_id, const std::string & connectionID) {
 		std::map<std::string, size_t>::iterator iter =  allocationID_to_tunerID.find(connectionID);
 		if(iter == allocationID_to_tunerID.end())
 			return false;
@@ -557,7 +557,7 @@ namespace frontend {
 
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::is_connectionID_valid_for_streamID(const std::string & streamID, const std::string & connectionID) {
+	bool FrontendTunerDevice<TunerStatusStructType>::is_connectionID_valid_for_streamID(const std::string & streamID, const std::string & connectionID) {
 		string_number_mapping::iterator iter = streamID_to_tunerID.find(streamID);
 		if (iter == streamID_to_tunerID.end())
 			return false;
@@ -565,7 +565,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::is_connectionID_controller_for_streamID(const std::string & streamID, const std::string & connectionID) {
+	bool FrontendTunerDevice<TunerStatusStructType>::is_connectionID_controller_for_streamID(const std::string & streamID, const std::string & connectionID) {
 		string_number_mapping::iterator iter = streamID_to_tunerID.find(streamID);
 		if (iter == streamID_to_tunerID.end())
 			return false;
@@ -577,7 +577,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::is_connectionID_listener_for_streamID(const std::string & streamID, const std::string & connectionID) {
+	bool FrontendTunerDevice<TunerStatusStructType>::is_connectionID_listener_for_streamID(const std::string & streamID, const std::string & connectionID) {
 		string_number_mapping::iterator iter = streamID_to_tunerID.find(streamID);
 		if (iter == streamID_to_tunerID.end())
 			return false;
@@ -589,7 +589,7 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	bool Tuner_impl<TunerStatusStructType>::is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr){
+	bool FrontendTunerDevice<TunerStatusStructType>::is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr){
 		double req_min_bw_sr = std::min(req_bw,req_sr);
 		double min_bw_sr = std::min(bw,sr);
 		if( (req_cf + req_min_bw_sr/2 <= cf + min_bw_sr/2) && (req_cf - req_min_bw_sr/2 >= cf - min_bw_sr/2) )
