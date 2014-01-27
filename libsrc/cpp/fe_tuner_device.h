@@ -1,5 +1,5 @@
-#ifndef FE_TUNER_IMPL_BASE_H
-#define FE_TUNER_IMPL_BASE_H
+#ifndef FE_TUNER_DEVICE_BASE_H
+#define FE_TUNER_DEVICE_BASE_H
 
 #include <ossie/Device_impl.h>
 #include <uuid/uuid.h>

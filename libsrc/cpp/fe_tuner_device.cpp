@@ -1,4 +1,4 @@
-#include "fe_tuner_impl.h"
+#include "fe_tuner_device.h"
 
 namespace frontend {
 
