@@ -492,19 +492,19 @@ namespace frontend {
 	}
 
 	template < typename TunerStatusStructType >
-	long Tuner_impl<TunerStatusStructType>::addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listner_alloc){
+	long Tuner_impl<TunerStatusStructType>::addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listener_alloc){
 		long NO_VALID_TUNER = -1;
 
 		// Do not allocate if allocation ID has already been used
-		if (getTunerMapping(frontend_listner_alloc.listener_allocation_id) >= 0)
+		if (getTunerMapping(frontend_listener_alloc.listener_allocation_id) >= 0)
 			return NO_VALID_TUNER;
 
 		long tuner_id = NO_VALID_TUNER;
 		// Do not allocate if existing allocation ID does not exist
-		if ((tuner_id = getTunerMapping(frontend_listner_alloc.existing_allocation_id)) < 0)
+		if ((tuner_id = getTunerMapping(frontend_listener_alloc.existing_allocation_id)) < 0)
 			return NO_VALID_TUNER;
 
-		allocationID_to_tunerID.insert(std::pair<std::string, size_t > (frontend_listner_alloc.listener_allocation_id, tuner_id));
+		allocationID_to_tunerID.insert(std::pair<std::string, size_t > (frontend_listener_alloc.listener_allocation_id, tuner_id));
 		tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
 		return tuner_id;
 	}

@@ -123,7 +123,7 @@ namespace frontend {
 
 	    	// Mapping and translation helpers. External string identifiers to internal numerical identifiers
 	        virtual long addTunerMapping(const frontend::frontend_tuner_allocation_struct & frontend_alloc);
-	    	virtual long addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listner_alloc);
+	    	virtual long addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listener_alloc);
 			virtual bool removeTunerMapping(std::string allocation_id);
 			virtual bool removeTunerMapping(size_t tuner_id);
 			virtual long getTunerMapping(std::string allocation_id);
