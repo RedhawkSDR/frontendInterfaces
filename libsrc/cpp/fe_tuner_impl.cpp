@@ -455,13 +455,13 @@ namespace frontend {
 	template < typename TunerStatusStructType >
 	long Tuner_impl<TunerStatusStructType>::addTunerMapping(const frontend::frontend_tuner_allocation_struct & frontend_alloc) {
 		long NO_VALID_TUNER = -1;
+		exclusive_lock lock(allocationID_MappingLock);
 
 		// Do not allocate if allocation ID has already been used
 		if(getTunerMapping(frontend_alloc.allocation_id) >= 0)
 			return NO_VALID_TUNER;
 
 		// Next, try to allocate a new tuner
-		exclusive_lock lock(allocationID_MappingLock);
 		for (long tuner_id = 0; tuner_id < long(tunerChannels.size()); tuner_id++) {
 			if(tunerChannels[tuner_id].frontend_status->tuner_type != frontend_alloc.tuner_type)
 				continue;
@@ -494,6 +494,7 @@ namespace frontend {
 	template < typename TunerStatusStructType >
 	long Tuner_impl<TunerStatusStructType>::addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listener_alloc){
 		long NO_VALID_TUNER = -1;
+		exclusive_lock lock(allocationID_MappingLock);
 
 		// Do not allocate if allocation ID has already been used
 		if (getTunerMapping(frontend_listener_alloc.listener_allocation_id) >= 0)
@@ -512,8 +513,8 @@ namespace frontend {
 	template < typename TunerStatusStructType >
 	long Tuner_impl<TunerStatusStructType>::getTunerMapping(std::string allocation_id) {
 		long NO_VALID_TUNER = -1;
-
 		exclusive_lock lock(allocationID_MappingLock);
+
 		string_number_mapping::iterator iter = allocationID_to_tunerID.find(allocation_id);
 		if (iter != allocationID_to_tunerID.end())
 			return iter->second;
@@ -534,6 +535,7 @@ namespace frontend {
 	template < typename TunerStatusStructType >
 	bool Tuner_impl<TunerStatusStructType>::removeTunerMapping(size_t tuner_id) {
 		long cnt = 0;
+		exclusive_lock lock(allocationID_MappingLock);
 		for(string_number_mapping::iterator it = allocationID_to_tunerID.begin(); it != allocationID_to_tunerID.end(); it++){
 			if(it->second == tuner_id){
 				allocationID_to_tunerID.erase(it);
