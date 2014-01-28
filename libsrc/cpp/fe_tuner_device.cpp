@@ -319,7 +319,7 @@ namespace frontend {
 						throw CF::Device::InvalidCapacity("LISTENER ALLOCATION ID ALREADY IN USE", capacities);
 					}
 
-					if(addTunerMapping(frontend_listener_allocation) < 0){
+					if(addListenerMapping(frontend_listener_allocation) < 0){
 						//TODO: add back log messages
 						std::cout<<"allocateCapacity: UNKNOWN CONTROL ALLOCATION ID"<<std::endl;
 						throw FRONTEND::BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
