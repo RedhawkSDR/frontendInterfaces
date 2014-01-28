@@ -443,12 +443,12 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
     // Mapping and translation helpers. External string identifiers to internal numerical identifiers
     public int addTunerMapping(frontend.FrontendTunerStructProps.frontend_tuner_allocation_struct frontend_alloc){
         int NO_VALID_TUNER = -1;
-        // Do not allocate if allocation ID has already been used
-        if(getTunerMapping(frontend_alloc.allocation_id.getValue()) >= 0)
-            return NO_VALID_TUNER;
-                
-        // Next, try to allocate a new tuner
         synchronized(allocationID_MappingLock){
+            // Do not allocate if allocation ID has already been used
+            if(getTunerMapping(frontend_alloc.allocation_id.getValue()) >= 0)
+                return NO_VALID_TUNER;
+                
+            // Next, try to allocate a new tuner
             int numChannels = tunerChannels.size();
             for (int tuner_id = 0; tuner_id < numChannels; tuner_id++) {
                 if(tunerChannels.get(tuner_id).frontend_status.tuner_type.getValue() != frontend_alloc.tuner_type.getValue())
@@ -485,18 +485,20 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
 
     public int addTunerMapping(frontend.FrontendTunerStructProps.frontend_listener_allocation_struct frontend_listener_alloc){
         int NO_VALID_TUNER = -1;
-        // Do not allocate if allocation ID has already been used
-        if (getTunerMapping(frontend_listener_alloc.listener_allocation_id.getValue()) >= 0)
-            return NO_VALID_TUNER;
+        synchronized(allocationID_MappingLock){
+            // Do not allocate if allocation ID has already been used
+            if (getTunerMapping(frontend_listener_alloc.listener_allocation_id.getValue()) >= 0)
+                return NO_VALID_TUNER;
 
-        int tuner_id = NO_VALID_TUNER;
-        // Do not allocate if existing allocation ID does not exist
-        if ((tuner_id = getTunerMapping(frontend_listener_alloc.existing_allocation_id.getValue())) < 0)
-            return NO_VALID_TUNER;
+            int tuner_id = NO_VALID_TUNER;
+            // Do not allocate if existing allocation ID does not exist
+            if ((tuner_id = getTunerMapping(frontend_listener_alloc.existing_allocation_id.getValue())) < 0)
+                return NO_VALID_TUNER;
 
-        allocationID_to_tunerID.put(frontend_listener_alloc.listener_allocation_id.getValue(), tuner_id);
-        tunerChannels.get(tuner_id).frontend_status.allocation_id_csv.setValue(create_allocation_id_csv(tuner_id));
-        return tuner_id;
+            allocationID_to_tunerID.put(frontend_listener_alloc.listener_allocation_id.getValue(), tuner_id);
+            tunerChannels.get(tuner_id).frontend_status.allocation_id_csv.setValue(create_allocation_id_csv(tuner_id));
+            return tuner_id;
+        }
     }
 
     public int getTunerMapping(String allocation_id){
