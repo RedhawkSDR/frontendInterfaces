@@ -85,19 +85,6 @@ class FrontendTunerDevice(CF__POA.Device, Device):
     
     """ Allocation handlers """
     def allocate_frontend_tuner_allocation(self, frontend_tuner_allocation):
-        # TODO
-        frontend_tuner_allocation.tuner_type
-        frontend_tuner_allocation.allocation_id
-        frontend_tuner_allocation.center_frequency
-        frontend_tuner_allocation.bandwidth
-        frontend_tuner_allocation.bandwidth_tolerance
-        frontend_tuner_allocation.sample_rate
-        frontend_tuner_allocation.sample_rate_tolerance
-        frontend_tuner_allocation.device_control
-        frontend_tuner_allocation.group_id
-        frontend_tuner_allocation.rf_flow_id
-        return False   
-    
         try:
             if not self._valid_tuner_type(frontend_tuner_allocation.tuner_type):
                 #TODO: add back log messages
@@ -252,11 +239,6 @@ class FrontendTunerDevice(CF__POA.Device, Device):
         self.tunerChannels[tuner_id].frontend_status.allocation_id_csv = self.create_allocation_id_csv(tuner_id)
 
     def allocate_frontend_listener_allocation(self, frontend_listener_allocation):
-        # TODO
-        frontend_listener_allocation.existing_allocation_id
-        frontend_listener_allocation.listener_allocation_id
-        return False
-    
         try:
             # Check validity of allocation_id's
             if not frontend_listener_allocation.existing_allocation_id:
@@ -466,6 +448,8 @@ class FrontendTunerDevice(CF__POA.Device, Device):
 
     # Configure tuner - gets called during allocation
     def enableTuner(self, tuner_id, enable):
+        ''' assumes collector RF and channel RF are the same. If not true, override function
+        '''
         # Lock the tuner
         self.tunerChannels[tuner_id].lock.acquire()
         try:
@@ -572,12 +556,14 @@ class FrontendTunerDevice(CF__POA.Device, Device):
         sri.keywords.append(CF.DataType(id=id, value=any.to_any(myValue)))
         return True
 
-    def configureTunerSRI(self, sri, frequency, bandwidth, sample_rate, mode, rf_flow_id):
+    def configureTunerSRI(self, sri, channel_frequency, bandwidth, sample_rate, mode, rf_flow_id, collector_frequency = -1.0):
         if sri == None:
             return
 
+        chanFreq = int(channel_frequency)
+
         #Create new streamID
-        streamID = "tuner_freq_" + str(int(frequency)) + "_Hz_" + str(uuid.uuid4())
+        streamID = "tuner_freq_" + str(chanFreq) + "_Hz_" + str(uuid.uuid4())
         
         sri.mode = mode
         sri.hversion = 0
@@ -590,37 +576,19 @@ class FrontendTunerDevice(CF__POA.Device, Device):
         sri.yunits = 1
         sri.streamID = streamID
         sri.blocking = False
-
-        addModifyKeyword(sri, "COL_RF", centerFreq)
-        addModifyKeyword(sri, "CHAN_RF", centerFreq)
-        addModifyKeyword(sri,"FRONTEND::RF_FLOW_ID",rf_flow_id)
-        addModifyKeyword(sri,"FRONTEND::BANDWIDTH", bandwidth)
-        addModifyKeyword(sri,"FRONTEND::DEVICE_ID", self._get_identifier())
-
-    def updateSriTimes(self, sri, timeUp, timeDown, timeType):
-        ''' sri is BULKIO.StreamSRI object
-            timeUp and timeDown are seconds since 1970
-            timeType: 1=J1970, 2=JCY
-        '''
         
-        curr_up = time.gmtime()
-        time_up = time.gmtime(timeUp) # assumes timeUp is seconds since 1970
-        time_down = time.gmtime(timeDown)# assumes timeDown is seconds since 1970
         
-        # using timeUp/gmt_up or current time 
-        if timeType == JCY:
-            DOIU = '0000%d00%d00%d'%(curr_up.tm_year,time_up.tm_mon,time_up.tm_mday)
+        # for some devices, colFreq is the same as chanFreq
+        if (collector_frequency < 0):
+            colFreq = chanFreq
         else:
-            DOIU = '0000%d00%d00%d'%(time_up.tm_year,time_up.tm_mon,time_up.tm_mday)
-        TUOI = '00%d00%d00%d'%(time_up.tm_hour,time_up.tm_min,time_up.tm_sec)
-        # using timeDown/gmt_down
-        DOID = '0000%d00%d00%d'%(time_down.tm_year,time_down.tm_mon,time_down.tm_mday)
-        TDOI = '00%d00%d00%d'%(time_down.tm_hour,time_down.tm_min,time_down.tm_sec)
+            colFreq = int(collector_frequency)
 
-        addModifyKeyword(sri, "DOIU", DOIU)
-        addModifyKeyword(sri, "TUOI", TUOI)
-        addModifyKeyword(sri, "DOID", DOID)
-        addModifyKeyword(sri, "TDOI", TDOI)
+        addModifyKeyword(sri, "COL_RF", float(colFreq))
+        addModifyKeyword(sri, "CHAN_RF", float(chanFreq))
+        addModifyKeyword(sri,"FRONTEND::RF_FLOW_ID",str(rf_flow_id))
+        addModifyKeyword(sri,"FRONTEND::BANDWIDTH", float(bandwidth))
+        addModifyKeyword(sri,"FRONTEND::DEVICE_ID", str(self._get_identifier()))
 
     # This is not currently used but is available as a debugging tool
     def printSRI(self, sri, strHeader = "DEBUG SRI"):

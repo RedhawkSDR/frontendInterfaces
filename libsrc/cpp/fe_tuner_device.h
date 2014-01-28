@@ -123,7 +123,7 @@ namespace frontend {
 
 	    	// Mapping and translation helpers. External string identifiers to internal numerical identifiers
 	        virtual long addTunerMapping(const frontend::frontend_tuner_allocation_struct & frontend_alloc);
-	    	virtual long addTunerMapping(const frontend::frontend_listener_allocation_struct & frontend_listener_alloc);
+	    	virtual long addListenerMapping(const frontend::frontend_listener_allocation_struct & frontend_listener_alloc);
 			virtual bool removeTunerMapping(std::string allocation_id);
 			virtual bool removeTunerMapping(size_t tuner_id);
 			virtual long getTunerMapping(std::string allocation_id);
@@ -134,7 +134,7 @@ namespace frontend {
 			virtual bool is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr);
 
 			// Configure tuner - gets called during allocation
-			virtual bool enableTuner(size_t tuner_id, bool enable);
+			virtual bool enableTuner(size_t tuner_id, bool enable); /* assumes collector RF and channel RF are the same. If not true, override function */
 			virtual bool removeTuner(size_t tuner_id);
 
 		protected:
@@ -216,17 +216,17 @@ namespace frontend {
 				return true;
 			}
 
-			virtual void configureTunerSRI(BULKIO::StreamSRI *sri, double frequency, double bandwidth, double sample_rate, short mode, std::string rf_flow_id) {
+			virtual void configureTunerSRI(BULKIO::StreamSRI *sri, double channel_frequency, double bandwidth, double sample_rate, short mode, std::string rf_flow_id, double collector_frequency = -1.0) {
 				if (sri == NULL)
 					return;
 
 				//Convert CenterFreq into string
-				long centerFreq = long(frequency);
-				char centerFreq_str[16];
-				sprintf(centerFreq_str, "%ld", centerFreq);
+				long chanFreq = long(channel_frequency);
+				char chanFreq_str[16];
+				sprintf(chanFreq_str, "%ld", chanFreq);
 
 				//Create new streamID
-				std::string streamID = "tuner_freq_" + std::string(centerFreq_str) + "_Hz_" + UUID_HELPER::new_uuid();
+				std::string streamID = "tuner_freq_" + std::string(chanFreq_str) + "_Hz_" + UUID_HELPER::new_uuid();
 
 				sri->mode = mode;
 				sri->hversion = 0;
@@ -240,84 +240,18 @@ namespace frontend {
 				sri->streamID = CORBA::string_dup(streamID.c_str());
 				sri->blocking = false;
 
-				addModifyKeyword<CORBA::Double > (sri, "COL_RF", CORBA::Double(centerFreq));
-				addModifyKeyword<CORBA::Double > (sri, "CHAN_RF", CORBA::Double(centerFreq));
+				// for some devices, colFreq is the same as chanFreq
+				long colFreq;
+				if (collector_frequency < 0)
+					colFreq = chanFreq;
+				else
+					colFreq = long(collector_frequency);
+
+				addModifyKeyword<CORBA::Double > (sri, "COL_RF", CORBA::Double(colFreq));
+				addModifyKeyword<CORBA::Double > (sri, "CHAN_RF", CORBA::Double(chanFreq));
 				addModifyKeyword<std::string> (sri,"FRONTEND::RF_FLOW_ID",rf_flow_id);
 				addModifyKeyword<CORBA::Double> (sri,"FRONTEND::BANDWIDTH", CORBA::Double(bandwidth));
 				addModifyKeyword<std::string> (sri,"FRONTEND::DEVICE_ID",std::string(identifier()));
-			}
-
-			virtual void updateSriTimes(BULKIO::StreamSRI *sri, double timeUp, double timeDown, timeTypes timeType) {
-
-				std::stringstream DOIU;
-				std::stringstream TUOI;
-				std::stringstream DOID;
-				std::stringstream TDOI;
-
-				time_t time_up = (time_t) timeUp;
-				time_t time_down = (time_t) timeDown;
-				time_t now;
-				struct tm curr_time;
-				curr_time.tm_year = 0;
-				struct tm gmt_up;
-				struct tm gmt_down;
-
-				gmt_up = *gmtime(&time_up);
-				gmt_down = *gmtime(&time_down);
-				if (timeType == JCY) {
-					now = time(0);
-					curr_time = *gmtime(&now);
-				}
-
-				DOIU.width(4);
-				DOIU.fill('0');
-				if (timeType == JCY)
-					DOIU << (curr_time.tm_year + 1900);
-				else
-					DOIU << (gmt_up.tm_year + 1900);
-				DOIU.width(2);
-				DOIU.fill('0');
-				DOIU << (gmt_up.tm_mon + 1);
-				DOIU.width(2);
-				DOIU.fill('0');
-				DOIU << gmt_up.tm_mday;
-
-				TUOI.width(2);
-				TUOI.fill('0');
-				TUOI << gmt_up.tm_hour;
-				TUOI.width(2);
-				TUOI.fill('0');
-				TUOI << gmt_up.tm_min;
-				TUOI.width(2);
-				TUOI.fill('0');
-				TUOI << gmt_up.tm_sec;
-
-				DOID.width(4);
-				DOID.fill('0');
-				DOID << (gmt_down.tm_year + 1900);
-				DOID.width(2);
-				DOID.fill('0');
-				DOID << (gmt_down.tm_mon + 1);
-				DOID.width(2);
-				DOID.fill('0');
-				DOID << gmt_down.tm_mday;
-
-				TDOI.width(2);
-				TDOI.fill('0');
-				TDOI << gmt_down.tm_hour;
-				TDOI.width(2);
-				TDOI.fill('0');
-				TDOI << gmt_down.tm_min;
-				TDOI.width(2);
-				TDOI.fill('0');
-				TDOI << gmt_down.tm_sec;
-
-
-				addModifyKeyword<std::string > (sri, "DOIU", DOIU.str());
-				addModifyKeyword<std::string > (sri, "TUOI", TUOI.str());
-				addModifyKeyword<std::string > (sri, "DOID", DOID.str());
-				addModifyKeyword<std::string > (sri, "TDOI", TDOI.str());
-
 			}
 
 			// This is not currently used but is available as a debugging tool
