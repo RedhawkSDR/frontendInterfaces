@@ -2,9 +2,9 @@
 #define FE_TUNER_PORT_H
 
 #include "fe_port_impl.h"
+#include "fe_base.h"
 
 #include <FRONTEND/TunerControl.h>
-#include <fe_base.h>
 
 
 namespace frontend {
