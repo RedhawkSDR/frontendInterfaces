@@ -21,7 +21,7 @@ libfrontend_@FRONTEND_API_VERSION@_la_SOURCES = \
     cpp/fe_rfinfo_port_impl.cpp \
     cpp/fe_rfsource_port_impl.cpp \
     cpp/fe_tuner_port_impl.cpp \
-    cpp/fe_tuner_impl.cpp
+    cpp/fe_tuner_device.cpp
 
 ## Define the list of public header files and their install location.
 library_includedir = $(includedir)/frontend
@@ -31,8 +31,8 @@ library_include_HEADERS = \
 	cpp/fe_port_impl.h \
 	cpp/fe_rfinfo_port_impl.h \
 	cpp/fe_rfsource_port_impl.h \
-	cpp/fe_tuner_impl.h \
-        cpp/fe_tuner_impl.cpp \
+	cpp/fe_tuner_device.h \
+        cpp/fe_tuner_device.cpp \
 	cpp/fe_tuner_port_impl.h \
 	cpp/fe_tuner_struct_props.h \
         cpp/fe_base.h
