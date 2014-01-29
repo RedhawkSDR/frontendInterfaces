@@ -321,11 +321,12 @@ class FrontendTunerDevice(CF__POA.Device, Device):
     def addTunerMapping(self, frontend_alloc):
         NO_VALID_TUNER = -1
 
+        # Do not allocate if allocation ID has already been used
+        if self.getTunerMapping(frontend_alloc.allocation_id) >= 0 :
+            return NO_VALID_TUNER
+            
         self.allocationID_MappingLock.acquire()
         try:
-            # Do not allocate if allocation ID has already been used
-            if self.getTunerMapping(frontend_alloc.allocation_id) >= 0 :
-                return NO_VALID_TUNER
 
             # Next, try to allocate a new tuner
             for tuner_id,tunerChannel in enumerate(self.tunerChannels):
@@ -359,18 +360,17 @@ class FrontendTunerDevice(CF__POA.Device, Device):
     def addListenerMapping(self, frontend_listener_alloc):
         NO_VALID_TUNER = -1
 
+        # Do not allocate if allocation ID has already been used
+        if self.getTunerMapping(frontend_listener_alloc.listener_allocation_id) >= 0:
+            return NO_VALID_TUNER
+
+        # Do not allocate if existing allocation ID does not exist
+        tuner_id = self.getTunerMapping(frontend_listener_alloc.existing_allocation_id)
+        if tuner_id < 0:
+            return NO_VALID_TUNER
+
         self.allocationID_MappingLock.acquire()
         try:
-
-            # Do not allocate if allocation ID has already been used
-            if self.getTunerMapping(frontend_listener_alloc.listener_allocation_id) >= 0:
-                return NO_VALID_TUNER
-    
-            # Do not allocate if existing allocation ID does not exist
-            tuner_id = getTunerMapping(frontend_listener_alloc.existing_allocation_id)
-            if tuner_id < 0:
-                return NO_VALID_TUNER
-    
             self.allocationID_to_tunerID[frontend_listener_alloc.listener_allocation_id] = tuner_id
             self.tunerChannels[tuner_id].frontend_status.allocation_id_csv = create_allocation_id_csv(tuner_id)
             return tuner_id
