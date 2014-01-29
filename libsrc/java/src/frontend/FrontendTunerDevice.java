@@ -110,26 +110,21 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
 
     private Class<TunerStatusStructType> frontend_tuner_status_class_type;
 
-/******************/
     public final StructSequenceProperty<TunerStatusStructType> frontend_tuner_status =
         new StructSequenceProperty<TunerStatusStructType> (
             "FRONTEND::tuner_status", //id
             "frontend_tuner_status", //name
             frontend_tuner_status_class_type, //type
-//            StructSequenceProperty.<TunerStatusStructType>asList(), //defaultValue
             (List)new ArrayList<TunerStatusStructType>(),
             Mode.READONLY, //mode
             new Kind[] { Kind.CONFIGURE } //kind
         );
-/*************************/
 
     protected Map<String, Integer> allocationID_to_tunerID;
 
     protected Map<String, Integer> streamID_to_tunerID;
 
     protected Object allocationID_MappingLock;
-
-//    protected List<TunerStatusStructType> frontend_tuner_status;
 
     protected List<indivTuner<TunerStatusStructType>> tunerChannels; 
 
@@ -170,14 +165,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             alloc_id_csv.setLength(alloc_id_csv.length()-1);
         }
         return alloc_id_csv.toString();
-    }
-
-    // Device specific allocation handling
-    protected void updateUsageState(){
-////Can't overload with different signature than base class
-////C++ returns state
-/// Need to add an argument to compile:    protected CF.DevicePackage.UsageType updateUsageState(int junk){
-/// TRM
     }
 
     public boolean allocateTuner(frontend.FrontendTunerStructProps.frontend_tuner_allocation_struct capacity) throws CF.DevicePackage.InvalidCapacity, Exception {
