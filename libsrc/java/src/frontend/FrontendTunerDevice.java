@@ -45,6 +45,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
     public class indivTuner<T extends frontend.FrontendTunerStructProps.default_frontend_tuner_status_struct_struct> {
 
         public indivTuner(){
+            complex = true;
             frontend_status = null;
             lock = null;
         }
@@ -62,6 +63,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         }
 
         public BULKIO.StreamSRI sri;
+        public boolean complex;
         public Object lock;
         public String control_allocation_id;
         public T frontend_status;
@@ -346,7 +348,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                 throw new CF.DevicePackage.InvalidCapacity("LISTENER ALLOCATION ID ALREADY IN USE", new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
             }
 
-            if(addTunerMapping(capacity) < 0){
+            if(addListenerMapping(capacity) < 0){
                 //TODO: add back log messages
                 System.out.println("allocateListener: UNKNOWN CONTROL ALLOCATION ID");
                 throw new FRONTEND.BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
@@ -394,6 +396,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         return true;
     }
 
+    // assumes collector RF and channel RF are the same if not true, override function 
     public boolean enableTuner(int tuner_id, boolean enable){
         // Lock the tuner
         synchronized(tunerChannels.get(tuner_id).lock){
@@ -402,12 +405,12 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             tunerChannels.get(tuner_id).frontend_status.enabled.setValue(enable);
             // If going from disabled to enabled
             if (!prev_enabled && enable) {
+                int mode = tunerChannels.get(tuner_id).complex?1:0;
                 configureTunerSRI(  tunerChannels.get(tuner_id).sri,
                                     tunerChannels.get(tuner_id).frontend_status.center_frequency.getValue(),
                                     tunerChannels.get(tuner_id).frontend_status.bandwidth.getValue(),
                                     tunerChannels.get(tuner_id).frontend_status.sample_rate.getValue(),
-                                    //tunerChannels.get(tuner_id).frontend_status.complex, --> "complex" is optional, can't assume it's there
-                                    1, // TODO - assumes complex data, override enableTuner function if necessary
+                                    mode, 
                                     tunerChannels.get(tuner_id).frontend_status.rf_flow_id.getValue());
                 streamID_to_tunerID.put(tunerChannels.get(tuner_id).sri.streamID, tuner_id);
                 _dev_enable(tuner_id);
@@ -430,11 +433,11 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
     // Mapping and translation helpers. External string identifiers to internal numerical identifiers
     public int addTunerMapping(frontend.FrontendTunerStructProps.frontend_tuner_allocation_struct frontend_alloc){
         int NO_VALID_TUNER = -1;
-        synchronized(allocationID_MappingLock){
-            // Do not allocate if allocation ID has already been used
-            if(getTunerMapping(frontend_alloc.allocation_id.getValue()) >= 0)
-                return NO_VALID_TUNER;
+        // Do not allocate if allocation ID has already been used
+        if(getTunerMapping(frontend_alloc.allocation_id.getValue()) >= 0)
+            return NO_VALID_TUNER;
                 
+        synchronized(allocationID_MappingLock){
             // Next, try to allocate a new tuner
             int numChannels = tunerChannels.size();
             for (int tuner_id = 0; tuner_id < numChannels; tuner_id++) {
@@ -470,13 +473,13 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         }
     }
 
-    public int addTunerMapping(frontend.FrontendTunerStructProps.frontend_listener_allocation_struct frontend_listener_alloc){
+    public int addListenerMapping(frontend.FrontendTunerStructProps.frontend_listener_allocation_struct frontend_listener_alloc){
         int NO_VALID_TUNER = -1;
-        synchronized(allocationID_MappingLock){
-            // Do not allocate if allocation ID has already been used
-            if (getTunerMapping(frontend_listener_alloc.listener_allocation_id.getValue()) >= 0)
-                return NO_VALID_TUNER;
+        // Do not allocate if allocation ID has already been used
+        if (getTunerMapping(frontend_listener_alloc.listener_allocation_id.getValue()) >= 0)
+            return NO_VALID_TUNER;
 
+        synchronized(allocationID_MappingLock){
             int tuner_id = NO_VALID_TUNER;
             // Do not allocate if existing allocation ID does not exist
             if ((tuner_id = getTunerMapping(frontend_listener_alloc.existing_allocation_id.getValue())) < 0)
@@ -631,16 +634,19 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         sri.keywords = updatedKeywords;
         return true;
     }
+    public void configureTunerSRI(BULKIO.StreamSRI sri, Double channel_frequency, Double bandwidth, Double sample_rate, int mode, String rf_flow_id) {
+        configureTunerSRI(sri, channel_frequency, bandwidth, sample_rate, mode, rf_flow_id, -1.0);
+    }
 
-    public void configureTunerSRI(BULKIO.StreamSRI sri, Double frequency, Double bandwidth, Double sample_rate, int mode, String rf_flow_id) {
+    public void configureTunerSRI(BULKIO.StreamSRI sri, Double channel_frequency, Double bandwidth, Double sample_rate, int mode, String rf_flow_id, Double collector_frequency) {
         if (sri == null)
             return;
 
         //Convert CenterFreq into string
-        long centerFreq = frequency.longValue();
+        long chanFreq = channel_frequency.longValue();
 
         //Create new streamID
-        String streamID = "tuner_freq_" + Long.toString(centerFreq).substring(0,15) + "_Hz_" + java.util.UUID.randomUUID().toString();
+        String streamID = "tuner_freq_" + Long.toString(chanFreq).substring(0,15) + "_Hz_" + java.util.UUID.randomUUID().toString();
 
         sri.mode = (short)mode;
         sri.hversion = 0;
@@ -654,9 +660,17 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         sri.streamID = streamID;
         sri.blocking = false;
 
-        Any centerFreqAny = AnyUtils.toAny(centerFreq,"double"); 
-        addModifyKeyword(sri, "COL_RF", centerFreqAny);
-        addModifyKeyword(sri, "CHAN_RF", centerFreqAny);
+        // for some devices, colFreq is the same as chanFreq
+        long colFreq;
+        if (collector_frequency < 0)
+            colFreq = chanFreq;
+        else
+            colFreq = collector_frequency.longValue();
+
+        Any colFreqAny = AnyUtils.toAny(colFreq,"double"); 
+        addModifyKeyword(sri, "COL_RF", colFreqAny);
+        Any chanFreqAny = AnyUtils.toAny(chanFreq,"double"); 
+        addModifyKeyword(sri, "CHAN_RF", chanFreqAny);
         Any rfFlowIdAny = AnyUtils.toAny(rf_flow_id,"string"); 
         addModifyKeyword(sri,"FRONTEND::RF_FLOW_ID",rfFlowIdAny);
         Any bandwidthAny = AnyUtils.toAny(bandwidth,"double"); 
@@ -685,38 +699,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             System.out.println("\tKEYWORD KEY:VAL : " + sri.keywords[ii].id + ":" + String.valueOf(AnyUtils.convertAny(sri.keywords[ii].value)));
         }
 
-    }
-
-    public void updateSriTimes(BULKIO.StreamSRI sri, double timeUp, double timeDown, timeTypes timeType){
-        DateFormat dateFormatDay = new SimpleDateFormat("yyyyMMdd");
-        dateFormatDay.setTimeZone(TimeZone.getTimeZone("GMT"));
-        DateFormat dateFormatTime = new SimpleDateFormat("HHmmss");
-        dateFormatTime.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        int currentYear = cal.get(Calendar.YEAR);
-
-        cal.setTimeInMillis((new Double(timeUp)).longValue()*1000);
-        if (timeType == timeTypes.JCY){
-            cal.set(Calendar.YEAR,currentYear);
-        }
-        String DOIU = dateFormatDay.format(cal.getTime());
-        String TUOI = dateFormatTime.format(cal.getTime());
-        cal.setTimeInMillis((new Double(timeDown)).longValue()*1000);
-        if (timeType == timeTypes.JCY){
-            cal.set(Calendar.YEAR,currentYear);
-        }
-        String DOID = dateFormatDay.format(cal.getTime());
-        String TDOI = dateFormatTime.format(cal.getTime());
-
-        Any doiuAny = AnyUtils.toAny(DOIU, "string"); 
-        addModifyKeyword(sri, "DOIU", doiuAny);
-        Any tuoiAny = AnyUtils.toAny(TUOI, "string"); 
-        addModifyKeyword(sri, "TUOI", tuoiAny);
-        Any doidAny = AnyUtils.toAny(DOID, "string"); 
-        addModifyKeyword(sri, "DOID", doidAny);
-        Any tdoiAny = AnyUtils.toAny(TDOI, "string"); 
-        addModifyKeyword(sri, "TDOI", tdoiAny);
     }
 
     private void construct() {
