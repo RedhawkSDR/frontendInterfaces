@@ -5,18 +5,21 @@
 # Source: testPythonFeDevice.spd.xml
 from ossie.cf import CF, CF__POA
 from ossie.utils import uuid
-from omniORB import CORBA, any
+#from omniORB import CORBA
+from omniORB import any
 
 from ossie.device import Device
 from ossie.properties import simple_property
 from ossie.properties import struct_property
 from ossie.properties import structseq_property
 
-import Queue, copy, time, threading
-from ossie.resource import usesport, providesport
-import bulkio
+#import Queue, copy, time
+import threading
+#from ossie.resource import usesport, providesport
+#import bulkio
 from bulkio.bulkioInterfaces import BULKIO
-from redhawk.frontendInterfaces import FRONTEND__POA
+from redhawk.frontendInterfaces import FRONTEND
+#from redhawk.frontendInterfaces import FRONTEND__POA
 
 def zeroSRI(sri):
     if sri:
@@ -196,7 +199,7 @@ class FrontendTunerDevice(CF__POA.Device, Device):
                     
                 # enable tuner after successful allocation
                 try:
-                    enableTuner(tuner_id,true);
+                    enableTuner(tuner_id,True);
                 except:
                     #TODO: add back log messages
                     print "allocate_frontend_tuner_allocation: FAILED TO ENABLE TUNER AFTER ALLOCATION"
@@ -382,8 +385,8 @@ class FrontendTunerDevice(CF__POA.Device, Device):
         try:
             if allocation_id in self.allocationID_to_tunerID:
                 del self.allocationID_to_tunerID[allocation_id]
-                return true;
-            return false;
+                return True;
+            return False;
         finally:
             self.allocationID_MappingLock.release()
     
@@ -448,7 +451,7 @@ class FrontendTunerDevice(CF__POA.Device, Device):
 
     # Configure tuner - gets called during allocation
     def enableTuner(self, tuner_id, enable):
-        ''' assumes collector RF and channel RF are the same. If not true, override function
+        ''' assumes collector RF and channel RF are the same. If not True, override function
         '''
         # Lock the tuner
         self.tunerChannels[tuner_id].lock.acquire()
@@ -547,7 +550,7 @@ class FrontendTunerDevice(CF__POA.Device, Device):
             return min_rate
         return req_rate
 
-    def addModifyKeyword(self, sri, id, myValue, addOnly=false):
+    def addModifyKeyword(self, sri, id, myValue, addOnly=False):
         if not addOnly:
             for keyword in sri.keywords:
                 if keyword.id == id:
