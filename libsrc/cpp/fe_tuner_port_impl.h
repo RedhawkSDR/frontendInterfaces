@@ -8,409 +8,163 @@
 
 
 namespace frontend {
-
-	// ----------------------------------------------------------------------------------------
-	// InFrontendTunerPort declaration
-	// ----------------------------------------------------------------------------------------
-	class InFrontendTunerPort : public virtual POA_FRONTEND::FrontendTuner, public Port_Provides_base_impl
-	{
-		public:
-			InFrontendTunerPort(std::string port_name,
-				CharFromChar *newTunerTypeGetterCB = NULL,
-				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
-				CharFromChar *newTunerGroupIdGetterCB = NULL,
-				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
-				PropFromChar *newTunerStatusGetterCB = NULL);
-			InFrontendTunerPort(std::string port_name,
-                                LOGGER_PTR logger,
-				CharFromChar *newTunerTypeGetterCB = NULL,
-				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
-				CharFromChar *newTunerGroupIdGetterCB = NULL,
-				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
-				PropFromChar *newTunerStatusGetterCB = NULL);
-			~InFrontendTunerPort();
-
-			char* getTunerType(const char* id);
-			CORBA::Boolean getTunerDeviceControl(const char* id);
-			char* getTunerGroupId(const char* id);
-			char* getTunerRfFlowId(const char* id);
-			CF::Properties* getTunerStatus(const char* id);
-
-			// Assign  TunerType callbacks - getters
-			template< typename T > inline
-			  void setTunerTypeGetterCB(T &target, char* (T::*func)( const char* id)  ) {
-				getTunerTypeCB =  boost::make_shared< MemberCharFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerTypeGetterCB(T *target, char* (T::*func)( const char* id)  ) {
-				getTunerTypeCB =  boost::make_shared< MemberCharFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerTypeGetterCB( CharFromChar *newCB );
-			void   setTunerTypeGetterCB( CharFromCharFn  newCB );
-
-			// Assign  TunerDeviceControl callbacks - getters
-			template< typename T > inline
-			  void setTunerDeviceControlGetterCB(T &target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerDeviceControlCB =  boost::make_shared< MemberBooleanFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerDeviceControlGetterCB(T *target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerDeviceControlCB =  boost::make_shared< MemberBooleanFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerDeviceControlGetterCB( BooleanFromChar *newCB );
-			void   setTunerDeviceControlGetterCB( BooleanFromCharFn  newCB );
-
-			// Assign  TunerGroupId callbacks - getters
-			template< typename T > inline
-			  void setTunerGroupIdGetterCB(T &target, char* (T::*func)( const char* id)  ) {
-				getTunerGroupIdCB =  boost::make_shared< MemberCharFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerGroupIdGetterCB(T *target, char* (T::*func)( const char* id)  ) {
-				getTunerGroupIdCB =  boost::make_shared< MemberCharFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerGroupIdGetterCB( CharFromChar *newCB );
-			void   setTunerGroupIdGetterCB( CharFromCharFn  newCB );
-
-			// Assign  TunerRfFlowId callbacks - getters
-			template< typename T > inline
-			  void setTunerRfFlowIdGetterCB(T &target, char* (T::*func)( const char* id)  ) {
-				getTunerRfFlowIdCB =  boost::make_shared< MemberCharFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerRfFlowIdGetterCB(T *target, char* (T::*func)( const char* id)  ) {
-				getTunerRfFlowIdCB =  boost::make_shared< MemberCharFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerRfFlowIdGetterCB( CharFromChar *newCB );
-			void   setTunerRfFlowIdGetterCB( CharFromCharFn  newCB );
-
-			// Assign  TunerStatus callbacks - getters
-			template< typename T > inline
-			  void setTunerStatusGetterCB(T &target, CF::Properties* (T::*func)( const char* id)  ) {
-				getTunerStatusCB =  boost::make_shared< MemberPropFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerStatusGetterCB(T *target, CF::Properties* (T::*func)( const char* id)  ) {
-				getTunerStatusCB =  boost::make_shared< MemberPropFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerStatusGetterCB( PropFromChar *newCB );
-			void   setTunerStatusGetterCB( PropFromCharFn  newCB );
-
-                        void   setLogger(LOGGER_PTR newLogger);
-
-		protected:
-			boost::mutex portAccess;
-
-			// Callbacks
-			boost::shared_ptr< CharFromChar > getTunerTypeCB;
-			boost::shared_ptr< BooleanFromChar > getTunerDeviceControlCB;
-			boost::shared_ptr< CharFromChar > getTunerGroupIdCB;
-			boost::shared_ptr< CharFromChar > getTunerRfFlowIdCB;
-			boost::shared_ptr< PropFromChar > getTunerStatusCB;
-
-                        LOGGER_PTR logger;
-
-	};
-
-	// ----------------------------------------------------------------------------------------
-	// InAnalogTunerPort declaration
-	// ----------------------------------------------------------------------------------------
-	class InAnalogTunerPort : public virtual POA_FRONTEND::AnalogTuner, public InFrontendTunerPort
-	{
-		public:
-			InAnalogTunerPort(std::string port_name,
-				CharFromChar *newTunerTypeGetterCB = NULL,
-				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
-				CharFromChar *newTunerGroupIdGetterCB = NULL,
-				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
-				PropFromChar *newTunerStatusGetterCB = NULL,
-				DoubleFromChar *newTunerCenterFrequencyGetterCB = NULL,
-				VoidFromCharDouble *newTunerCenterFrequencySetterCB = NULL,
-				DoubleFromChar *newTunerBandwidthGetterCB = NULL,
-				VoidFromCharDouble *newTunerBandwidthSetterCB = NULL,
-				BooleanFromChar *newTunerAgcEnableGetterCB = NULL,
-				VoidFromCharBoolean *newTunerAgcEnableSetterCB = NULL,
-				FloatFromChar *newTunerGainGetterCB = NULL,
-				VoidFromCharFloat *newTunerGainSetterCB = NULL,
-				LongFromChar *newTunerReferenceSourceGetterCB = NULL,
-				VoidFromCharLong *newTunerReferenceSourceSetterCB = NULL,
-				BooleanFromChar *newTunerEnableGetterCB = NULL,
-				VoidFromCharBoolean *newTunerEnableSetterCB = NULL);
-			InAnalogTunerPort(std::string port_name,
-                                LOGGER_PTR logger,
-				CharFromChar *newTunerTypeGetterCB = NULL,
-				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
-				CharFromChar *newTunerGroupIdGetterCB = NULL,
-				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
-				PropFromChar *newTunerStatusGetterCB = NULL,
-				DoubleFromChar *newTunerCenterFrequencyGetterCB = NULL,
-				VoidFromCharDouble *newTunerCenterFrequencySetterCB = NULL,
-				DoubleFromChar *newTunerBandwidthGetterCB = NULL,
-				VoidFromCharDouble *newTunerBandwidthSetterCB = NULL,
-				BooleanFromChar *newTunerAgcEnableGetterCB = NULL,
-				VoidFromCharBoolean *newTunerAgcEnableSetterCB = NULL,
-				FloatFromChar *newTunerGainGetterCB = NULL,
-				VoidFromCharFloat *newTunerGainSetterCB = NULL,
-				LongFromChar *newTunerReferenceSourceGetterCB = NULL,
-				VoidFromCharLong *newTunerReferenceSourceSetterCB = NULL,
-				BooleanFromChar *newTunerEnableGetterCB = NULL,
-				VoidFromCharBoolean *newTunerEnableSetterCB = NULL);
-			~InAnalogTunerPort();
-
-			void setTunerCenterFrequency(const char* id, CORBA::Double freq);
-			CORBA::Double getTunerCenterFrequency(const char* id);
-			void setTunerBandwidth(const char* id, CORBA::Double bw);
-			CORBA::Double getTunerBandwidth(const char* id);
-			void setTunerAgcEnable(const char* id, CORBA::Boolean enable);
-			CORBA::Boolean getTunerAgcEnable(const char* id);
-			void setTunerGain(const char* id, CORBA::Float gain);
-			CORBA::Float getTunerGain(const char* id);
-			void setTunerReferenceSource(const char* id, CORBA::Long source);
-			CORBA::Long getTunerReferenceSource(const char* id);
-			void setTunerEnable(const char* id, CORBA::Boolean enable);
-			CORBA::Boolean getTunerEnable(const char* id);
-
-			// Assign  TunerCenterFrequency callbacks - getters
-			template< typename T > inline
-			  void setTunerCenterFrequencyGetterCB(T &target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerCenterFrequencyCB =  boost::make_shared< MemberDoubleFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerCenterFrequencyGetterCB(T *target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerCenterFrequencyCB =  boost::make_shared< MemberDoubleFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerCenterFrequencyGetterCB( DoubleFromChar *newCB );
-			void   setTunerCenterFrequencyGetterCB( DoubleFromCharFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerCenterFrequencySetterCB(T &target, void (T::*func)( const char* id, CORBA::Double freq)  ) {
-				setTunerCenterFrequencyCB =  boost::make_shared< MemberVoidFromCharDouble< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerCenterFrequencySetterCB(T *target, void (T::*func)( const char* id, CORBA::Double freq)  ) {
-				setTunerCenterFrequencyCB =  boost::make_shared< MemberVoidFromCharDouble< T > >( boost::ref(*target), func );
-			};
-			void   setTunerCenterFrequencySetterCB( VoidFromCharDouble *newCB );
-			void   setTunerCenterFrequencySetterCB( VoidFromCharDoubleFn  newCB );
-
-			// Assign  TunerBandwidth callbacks - getters
-			template< typename T > inline
-			  void setTunerBandwidthGetterCB(T &target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerBandwidthCB =  boost::make_shared< MemberDoubleFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerBandwidthGetterCB(T *target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerBandwidthCB =  boost::make_shared< MemberDoubleFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerBandwidthGetterCB( DoubleFromChar *newCB );
-			void   setTunerBandwidthGetterCB( DoubleFromCharFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerBandwidthSetterCB(T &target, void (T::*func)( const char* id, CORBA::Double bw)  ) {
-				setTunerBandwidthCB =  boost::make_shared< MemberVoidFromCharDouble< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerBandwidthSetterCB(T *target, void (T::*func)( const char* id, CORBA::Double bw)  ) {
-				setTunerBandwidthCB =  boost::make_shared< MemberVoidFromCharDouble< T > >( boost::ref(*target), func );
-			};
-			void   setTunerBandwidthSetterCB( VoidFromCharDouble *newCB );
-			void   setTunerBandwidthSetterCB( VoidFromCharDoubleFn  newCB );
-
-			// Assign  TunerAgcEnable callbacks - getters
-			template< typename T > inline
-			  void setTunerAgcEnableGetterCB(T &target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerAgcEnableCB =  boost::make_shared< MemberBooleanFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerAgcEnableGetterCB(T *target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerAgcEnableCB =  boost::make_shared< MemberBooleanFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerAgcEnableGetterCB( BooleanFromChar *newCB );
-			void   setTunerAgcEnableGetterCB( BooleanFromCharFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerAgcEnableSetterCB(T &target, void (T::*func)( const char* id, CORBA::Boolean enable)  ) {
-				setTunerAgcEnableCB =  boost::make_shared< MemberVoidFromCharBoolean< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerAgcEnableSetterCB(T *target, void (T::*func)( const char* id, CORBA::Boolean enable)  ) {
-				setTunerAgcEnableCB =  boost::make_shared< MemberVoidFromCharBoolean< T > >( boost::ref(*target), func );
-			};
-			void   setTunerAgcEnableSetterCB( VoidFromCharBoolean *newCB );
-			void   setTunerAgcEnableSetterCB( VoidFromCharBooleanFn  newCB );
-
-			// Assign  TunerGain callbacks - getters
-			template< typename T > inline
-			  void setTunerGainGetterCB(T &target, CORBA::Float (T::*func)( const char* id)  ) {
-				getTunerGainCB =  boost::make_shared< MemberFloatFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerGainGetterCB(T *target, CORBA::Float (T::*func)( const char* id)  ) {
-				getTunerGainCB =  boost::make_shared< MemberFloatFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerGainGetterCB( FloatFromChar *newCB );
-			void   setTunerGainGetterCB( FloatFromCharFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerGainSetterCB(T &target, void (T::*func)( const char* id, CORBA::Float gain)  ) {
-				setTunerGainCB =  boost::make_shared< MemberVoidFromCharFloat< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerGainSetterCB(T *target, void (T::*func)( const char* id, CORBA::Float gain)  ) {
-				setTunerGainCB =  boost::make_shared< MemberVoidFromCharFloat< T > >( boost::ref(*target), func );
-			};
-			void   setTunerGainSetterCB( VoidFromCharFloat *newCB );
-			void   setTunerGainSetterCB( VoidFromCharFloatFn  newCB );
-
-			// Assign  TunerReferenceSource callbacks - getters
-			template< typename T > inline
-			  void setTunerReferenceSourceGetterCB(T &target, CORBA::Long (T::*func)( const char* id)  ) {
-				getTunerReferenceSourceCB =  boost::make_shared< MemberLongFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerReferenceSourceGetterCB(T *target, CORBA::Long (T::*func)( const char* id)  ) {
-				getTunerReferenceSourceCB =  boost::make_shared< MemberLongFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerReferenceSourceGetterCB( LongFromChar *newCB );
-			void   setTunerReferenceSourceGetterCB( LongFromCharFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerReferenceSourceSetterCB(T &target, void (T::*func)( const char* id, CORBA::Long source)  ) {
-				setTunerReferenceSourceCB =  boost::make_shared< MemberVoidFromCharLong< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerReferenceSourceSetterCB(T *target, void (T::*func)( const char* id, CORBA::Long source)  ) {
-				setTunerReferenceSourceCB =  boost::make_shared< MemberVoidFromCharLong< T > >( boost::ref(*target), func );
-			};
-			void   setTunerReferenceSourceSetterCB( VoidFromCharLong *newCB );
-			void   setTunerReferenceSourceSetterCB( VoidFromCharLongFn  newCB );
-
-			// Assign  TunerEnable callbacks - getters
-			template< typename T > inline
-			  void setTunerEnableGetterCB(T &target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerEnableCB =  boost::make_shared< MemberBooleanFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerEnableGetterCB(T *target, CORBA::Boolean (T::*func)( const char* id)  ) {
-				getTunerEnableCB =  boost::make_shared< MemberBooleanFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerEnableGetterCB( BooleanFromChar *newCB );
-			void   setTunerEnableGetterCB( BooleanFromCharFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerEnableSetterCB(T &target, void (T::*func)( const char* id, CORBA::Boolean enable)  ) {
-				setTunerEnableCB =  boost::make_shared< MemberVoidFromCharBoolean< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerEnableSetterCB(T *target, void (T::*func)( const char* id, CORBA::Boolean enable)  ) {
-				setTunerEnableCB =  boost::make_shared< MemberVoidFromCharBoolean< T > >( boost::ref(*target), func );
-			};
-			void   setTunerEnableSetterCB( VoidFromCharBoolean *newCB );
-			void   setTunerEnableSetterCB( VoidFromCharBooleanFn  newCB );
-
-
-		protected:
-
-			// Callbacks
-			boost::shared_ptr< DoubleFromChar > getTunerCenterFrequencyCB;
-			boost::shared_ptr< VoidFromCharDouble > setTunerCenterFrequencyCB;
-			boost::shared_ptr< DoubleFromChar > getTunerBandwidthCB;
-			boost::shared_ptr< VoidFromCharDouble > setTunerBandwidthCB;
-			boost::shared_ptr< BooleanFromChar > getTunerAgcEnableCB;
-			boost::shared_ptr< VoidFromCharBoolean > setTunerAgcEnableCB;
-			boost::shared_ptr< FloatFromChar > getTunerGainCB;
-			boost::shared_ptr< VoidFromCharFloat > setTunerGainCB;
-			boost::shared_ptr< LongFromChar > getTunerReferenceSourceCB;
-			boost::shared_ptr< VoidFromCharLong > setTunerReferenceSourceCB;
-			boost::shared_ptr< BooleanFromChar > getTunerEnableCB;
-			boost::shared_ptr< VoidFromCharBoolean > setTunerEnableCB;
-
-	};
-
-
-	// ----------------------------------------------------------------------------------------
-	// InDigitalTunerPort declaration
-	// ----------------------------------------------------------------------------------------
-	class InDigitalTunerPort : public virtual POA_FRONTEND::DigitalTuner, public InAnalogTunerPort
-	{
-		public:
-			InDigitalTunerPort(std::string port_name,
-				CharFromChar *newTunerTypeGetterCB = NULL,
-				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
-				CharFromChar *newTunerGroupIdGetterCB = NULL,
-				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
-				PropFromChar *newTunerStatusGetterCB = NULL,
-				DoubleFromChar *newTunerCenterFrequencyGetterCB = NULL,
-				VoidFromCharDouble *newTunerCenterFrequencySetterCB = NULL,
-				DoubleFromChar *newTunerBandwidthGetterCB = NULL,
-				VoidFromCharDouble *newTunerBandwidthSetterCB = NULL,
-				BooleanFromChar *newTunerAgcEnableGetterCB = NULL,
-				VoidFromCharBoolean *newTunerAgcEnableSetterCB = NULL,
-				FloatFromChar *newTunerGainGetterCB = NULL,
-				VoidFromCharFloat *newTunerGainSetterCB = NULL,
-				LongFromChar *newTunerReferenceSourceGetterCB = NULL,
-				VoidFromCharLong *newTunerReferenceSourceSetterCB = NULL,
-				BooleanFromChar *newTunerEnableGetterCB = NULL,
-				VoidFromCharBoolean *newTunerEnableSetterCB = NULL,
-				DoubleFromChar *newTunerOutputSampleRateGetterCB = NULL,
-				VoidFromCharDouble *newTunerOutputSampleRateSetterCB = NULL);//, USRP_UHD_base *_parent);
-			InDigitalTunerPort(std::string port_name,
-                                LOGGER_PTR logger,
-				CharFromChar *newTunerTypeGetterCB = NULL,
-				BooleanFromChar *newTunerDeviceControlGetterCB = NULL,
-				CharFromChar *newTunerGroupIdGetterCB = NULL,
-				CharFromChar *newTunerRfFlowIdGetterCB = NULL,
-				PropFromChar *newTunerStatusGetterCB = NULL,
-				DoubleFromChar *newTunerCenterFrequencyGetterCB = NULL,
-				VoidFromCharDouble *newTunerCenterFrequencySetterCB = NULL,
-				DoubleFromChar *newTunerBandwidthGetterCB = NULL,
-				VoidFromCharDouble *newTunerBandwidthSetterCB = NULL,
-				BooleanFromChar *newTunerAgcEnableGetterCB = NULL,
-				VoidFromCharBoolean *newTunerAgcEnableSetterCB = NULL,
-				FloatFromChar *newTunerGainGetterCB = NULL,
-				VoidFromCharFloat *newTunerGainSetterCB = NULL,
-				LongFromChar *newTunerReferenceSourceGetterCB = NULL,
-				VoidFromCharLong *newTunerReferenceSourceSetterCB = NULL,
-				BooleanFromChar *newTunerEnableGetterCB = NULL,
-				VoidFromCharBoolean *newTunerEnableSetterCB = NULL,
-				DoubleFromChar *newTunerOutputSampleRateGetterCB = NULL,
-				VoidFromCharDouble *newTunerOutputSampleRateSetterCB = NULL);//, USRP_UHD_base *_parent);
-			~InDigitalTunerPort();
-
-			void setTunerOutputSampleRate(const char* id, CORBA::Double sr);
-			CORBA::Double getTunerOutputSampleRate(const char* id);
-
-			// Assign  TunerOutputSampleRate callbacks - getters
-			template< typename T > inline
-			  void setTunerOutputSampleRateGetterCB(T &target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerOutputSampleRateCB =  boost::make_shared< MemberDoubleFromChar< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerOutputSampleRateGetterCB(T *target, CORBA::Double (T::*func)( const char* id)  ) {
-				getTunerOutputSampleRateCB =  boost::make_shared< MemberDoubleFromChar< T > >( boost::ref(*target), func );
-			};
-			void   setTunerOutputSampleRateGetterCB( DoubleFromChar *newCB );
-			void   setTunerOutputSampleRateGetterCB( DoubleFromCharFn  newCB );
-			// and setters
-			template< typename T > inline
-			  void setTunerOutputSampleRateSetterCB(T &target, void (T::*func)( const char* id, CORBA::Double sr)  ) {
-				setTunerOutputSampleRateCB =  boost::make_shared< MemberVoidFromCharDouble< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setTunerOutputSampleRateSetterCB(T *target, void (T::*func)( const char* id, CORBA::Double sr)  ) {
-				setTunerOutputSampleRateCB =  boost::make_shared< MemberVoidFromCharDouble< T > >( boost::ref(*target), func );
-			};
-			void   setTunerOutputSampleRateSetterCB( VoidFromCharDouble *newCB );
-			void   setTunerOutputSampleRateSetterCB( VoidFromCharDoubleFn  newCB );
-
-		protected:
-
-			// Callbacks
-			boost::shared_ptr< DoubleFromChar > getTunerOutputSampleRateCB;
-			boost::shared_ptr< VoidFromCharDouble > setTunerOutputSampleRateCB;
-
-	};
-
+    
+    class tuner_delegation {
+        virtual std::string getTunerType(std::string& id) = 0;
+        virtual bool getTunerDeviceControl(std::string& id) = 0;
+        virtual std::string getTunerGroupId(std::string& id) = 0;
+        virtual std::string getTunerRfFlowId(std::string& id) = 0;
+        virtual CF::Properties* getTunerStatus(std::string& id) = 0;
+    };
+    class analog_tuner_delegation : public virtual tuner_delegation {
+        virtual void setTunerCenterFrequency(std::string& id, double freq) = 0;
+        virtual double getTunerCenterFrequency(std::string& id) = 0;
+        virtual void setTunerBandwidth(std::string& id, double bw) = 0;
+        virtual double getTunerBandwidth(std::string& id) = 0;
+        virtual void setTunerAgcEnable(std::string& id, bool enable) = 0;
+        virtual bool getTunerAgcEnable(std::string& id) = 0;
+        virtual void setTunerGain(std::string& id, float gain) = 0;
+        virtual float getTunerGain(std::string& id) = 0;
+        virtual void setTunerReferenceSource(std::string& id, long source) = 0;
+        virtual long getTunerReferenceSource(std::string& id) = 0;
+        virtual void setTunerEnable(std::string& id, bool enable) = 0;
+        virtual bool getTunerEnable(std::string& id) = 0;
+    };
+    class digital_tuner_delegation : public virtual analog_tuner_delegation {
+        virtual void setTunerOutputSampleRate(std::string& id, double sr) = 0;
+        virtual double getTunerOutputSampleRate(std::string& id) = 0;
+    };
+    
+    template <class T>
+    class FrontendTuner_In_i : public virtual POA_FRONTEND::FrontendTuner, public Port_Provides_base_impl
+    {
+        public:
+            FrontendTuner_In_i(std::string port_name, T *_parent): 
+            Port_Provides_base_impl(port_name)
+            {
+                parent = static_cast<T *> (_parent);
+            };
+            ~FrontendTuner_In_i() {};
+            char* getTunerType(const char* id) {
+                boost::mutex::scoped_lock lock(portAccess);
+                std::string _id(id);
+                return (CORBA::string_dup(this->parent->getTunerType(_id).c_str()));
+            };
+            CORBA::Boolean getTunerDeviceControl(const char* id) {
+                boost::mutex::scoped_lock lock(portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerDeviceControl(_id));
+            };
+            char* getTunerGroupId(const char* id) {
+                boost::mutex::scoped_lock lock(portAccess);
+                std::string _id(id);
+                return (CORBA::string_dup(this->parent->getTunerGroupId(_id).c_str()));
+            };
+            char* getTunerRfFlowId(const char* id) {
+                boost::mutex::scoped_lock lock(portAccess);
+                std::string _id(id);
+                return (CORBA::string_dup(this->parent->getTunerRfFlowId(_id).c_str()));
+            };
+            CF::Properties* getTunerStatus(const char* id) {
+                boost::mutex::scoped_lock lock(portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerStatus(_id));
+            };
+        protected:
+            T *parent;
+            boost::mutex portAccess;
+    };
+    
+    template <class T>
+    class AnalogTuner_In_i : public virtual POA_FRONTEND::AnalogTuner, public FrontendTuner_In_i<T>
+    {
+        public:
+            typedef FrontendTuner_In_i<T> super;
+            AnalogTuner_In_i(std::string port_name, T *_parent):super(port_name, _parent)
+            {};
+            ~AnalogTuner_In_i() {};
+            void setTunerCenterFrequency(const char* id, CORBA::Double freq) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                this->parent->setTunerCenterFrequency(_id, freq);
+            };
+            CORBA::Double getTunerCenterFrequency(const char* id) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerCenterFrequency(_id));
+            };
+            void setTunerBandwidth(const char* id, CORBA::Double bw) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                this->parent->setTunerBandwidth(_id, bw);
+            };
+            CORBA::Double getTunerBandwidth(const char* id) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerBandwidth(_id));
+            };
+            void setTunerAgcEnable(const char* id, CORBA::Boolean enable) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                this->parent->setTunerAgcEnable(_id, enable);
+            };
+            CORBA::Boolean getTunerAgcEnable(const char* id) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerAgcEnable(_id));
+            };
+            void setTunerGain(const char* id, CORBA::Float gain) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                this->parent->setTunerGain(_id, gain);
+            };
+            CORBA::Float getTunerGain(const char* id) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerGain(_id));
+            };
+            void setTunerReferenceSource(const char* id, CORBA::Long source) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                this->parent->setTunerReferenceSource(_id, source);
+            };
+            CORBA::Long getTunerReferenceSource(const char* id) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerReferenceSource(_id));
+            };
+            void setTunerEnable(const char* id, CORBA::Boolean enable) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                this->parent->setTunerEnable(_id, enable);
+            };
+            CORBA::Boolean getTunerEnable(const char* id) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerEnable(_id));
+            };
+    };
+    
+    template <class T>
+    class DigitalTuner_In_i : public virtual POA_FRONTEND::DigitalTuner, public AnalogTuner_In_i<T>
+    {
+        public:
+            typedef AnalogTuner_In_i<T> super;
+            DigitalTuner_In_i(std::string port_name, T *_parent):super(port_name, _parent)
+            {};
+            ~DigitalTuner_In_i() {};
+            void setTunerOutputSampleRate(const char* id, CORBA::Double sr) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                this->parent->setTunerOutputSampleRate(_id, sr);
+            };
+            CORBA::Double getTunerOutputSampleRate(const char* id) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::string _id(id);
+                return (this->parent->getTunerOutputSampleRate(_id));
+            };
+    };
+    
 	// ----------------------------------------------------------------------------------------
 	// OutFrontendTunerPort declaration
 	// ----------------------------------------------------------------------------------------

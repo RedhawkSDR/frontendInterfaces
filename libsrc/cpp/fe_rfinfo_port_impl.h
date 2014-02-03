@@ -4,13 +4,164 @@
 #include "fe_port_impl.h"
 
 #include <FRONTEND/RFInfo.h>
+#include <ossie/CorbaUtils.h>
 
 namespace frontend {
-
+    
+    struct FreqRange {
+        double min_val;
+        double max_val;
+        std::vector<double> values;
+    };
+    struct AntennaInfo {
+        std::string name;
+        std::string type;
+        std::string size;
+        std::string description;
+    };
+    struct FeedInfo {
+        std::string name;
+        std::string polarization;
+        FreqRange freq_range;
+    };
+    struct SensorInfo {
+        std::string mission;
+        std::string collector;
+        std::string rx;
+        AntennaInfo antenna;
+        FeedInfo feed;
+    };
+    struct PathDelay {
+        double freq;
+        double delay_ns;
+    };
+    typedef std::vector<PathDelay> PathDelays;
+    struct RFCapabilities {
+        FreqRange freq_range;
+        FreqRange bw_range;
+    };
+    struct RFInfoPkt {
+        std::string rf_flow_id;
+        double rf_center_freq;
+        double rf_bandwidth;
+        double if_center_freq;
+        bool spectrum_inverted;
+        SensorInfo sensor;
+        PathDelays ext_path_delays;
+        RFCapabilities capabilities;
+        CF::Properties additional_info;
+    };
+    typedef std::vector<RFInfoPkt> RFInfoPktSequence;
+    
+    class rfsource_delegation {
+        virtual std::vector<RFInfoPkt> get_available_rf_inputs() = 0;
+        virtual void set_available_rf_inputs(std::vector<RFInfoPkt> &inputs) = 0;
+        virtual RFInfoPkt get_current_rf_input() = 0;
+        virtual void set_current_rf_input(RFInfoPkt &input) = 0;
+    };
+    class rfinfo_delegation {
+        virtual std::string get_rf_flow_id(std::string& port_name) = 0;
+        virtual void set_rf_flow_id(std::string& port_name, const std::string& id) = 0;
+        virtual RFInfoPkt get_rfinfo_pkt(std::string& port_name) = 0;
+        virtual void set_rfinfo_pkt(std::string& port_name, const RFInfoPkt &pkt) = 0;
+    };
+    
+    FRONTEND::RFInfoPkt* returnRFInfoPkt(const RFInfoPkt &val);
+    RFInfoPkt returnRFInfoPkt(const FRONTEND::RFInfoPkt &tmpVal);
+    
+    template <class T>
+    class RFSource_In_i : public POA_FRONTEND::RFSource, public Port_Provides_base_impl
+    {
+        public:
+            RFSource_In_i(std::string port_name, T *_parent) : 
+            Port_Provides_base_impl(port_name)
+            {
+                parent = static_cast<T *> (_parent);
+            };
+            ~RFSource_In_i() {};
+            
+            FRONTEND::RFInfoPktSequence* available_rf_inputs() {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::vector<frontend::RFInfoPkt> retval = this->parent->get_available_rf_inputs();
+                FRONTEND::RFInfoPktSequence* tmpVal = new FRONTEND::RFInfoPktSequence();
+                std::vector<frontend::RFInfoPkt>::iterator itr = retval.begin();
+                while (itr != retval.end()) {
+                    FRONTEND::RFInfoPkt_var tmp = frontend::returnRFInfoPkt((*itr));
+                    tmpVal->length(tmpVal->length()+1);
+                    (*tmpVal)[tmpVal->length()-1] = tmp;
+                    itr++;
+                }
+                return tmpVal;
+            };
+            void available_rf_inputs( const FRONTEND::RFInfoPktSequence& data) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                std::vector<frontend::RFInfoPkt> inputs;
+                inputs.resize(data.length());
+                for (unsigned int i=0; i<inputs.size(); i++) {
+                    inputs[i] = frontend::returnRFInfoPkt(data[i]);
+                }
+                this->parent->set_available_rf_inputs(inputs);
+            };
+            FRONTEND::RFInfoPkt* current_rf_input() {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                frontend::RFInfoPkt retval = this->parent->get_current_rf_input();
+                FRONTEND::RFInfoPkt* tmpVal = frontend::returnRFInfoPkt(retval);
+                return tmpVal;
+            };
+            void current_rf_input( const FRONTEND::RFInfoPkt& data) {
+                boost::mutex::scoped_lock lock(this->portAccess);
+                frontend::RFInfoPkt input = frontend::returnRFInfoPkt(data);
+                this->parent->set_current_rf_input(input);
+            };
+            
+        protected:
+            T *parent;
+            boost::mutex portAccess;
+    };
+    
+    template <class T>
+    class RFInfo_In_i : public POA_FRONTEND::RFInfo, public Port_Provides_base_impl
+    {
+        public:
+            RFInfo_In_i(std::string port_name, T *_parent) : 
+            Port_Provides_base_impl(port_name)
+            {
+                parent = static_cast<T *> (_parent);
+            };
+            ~RFInfo_In_i() {};
+            
+            char* rf_flow_id() {
+                boost::mutex::scoped_lock lock(portAccess);
+                return (CORBA::string_dup(this->parent->get_rf_flow_id(this->name).c_str()));
+            };
+            void rf_flow_id(const char *id) {
+                boost::mutex::scoped_lock lock(portAccess);
+                std::string _id(id);
+                this->parent->set_rf_flow_id(this->name, _id);
+                return;
+            };
+            FRONTEND::RFInfoPkt* rfinfo_pkt() {
+                boost::mutex::scoped_lock lock(portAccess);
+                frontend::RFInfoPkt retval = this->parent->get_rfinfo_pkt(this->name);
+                FRONTEND::RFInfoPkt* tmpVal = frontend::returnRFInfoPkt(retval);
+                return tmpVal;
+            };
+            void rfinfo_pkt(const FRONTEND::RFInfoPkt& data) {
+                boost::mutex::scoped_lock lock(portAccess);
+                frontend::RFInfoPkt input = frontend::returnRFInfoPkt(data);
+                this->parent->set_rfinfo_pkt(this->name, input);
+                return;
+            };
+            
+        protected:
+            T *parent;
+            boost::mutex portAccess;
+    };
+    
 	// ----------------------------------------------------------------------------------------
 	// InRFInfoPort declaration
 	// ----------------------------------------------------------------------------------------
-	class InRFInfoPort : public POA_FRONTEND::RFInfo, public Port_Provides_base_impl
+	/*class InRFInfoPort : public POA_FRONTEND::RFInfo, public Port_Provides_base_impl
 	{
 	    public:
 	        InRFInfoPort(std::string port_name,
@@ -89,7 +240,7 @@ namespace frontend {
 			boost::shared_ptr< RFInfoPktFromVoid > getRFInfoPktCB;
 			boost::shared_ptr< VoidFromChar > setRFFlowIdCB;
 			boost::shared_ptr< VoidFromRFInfoPkt > setRFInfoPktCB;
-	};
+	};*/
 
 	// ----------------------------------------------------------------------------------------
 	// OutRFInfoPort declaration

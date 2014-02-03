@@ -3,11 +3,60 @@
 #include "fe_log.h"
 
 namespace frontend {
-
+    
+    FRONTEND::RFInfoPkt* returnRFInfoPkt(const RFInfoPkt &val) {
+        FRONTEND::RFInfoPkt* tmpVal = new FRONTEND::RFInfoPkt();
+        tmpVal->rf_flow_id = CORBA::string_dup(val.rf_flow_id.c_str());
+        tmpVal->rf_center_freq = val.rf_center_freq;
+        tmpVal->rf_bandwidth = val.rf_bandwidth;
+        tmpVal->if_center_freq = val.if_center_freq;
+        tmpVal->spectrum_inverted = val.spectrum_inverted;
+        tmpVal->sensor.collector = CORBA::string_dup(val.sensor.collector.c_str());
+        tmpVal->sensor.mission = CORBA::string_dup(val.sensor.mission.c_str());
+        tmpVal->sensor.rx = CORBA::string_dup(val.sensor.rx.c_str());
+        tmpVal->sensor.antenna.description = CORBA::string_dup(val.sensor.antenna.description.c_str());
+        tmpVal->sensor.antenna.name = CORBA::string_dup(val.sensor.antenna.name.c_str());
+        tmpVal->sensor.antenna.size = CORBA::string_dup(val.sensor.antenna.size.c_str());
+        tmpVal->sensor.antenna.type = CORBA::string_dup(val.sensor.antenna.type.c_str());
+        tmpVal->sensor.feed.name = CORBA::string_dup(val.sensor.feed.name.c_str());
+        tmpVal->sensor.feed.polarization = CORBA::string_dup(val.sensor.feed.polarization.c_str());
+        tmpVal->sensor.feed.freq_range.max_val = val.sensor.feed.freq_range.max_val;
+        tmpVal->sensor.feed.freq_range.min_val = val.sensor.feed.freq_range.min_val;
+        tmpVal->sensor.feed.freq_range.values.length(val.sensor.feed.freq_range.values.size());
+        for (unsigned int i=0; i<val.sensor.feed.freq_range.values.size(); i++) {
+            tmpVal->sensor.feed.freq_range.values[i] = val.sensor.feed.freq_range.values[i];
+        }
+        return tmpVal;
+    };
+    RFInfoPkt returnRFInfoPkt(const FRONTEND::RFInfoPkt &tmpVal) {
+        RFInfoPkt val;
+        val.rf_flow_id = ossie::corba::returnString(tmpVal.rf_flow_id);
+        val.rf_center_freq = tmpVal.rf_center_freq;
+        val.rf_bandwidth = tmpVal.rf_bandwidth;
+        val.if_center_freq = tmpVal.if_center_freq;
+        val.spectrum_inverted = tmpVal.spectrum_inverted;
+        val.sensor.collector = ossie::corba::returnString(tmpVal.sensor.collector);
+        val.sensor.mission = ossie::corba::returnString(tmpVal.sensor.mission);
+        val.sensor.rx = ossie::corba::returnString(tmpVal.sensor.rx);
+        val.sensor.antenna.description = ossie::corba::returnString(tmpVal.sensor.antenna.description);
+        val.sensor.antenna.name = ossie::corba::returnString(tmpVal.sensor.antenna.name);
+        val.sensor.antenna.size = ossie::corba::returnString(tmpVal.sensor.antenna.size);
+        val.sensor.antenna.type = ossie::corba::returnString(tmpVal.sensor.antenna.type);
+        val.sensor.feed.name = ossie::corba::returnString(tmpVal.sensor.feed.name);
+        val.sensor.feed.polarization = ossie::corba::returnString(tmpVal.sensor.feed.polarization);
+        val.sensor.feed.freq_range.max_val = tmpVal.sensor.feed.freq_range.max_val;
+        val.sensor.feed.freq_range.min_val = tmpVal.sensor.feed.freq_range.min_val;
+        val.sensor.feed.freq_range.values.resize(tmpVal.sensor.feed.freq_range.values.length());
+        for (unsigned int i=0; i<val.sensor.feed.freq_range.values.size(); i++) {
+            val.sensor.feed.freq_range.values[i] = tmpVal.sensor.feed.freq_range.values[i];
+        }
+        return val;
+    };
+    
 	// ----------------------------------------------------------------------------------------
 	// InRFInfoPort definition
 	// ----------------------------------------------------------------------------------------
-	InRFInfoPort::InRFInfoPort(std::string port_name,
+	/*InRFInfoPort::InRFInfoPort(std::string port_name,
     		CharFromVoid *newRFFlowIdGetterCB,
     		RFInfoPktFromVoid *newRFInfoPktGetterCB,
     		VoidFromChar *newRFFlowIdSetterCB,
@@ -130,7 +179,7 @@ namespace frontend {
 	}
 	void   InRFInfoPort::setRFInfoPktSetterCB( VoidFromRFInfoPktFn  newCB ) {
 		setRFInfoPktCB =  boost::make_shared< StaticVoidFromRFInfoPkt >( newCB );
-	}
+	}*/
 
 	// ----------------------------------------------------------------------------------------
 	// OutRFInfoPort definition
