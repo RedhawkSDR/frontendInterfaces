@@ -54,29 +54,30 @@ namespace frontend {
     typedef std::vector<RFInfoPkt> RFInfoPktSequence;
     
     class rfsource_delegation {
-        virtual std::vector<RFInfoPkt> get_available_rf_inputs() = 0;
-        virtual void set_available_rf_inputs(std::vector<RFInfoPkt> &inputs) = 0;
-        virtual RFInfoPkt get_current_rf_input() = 0;
-        virtual void set_current_rf_input(RFInfoPkt &input) = 0;
+        public:
+            virtual std::vector<RFInfoPkt> get_available_rf_inputs() = 0;
+            virtual void set_available_rf_inputs(std::vector<RFInfoPkt> &inputs) = 0;
+            virtual RFInfoPkt get_current_rf_input() = 0;
+            virtual void set_current_rf_input(RFInfoPkt &input) = 0;
     };
     class rfinfo_delegation {
-        virtual std::string get_rf_flow_id(std::string& port_name) = 0;
-        virtual void set_rf_flow_id(std::string& port_name, const std::string& id) = 0;
-        virtual RFInfoPkt get_rfinfo_pkt(std::string& port_name) = 0;
-        virtual void set_rfinfo_pkt(std::string& port_name, const RFInfoPkt &pkt) = 0;
+        public:
+            virtual std::string get_rf_flow_id(std::string& port_name) = 0;
+            virtual void set_rf_flow_id(std::string& port_name, const std::string& id) = 0;
+            virtual RFInfoPkt get_rfinfo_pkt(std::string& port_name) = 0;
+            virtual void set_rfinfo_pkt(std::string& port_name, const RFInfoPkt &pkt) = 0;
     };
     
     FRONTEND::RFInfoPkt* returnRFInfoPkt(const RFInfoPkt &val);
     RFInfoPkt returnRFInfoPkt(const FRONTEND::RFInfoPkt &tmpVal);
     
-    template <class T>
     class InRFSourcePort : public POA_FRONTEND::RFSource, public Port_Provides_base_impl
     {
         public:
-            InRFSourcePort(std::string port_name, T *_parent) : 
+            InRFSourcePort(std::string port_name, rfsource_delegation *_parent) : 
             Port_Provides_base_impl(port_name)
             {
-                parent = static_cast<T *> (_parent);
+                parent = _parent;
             };
             ~InRFSourcePort() {};
             
@@ -115,18 +116,17 @@ namespace frontend {
             };
             
         protected:
-            T *parent;
+            rfsource_delegation *parent;
             boost::mutex portAccess;
     };
     
-    template <class T>
     class InRFInfoPort : public POA_FRONTEND::RFInfo, public Port_Provides_base_impl
     {
         public:
-            InRFInfoPort(std::string port_name, T *_parent) : 
+            InRFInfoPort(std::string port_name, rfinfo_delegation *_parent) : 
             Port_Provides_base_impl(port_name)
             {
-                parent = static_cast<T *> (_parent);
+                parent = _parent;
             };
             ~InRFInfoPort() {};
             
@@ -154,7 +154,7 @@ namespace frontend {
             };
             
         protected:
-            T *parent;
+            rfinfo_delegation *parent;
             boost::mutex portAccess;
     };
     
