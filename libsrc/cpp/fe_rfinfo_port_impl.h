@@ -70,15 +70,15 @@ namespace frontend {
     RFInfoPkt returnRFInfoPkt(const FRONTEND::RFInfoPkt &tmpVal);
     
     template <class T>
-    class RFSource_In_i : public POA_FRONTEND::RFSource, public Port_Provides_base_impl
+    class InRFSourcePort : public POA_FRONTEND::RFSource, public Port_Provides_base_impl
     {
         public:
-            RFSource_In_i(std::string port_name, T *_parent) : 
+            InRFSourcePort(std::string port_name, T *_parent) : 
             Port_Provides_base_impl(port_name)
             {
                 parent = static_cast<T *> (_parent);
             };
-            ~RFSource_In_i() {};
+            ~InRFSourcePort() {};
             
             FRONTEND::RFInfoPktSequence* available_rf_inputs() {
                 boost::mutex::scoped_lock lock(this->portAccess);
@@ -120,15 +120,15 @@ namespace frontend {
     };
     
     template <class T>
-    class RFInfo_In_i : public POA_FRONTEND::RFInfo, public Port_Provides_base_impl
+    class InRFInfoPort : public POA_FRONTEND::RFInfo, public Port_Provides_base_impl
     {
         public:
-            RFInfo_In_i(std::string port_name, T *_parent) : 
+            InRFInfoPort(std::string port_name, T *_parent) : 
             Port_Provides_base_impl(port_name)
             {
                 parent = static_cast<T *> (_parent);
             };
-            ~RFInfo_In_i() {};
+            ~InRFInfoPort() {};
             
             char* rf_flow_id() {
                 boost::mutex::scoped_lock lock(portAccess);

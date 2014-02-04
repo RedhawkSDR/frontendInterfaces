@@ -36,15 +36,15 @@ namespace frontend {
     };
     
     template <class T>
-    class FrontendTuner_In_i : public virtual POA_FRONTEND::FrontendTuner, public Port_Provides_base_impl
+    class InFrontendTunerPort : public virtual POA_FRONTEND::FrontendTuner, public Port_Provides_base_impl
     {
         public:
-            FrontendTuner_In_i(std::string port_name, T *_parent): 
+            InFrontendTunerPort(std::string port_name, T *_parent): 
             Port_Provides_base_impl(port_name)
             {
                 parent = static_cast<T *> (_parent);
             };
-            ~FrontendTuner_In_i() {};
+            ~InFrontendTunerPort() {};
             char* getTunerType(const char* id) {
                 boost::mutex::scoped_lock lock(portAccess);
                 std::string _id(id);
@@ -76,13 +76,13 @@ namespace frontend {
     };
     
     template <class T>
-    class AnalogTuner_In_i : public virtual POA_FRONTEND::AnalogTuner, public FrontendTuner_In_i<T>
+    class InAnalogTunerPort : public virtual POA_FRONTEND::AnalogTuner, public InFrontendTunerPort<T>
     {
         public:
-            typedef FrontendTuner_In_i<T> super;
-            AnalogTuner_In_i(std::string port_name, T *_parent):super(port_name, _parent)
+            typedef InFrontendTunerPort<T> super;
+            InAnalogTunerPort(std::string port_name, T *_parent):super(port_name, _parent)
             {};
-            ~AnalogTuner_In_i() {};
+            ~InAnalogTunerPort() {};
             void setTunerCenterFrequency(const char* id, CORBA::Double freq) {
                 boost::mutex::scoped_lock lock(this->portAccess);
                 std::string _id(id);
@@ -146,13 +146,13 @@ namespace frontend {
     };
     
     template <class T>
-    class DigitalTuner_In_i : public virtual POA_FRONTEND::DigitalTuner, public AnalogTuner_In_i<T>
+    class InDigitalTunerPort : public virtual POA_FRONTEND::DigitalTuner, public InAnalogTunerPort<T>
     {
         public:
-            typedef AnalogTuner_In_i<T> super;
-            DigitalTuner_In_i(std::string port_name, T *_parent):super(port_name, _parent)
+            typedef InAnalogTunerPort<T> super;
+            InDigitalTunerPort(std::string port_name, T *_parent):super(port_name, _parent)
             {};
-            ~DigitalTuner_In_i() {};
+            ~InDigitalTunerPort() {};
             void setTunerOutputSampleRate(const char* id, CORBA::Double sr) {
                 boost::mutex::scoped_lock lock(this->portAccess);
                 std::string _id(id);
