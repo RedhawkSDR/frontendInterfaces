@@ -167,12 +167,6 @@ namespace frontend {
 				};
 				if (id == "FRONTEND::tuner_allocation"){
 
-					if(!_valid_tuner_type(frontend_tuner_allocation.tuner_type)){
-						//TODO: add back log messages
-						std::cout<<"allocateCapacity: UNKNOWN FRONTEND TUNER TYPE"<<std::endl;
-						throw CF::Device::InvalidCapacity("UNKNOWN FRONTEND TUNER TYPE", capacities);
-					}
-
 					// Check allocation_id
 					if (frontend_tuner_allocation.allocation_id.empty()) {
 						//TODO: add back log messages
@@ -213,31 +207,12 @@ namespace frontend {
 								throw FRONTEND::BadParameterException(("CAN NOT ALLOCATE A TUNER WITH RF FLOW ID = " + frontend_tuner_allocation.rf_flow_id + " !").c_str());
 							}
 
-							//Check Validity
-							if (!_valid_center_frequency(frontend_tuner_allocation.center_frequency,tuner_id)){
-								//TODO: add back log messages
-								std::cout<<"allocateCapacity: INVALID FREQUENCY"<<std::endl;
-								throw FRONTEND::BadParameterException("allocateCapacity(): INVALID FREQUENCY");
-							}
-							if (!_valid_bandwidth(frontend_tuner_allocation.bandwidth,tuner_id)){
-								//TODO: add back log messages
-								std::cout<<"allocateCapacity: INVALID BANDWIDTH"<<std::endl;
-								throw FRONTEND::BadParameterException("allocateCapacity(): INVALID BANDWIDTH");
-							}
-							if (!_valid_sample_rate(frontend_tuner_allocation.sample_rate,tuner_id)){
-								//TODO: add back log messages
-								std::cout<<"allocateCapacity: INVALID RATE"<<std::endl;
-								throw FRONTEND::BadParameterException("allocateCapacity(): INVALID RATE");
-							}
-
 							try {
-								_dev_set_all(frontend_tuner_allocation.center_frequency,
-											 frontend_tuner_allocation.bandwidth,
-											 frontend_tuner_allocation.sample_rate,
-											 tuner_id);
-								//_dev_set_center_frequency(frontend_tuner_allocation.center_frequency,tuner_id);
-								//_dev_set_bandwidth(frontend_tuner_allocation.bandwidth,tuner_id);
-								//_dev_set_sample_rate(frontend_tuner_allocation.sample_rate,tuner_id);
+                                frontend::tuning_request request;
+                                request.center_frequency = frontend_tuner_allocation.center_frequency;
+                                request.bandwidth = frontend_tuner_allocation.bandwidth;
+                                request.sample_rate = frontend_tuner_allocation.sample_rate;
+                                _dev_set_tuning(frontend_tuner_allocation.tuner_type, request, tuner_id);
 							}
 							catch(...){
 								char msg[512];
@@ -248,14 +223,12 @@ namespace frontend {
 							};
 
 							try {
-								_dev_get_all(tunerChannels[tuner_id].frontend_status->center_frequency,
-											 tunerChannels[tuner_id].frontend_status->bandwidth,
-											 tunerChannels[tuner_id].frontend_status->sample_rate,
-											 tuner_id);
-								//tunerChannels[tuner_id].frontend_status->center_frequency = _dev_get_center_frequency(tuner_id);
-								//tunerChannels[tuner_id].frontend_status->bandwidth = _dev_get_bandwidth(tuner_id);
-								//tunerChannels[tuner_id].frontend_status->sample_rate = _dev_get_sample_rate(tuner_id);
-							}
+                                frontend::tuning_request setting;
+                                _dev_get_tuning(setting, tuner_id);
+                                tunerChannels[tuner_id].frontend_status->center_frequency = setting.center_frequency;
+                                tunerChannels[tuner_id].frontend_status->bandwidth = setting.bandwidth;
+                                tunerChannels[tuner_id].frontend_status->sample_rate = setting.sample_rate;
+                            }
 							catch(...){
 								char msg[512];
 								sprintf(msg,"allocateCapacity(%d): failed when querying device hardware",int(tuner_id));

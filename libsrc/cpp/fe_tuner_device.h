@@ -66,6 +66,12 @@ namespace frontend {
 		J1970 = 1,
 		JCY = 2
 	};
+    
+    struct tuning_request {
+        double center_frequency;
+        double bandwidth;
+        double sample_rate;
+    };
 
 	/** Individual Tuner. This structure contains stream specific data for channel/tuner to include:
 	 * 		- Additional stream metadata (sri)
@@ -164,23 +170,11 @@ namespace frontend {
 			///////////////////////////////
 		    virtual bool push_EOS_on_listener(std::string listener_allocation_id) = 0;
 
-			virtual bool _valid_tuner_type(std::string tuner_type) = 0;
-			virtual bool _valid_center_frequency(double req_freq, size_t tuner_id) = 0;
-			virtual bool _valid_bandwidth(double req_bw, size_t tuner_id) = 0;
-			virtual bool _valid_sample_rate(double req_sr, size_t tuner_id) = 0;
-
 			virtual bool _dev_enable(size_t tuner_id) = 0;
 			virtual bool _dev_disable(size_t tuner_id) = 0;
 
-			virtual bool _dev_set_all(double req_freq, double req_bw, double req_sr, size_t tuner_id) = 0;
-			virtual bool _dev_set_center_frequency(double req_freq, size_t tuner_id) = 0;
-			virtual bool _dev_set_bandwidth(double req_bw, size_t tuner_id) = 0;
-			virtual bool _dev_set_sample_rate(double req_sr, size_t tuner_id) = 0;
-
-			virtual bool _dev_get_all(double &freq, double &bw, double &sr, size_t tuner_id) = 0;
-			virtual double _dev_get_center_frequency(size_t tuner_id) = 0;
-			virtual double _dev_get_bandwidth(size_t tuner_id) = 0;
-			virtual double _dev_get_sample_rate(size_t tuner_id) = 0;
+            virtual bool _dev_set_tuning(std::string &tuner_type, tuning_request &request, size_t tuner_id) = 0;
+            virtual bool _dev_get_tuning(tuning_request &response, size_t tuner_id) = 0;
 
 			////////////////////////////
 			// Other helper functions //
