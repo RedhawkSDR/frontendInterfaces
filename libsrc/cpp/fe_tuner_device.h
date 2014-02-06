@@ -9,76 +9,25 @@
 #include "bulkio/bulkio.h"
 #include "fe_tuner_struct_props.h"
 
-
-/*********************************************************************************************/
-/**************************             UUID_HELPER                 **************************/
-/*********************************************************************************************/
-namespace UUID_HELPER { // should this just exist within namespace "frontend"?
-	inline std::string new_uuid() {
-		uuid_t new_random_uuid;
-		uuid_generate_random(new_random_uuid);
-		char new_random_uuid_str[37];
-		uuid_unparse(new_random_uuid, new_random_uuid_str);
-		return std::string(new_random_uuid_str);
-	};
-}; // end of namespace UUID_HELPER
-
-/*********************************************************************************************/
-/**************************             BULKIO HELPERS              **************************/
-/*********************************************************************************************/
-namespace BIO_HELPER{ // should this just extend the "bulkio" namespace, rather than create a new one? or be part of "frontend" namespace?
-
-	inline void zeroSRI(BULKIO::StreamSRI *sri) {
-		sri->hversion = 1;
-		sri->xstart = 0.0;
-		sri->xdelta = 1.0;
-		sri->xunits = 1;
-		sri->subsize = 1;
-		sri->ystart = 0.0;
-		sri->ydelta = 1.0;
-		sri->yunits = 1;
-		sri->mode = 0;
-		sri->streamID = "";
-		sri->keywords.length(0);
-	};
-
-	inline void zeroTime(BULKIO::PrecisionUTCTime *timeTag) {
-		timeTag->tcmode = 1;
-		timeTag->tcstatus = 0;
-		timeTag->toff = 0.0;
-		timeTag->twsec = 0.0;
-		timeTag->tfsec = 0.0;
-	};
-
-}; // end of namespace BIO_HELPER
-
-
-
-
-
 /*********************************************************************************************/
 /**************************              FRONTEND                   **************************/
 /*********************************************************************************************/
 namespace frontend {
-
-	// Time Type Definition
-	enum timeTypes {
-		J1970 = 1,
-		JCY = 2
-	};
-    
-    struct tuning_request {
-        double center_frequency;
-        double bandwidth;
-        double sample_rate;
-    };
 
 	/** Individual Tuner. This structure contains stream specific data for channel/tuner to include:
 	 * 		- Additional stream metadata (sri)
 	 * 		- Control information (allocation id's)
 	 * 		- Reference to associated frontend_tuner_status property where additional information is held. Note: frontend_tuner_status structure is required by frontend interfaces v2.0
 	 */
-
+    
+    inline std::string new_uuid() {
+        uuid_t new_random_uuid;
+        uuid_generate_random(new_random_uuid);
+        char new_random_uuid_str[37];
+        uuid_unparse(new_random_uuid, new_random_uuid_str);
+        return std::string(new_random_uuid_str);
+    };
+    
 	template < typename TunerStatusStructType >
 	struct indivTuner {
 		indivTuner(){
@@ -93,7 +42,7 @@ namespace frontend {
 		TunerStatusStructType* frontend_status;
 
 		void reset(){
-			BIO_HELPER::zeroSRI(&sri);
+			bulkio::sri::zeroSRI(sri);
 			control_allocation_id.clear();
 			if(frontend_status != NULL){
 				frontend_status->allocation_id_csv.clear();
@@ -220,7 +169,7 @@ namespace frontend {
 				sprintf(chanFreq_str, "%ld", chanFreq);
 
 				//Create new streamID
-				std::string streamID = "tuner_freq_" + std::string(chanFreq_str) + "_Hz_" + UUID_HELPER::new_uuid();
+				std::string streamID = "tuner_freq_" + std::string(chanFreq_str) + "_Hz_" + new_uuid();
 
 				sri->mode = mode;
 				sri->hversion = 0;

@@ -157,7 +157,7 @@ namespace frontend {
 					//LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>, "UNKNOWN PROPERTY");
 					throw CF::Device::InvalidCapacity("UNKNOWN PROPERTY", capacities);
 				}
-				try{
+                try{
 					property->setValue(capacities[ii].value);
 				}
 				catch(const std::logic_error &e){
@@ -165,16 +165,15 @@ namespace frontend {
 					std::cout<<"allocateCapacity: COULD NOT PARSE CAPACITY"<<std::endl;
 					throw CF::Device::InvalidCapacity("COULD NOT PARSE CAPACITY", capacities);
 				};
-				if (id == "FRONTEND::tuner_allocation"){
+                if (id == "FRONTEND::tuner_allocation"){
 
 					// Check allocation_id
-					if (frontend_tuner_allocation.allocation_id.empty()) {
+                    if (frontend_tuner_allocation.allocation_id.empty()) {
 						//TODO: add back log messages
-						std::cout<<"allocateCapacity: MISSING ALLOCATION_ID"<<std::endl;
 						throw CF::Device::InvalidCapacity("MISSING ALLOCATION_ID", capacities);
 					}
 					// Check if allocation ID has already been used
-					if(getTunerMapping(frontend_tuner_allocation.allocation_id) >= 0){
+                    if(getTunerMapping(frontend_tuner_allocation.allocation_id) >= 0){
 						//TODO: add back log messages
 						std::cout<<"allocateCapacity: ALLOCATION_ID ALREADY IN USE"<<std::endl;
 						throw CF::Device::InvalidCapacity("ALLOCATION_ID ALREADY IN USE", capacities);
@@ -186,27 +185,26 @@ namespace frontend {
 						char msg[512];
 						sprintf(msg,"NO AVAILABLE TUNER");
 						//TODO: add back log messages
-						std::cout<<"allocateCapacity: NO AVAILABLE TUNER"<<std::endl;
+						std::cout<<"allocateCapacity: NO AVAILABLE TUNER. Make sure that the device has an initialized frontend_tuner_status"<<std::endl;
 						throw std::logic_error(msg);
 					}
-
+                    
 					// Initialize the tuner (only if requesting device control)
 					if (frontend_tuner_allocation.device_control){
-
 						{
-							exclusive_lock lock(* (tunerChannels[tuner_id].lock));
-							if(!frontend_tuner_allocation.group_id.empty() && frontend_tuner_allocation.group_id != tunerChannels[tuner_id].frontend_status->group_id ){
+                            //exclusive_lock lock(* (tunerChannels[tuner_id].lock));
+                            if(!frontend_tuner_allocation.group_id.empty() && frontend_tuner_allocation.group_id != tunerChannels[tuner_id].frontend_status->group_id ){
 								//TODO: add back log messages
 								std::cout<<"allocateCapacity: CANNOT ALLOCATE A TUNER WITH THAT GROUP ID"<<std::endl;
 								throw FRONTEND::BadParameterException("CAN NOT ALLOCATE A TUNER WITH THAT GROUP ID!");
 							}
-
+                            
 							if(!frontend_tuner_allocation.rf_flow_id.empty() && frontend_tuner_allocation.rf_flow_id != tunerChannels[tuner_id].frontend_status->rf_flow_id ){
 								//TODO: add back log messages
 								std::cout<<"allocateCapacity: CANNOT ALLOCATE A TUNER WITH THAT RF FLOW ID"<<std::endl;
 								throw FRONTEND::BadParameterException(("CAN NOT ALLOCATE A TUNER WITH RF FLOW ID = " + frontend_tuner_allocation.rf_flow_id + " !").c_str());
 							}
-
+                            
 							try {
                                 frontend::tuning_request request;
                                 request.center_frequency = frontend_tuner_allocation.center_frequency;
@@ -221,7 +219,7 @@ namespace frontend {
 								std::cout<<"allocateCapacity: failed when configuring device hardware"<<std::endl;
 								throw std::logic_error(msg);
 							};
-
+                            
 							try {
                                 frontend::tuning_request setting;
                                 _dev_get_tuning(setting, tuner_id);
@@ -237,7 +235,7 @@ namespace frontend {
 								throw std::logic_error(msg);
 							};
 
-							// Only check non-TX when bandwidth was not set to don't care
+                            // Only check non-TX when bandwidth was not set to don't care
 							if( (tunerChannels[tuner_id].frontend_status->tuner_type != "TX" && frontend_tuner_allocation.bandwidth != 0.0) &&
 								(tunerChannels[tuner_id].frontend_status->bandwidth < frontend_tuner_allocation.bandwidth ||
 								tunerChannels[tuner_id].frontend_status->bandwidth > frontend_tuner_allocation.bandwidth+frontend_tuner_allocation.bandwidth * frontend_tuner_allocation.bandwidth_tolerance/100.0 )){
@@ -249,7 +247,7 @@ namespace frontend {
 								throw std::logic_error(msg);
 							}
 							// always check TX, but only check non-TX when sample_rate was not set to don't care)
-							if( (tunerChannels[tuner_id].frontend_status->tuner_type == "TX" || frontend_tuner_allocation.sample_rate != 0.0) &&
+                            if( (tunerChannels[tuner_id].frontend_status->tuner_type == "TX" || frontend_tuner_allocation.sample_rate != 0.0) &&
 								(tunerChannels[tuner_id].frontend_status->sample_rate < frontend_tuner_allocation.sample_rate ||
 								tunerChannels[tuner_id].frontend_status->sample_rate > frontend_tuner_allocation.sample_rate+frontend_tuner_allocation.sample_rate * frontend_tuner_allocation.sample_rate_tolerance/100.0 )){
 								char msg[512];
@@ -262,7 +260,7 @@ namespace frontend {
 						} // release tuner lock
 
 						// enable tuner after successful allocation
-						try {
+                        try {
 							enableTuner(tuner_id,true);
 						} catch(...){
 							char msg[512];
@@ -271,7 +269,7 @@ namespace frontend {
 							std::cout<<"allocateCapacity: FAILED TO ENABLE TUNER AFTER ALLOCATION"<<std::endl;
 							throw std::logic_error(msg);
 						}
-					}
+                    }
 				}
 				else if (id == "FRONTEND::listener_allocation") {
 					// Check validity of allocation_id's
@@ -328,7 +326,7 @@ namespace frontend {
 			deallocateCapacity(capacities);
 			throw;
 		};
-
+        
 		return true;
 	}
 
@@ -388,8 +386,8 @@ namespace frontend {
 	bool FrontendTunerDevice<TunerStatusStructType>::removeTuner(size_t tuner_id) {
 		//LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
 		enableTuner(tuner_id, false);
-		tunerChannels[tuner_id].reset();
-		return true;
+        tunerChannels[tuner_id].reset();
+        return true;
 	}
 
 	template < typename TunerStatusStructType >
@@ -398,11 +396,11 @@ namespace frontend {
 		 */
 		//LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
 		// Lock the tuner
-		exclusive_lock lock(*(tunerChannels[tuner_id].lock));
-
+		//exclusive_lock lock(*(tunerChannels[tuner_id].lock));
+        
 		bool prev_enabled = tunerChannels[tuner_id].frontend_status->enabled;
 		tunerChannels[tuner_id].frontend_status->enabled = enable;
-
+        
 		// If going from disabled to enabled
 		if (!prev_enabled && enable) {
 			configureTunerSRI(& tunerChannels[tuner_id].sri,
@@ -414,14 +412,14 @@ namespace frontend {
 			streamID_to_tunerID.insert(std::make_pair(std::string(tunerChannels[tuner_id].sri.streamID), tuner_id));
 			_dev_enable(tuner_id);
 		}
-
+        
 		// If going from enabled to disabled
 		if (prev_enabled && !enable && !std::string(tunerChannels[tuner_id].sri.streamID).empty()) {
 
 			_dev_disable(tuner_id);
 			std::string streamID = std::string(tunerChannels[tuner_id].sri.streamID);
 			streamID_to_tunerID.erase(streamID);
-			BIO_HELPER::zeroSRI(& tunerChannels[tuner_id].sri);
+			bulkio::sri::zeroSRI(& tunerChannels[tuner_id].sri);
 		}
 
 		return true;
@@ -436,15 +434,16 @@ namespace frontend {
 		//LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
 		long NO_VALID_TUNER = -1;
 		exclusive_lock lock(allocationID_MappingLock);
-
-		// Do not allocate if allocation ID has already been used
+        
+        // Do not allocate if allocation ID has already been used
 		if(getTunerMapping(frontend_alloc.allocation_id) >= 0)
 			return NO_VALID_TUNER;
 
-		// Next, try to allocate a new tuner
+        // Next, try to allocate a new tuner
 		for (long tuner_id = 0; tuner_id < long(tunerChannels.size()); tuner_id++) {
-			if(tunerChannels[tuner_id].frontend_status->tuner_type != frontend_alloc.tuner_type)
+			if(tunerChannels[tuner_id].frontend_status->tuner_type != frontend_alloc.tuner_type) {
 				continue;
+            }
 			//listen
 			if (!frontend_alloc.device_control && !tunerChannels[tuner_id].control_allocation_id.empty()){
 				bool freq_valid = is_freq_valid(
@@ -468,7 +467,7 @@ namespace frontend {
 				return tuner_id;
 			}
 		}
-		return NO_VALID_TUNER;
+        return NO_VALID_TUNER;
 	}
 
 	template < typename TunerStatusStructType >
@@ -495,10 +494,10 @@ namespace frontend {
 	long FrontendTunerDevice<TunerStatusStructType>::getTunerMapping(std::string allocation_id) {
 		//LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
 		long NO_VALID_TUNER = -1;
-		exclusive_lock lock(allocationID_MappingLock);
+		//exclusive_lock lock(allocationID_MappingLock);
 
-		string_number_mapping::iterator iter = allocationID_to_tunerID.find(allocation_id);
-		if (iter != allocationID_to_tunerID.end())
+        string_number_mapping::iterator iter = allocationID_to_tunerID.find(allocation_id);
+        if (iter != allocationID_to_tunerID.end())
 			return iter->second;
 
 		return NO_VALID_TUNER;

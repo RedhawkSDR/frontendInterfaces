@@ -17,7 +17,9 @@
 #include <FRONTEND/GPS.h>
 #include <FRONTEND/NavigationData.h>
 
+#include <ossie/CorbaUtils.h>
 #include "fe_base.h"
+#include "fe_types.h"
 
 
 namespace frontend {
@@ -35,32 +37,58 @@ namespace frontend {
 	};
 	// END FROM bulkio_p.h
 
+    inline FRONTEND::RFInfoPkt* returnRFInfoPkt(const RFInfoPkt &val) {
+        FRONTEND::RFInfoPkt* tmpVal = new FRONTEND::RFInfoPkt();
+        tmpVal->rf_flow_id = CORBA::string_dup(val.rf_flow_id.c_str());
+        tmpVal->rf_center_freq = val.rf_center_freq;
+        tmpVal->rf_bandwidth = val.rf_bandwidth;
+        tmpVal->if_center_freq = val.if_center_freq;
+        tmpVal->spectrum_inverted = val.spectrum_inverted;
+        tmpVal->sensor.collector = CORBA::string_dup(val.sensor.collector.c_str());
+        tmpVal->sensor.mission = CORBA::string_dup(val.sensor.mission.c_str());
+        tmpVal->sensor.rx = CORBA::string_dup(val.sensor.rx.c_str());
+        tmpVal->sensor.antenna.description = CORBA::string_dup(val.sensor.antenna.description.c_str());
+        tmpVal->sensor.antenna.name = CORBA::string_dup(val.sensor.antenna.name.c_str());
+        tmpVal->sensor.antenna.size = CORBA::string_dup(val.sensor.antenna.size.c_str());
+        tmpVal->sensor.antenna.type = CORBA::string_dup(val.sensor.antenna.type.c_str());
+        tmpVal->sensor.feed.name = CORBA::string_dup(val.sensor.feed.name.c_str());
+        tmpVal->sensor.feed.polarization = CORBA::string_dup(val.sensor.feed.polarization.c_str());
+        tmpVal->sensor.feed.freq_range.max_val = val.sensor.feed.freq_range.max_val;
+        tmpVal->sensor.feed.freq_range.min_val = val.sensor.feed.freq_range.min_val;
+        tmpVal->sensor.feed.freq_range.values.length(val.sensor.feed.freq_range.values.size());
+        for (unsigned int i=0; i<val.sensor.feed.freq_range.values.size(); i++) {
+            tmpVal->sensor.feed.freq_range.values[i] = val.sensor.feed.freq_range.values[i];
+        }
+        return tmpVal;
+    };
+    inline RFInfoPkt returnRFInfoPkt(const FRONTEND::RFInfoPkt &tmpVal) {
+        RFInfoPkt val;
+        val.rf_flow_id = ossie::corba::returnString(tmpVal.rf_flow_id);
+        val.rf_center_freq = tmpVal.rf_center_freq;
+        val.rf_bandwidth = tmpVal.rf_bandwidth;
+        val.if_center_freq = tmpVal.if_center_freq;
+        val.spectrum_inverted = tmpVal.spectrum_inverted;
+        val.sensor.collector = ossie::corba::returnString(tmpVal.sensor.collector);
+        val.sensor.mission = ossie::corba::returnString(tmpVal.sensor.mission);
+        val.sensor.rx = ossie::corba::returnString(tmpVal.sensor.rx);
+        val.sensor.antenna.description = ossie::corba::returnString(tmpVal.sensor.antenna.description);
+        val.sensor.antenna.name = ossie::corba::returnString(tmpVal.sensor.antenna.name);
+        val.sensor.antenna.size = ossie::corba::returnString(tmpVal.sensor.antenna.size);
+        val.sensor.antenna.type = ossie::corba::returnString(tmpVal.sensor.antenna.type);
+        val.sensor.feed.name = ossie::corba::returnString(tmpVal.sensor.feed.name);
+        val.sensor.feed.polarization = ossie::corba::returnString(tmpVal.sensor.feed.polarization);
+        val.sensor.feed.freq_range.max_val = tmpVal.sensor.feed.freq_range.max_val;
+        val.sensor.feed.freq_range.min_val = tmpVal.sensor.feed.freq_range.min_val;
+        val.sensor.feed.freq_range.values.resize(tmpVal.sensor.feed.freq_range.values.length());
+        for (unsigned int i=0; i<val.sensor.feed.freq_range.values.size(); i++) {
+            val.sensor.feed.freq_range.values[i] = tmpVal.sensor.feed.freq_range.values[i];
+        }
+        return val;
+    };
 
 	//
 	// Callback signatures to register when functions are called (provides ports only)
 	//
-
-	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
-	typedef char* (*CharFromCharFn)( const char* id );
-	typedef CF::Properties* (*PropFromCharFn)( const char* id );
-	typedef CORBA::Double (*DoubleFromCharFn)( const char* id );
-	typedef CORBA::Boolean (*BooleanFromCharFn)( const char* id );
-	typedef CORBA::Float (*FloatFromCharFn)( const char* id );
-	typedef CORBA::Long (*LongFromCharFn)( const char* id );
-
-	typedef void (*VoidFromCharDoubleFn)( const char* id, CORBA::Double val );
-	typedef void (*VoidFromCharBooleanFn)( const char* id, CORBA::Boolean val );
-	typedef void (*VoidFromCharFloatFn)( const char* id, CORBA::Float val );
-	typedef void (*VoidFromCharLongFn)( const char* id, CORBA::Long val );
-
-	// for InRFInfoPort, InRFSourcePort
-	typedef char* (*CharFromVoidFn)( void );
-	typedef FRONTEND::RFInfoPkt* (*RFInfoPktFromVoidFn)( void );
-	typedef FRONTEND::RFInfoPktSequence* (*RFInfoPktSeqFromVoidFn)( void );
-
-	typedef void (*VoidFromCharFn)( const char* data );
-	typedef void (*VoidFromRFInfoPktFn)( const FRONTEND::RFInfoPkt& data );
-	typedef void (*VoidFromRFInfoPktSeqFn)( const FRONTEND::RFInfoPktSequence& data );
 
 	// for InGPSPort
 	typedef FRONTEND::GPSInfo* (*GPSInfoFromVoidFn)( void );
@@ -72,94 +100,6 @@ namespace frontend {
 	typedef FRONTEND::NavigationPacket* (*NavPktFromVoidFn)( void );
 	typedef void (*VoidFromNavPktFn)( const FRONTEND::NavigationPacket& data );
 
-	//
-	// Interface definition that will be notified when a function is called
-	//
-
-	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
-	class CharFromChar {
-		public:
-			virtual char* operator() ( const char* id ) = 0;
-			virtual ~CharFromChar() {};
-	};
-	class PropFromChar {
-		public:
-			virtual CF::Properties* operator() ( const char* id ) = 0;
-			virtual ~PropFromChar() {};
-	};
-	class DoubleFromChar {
-		public:
-			virtual CORBA::Double operator() ( const char* id ) = 0;
-			virtual ~DoubleFromChar() {};
-	};
-	class BooleanFromChar {
-		public:
-			virtual CORBA::Boolean operator() ( const char* id ) = 0;
-			virtual ~BooleanFromChar() {};
-	};
-	class FloatFromChar {
-		public:
-			virtual CORBA::Float operator() ( const char* id ) = 0;
-			virtual ~FloatFromChar() {};
-	};
-	class LongFromChar {
-		public:
-			virtual CORBA::Long operator() ( const char* id ) = 0;
-			virtual ~LongFromChar() {};
-	};
-
-	class VoidFromCharDouble {
-		public:
-			virtual void operator() ( const char* id, CORBA::Double val ) = 0;
-			virtual ~VoidFromCharDouble() {};
-	};
-	class VoidFromCharBoolean {
-		public:
-			virtual void operator() ( const char* id, CORBA::Boolean val ) = 0;
-			virtual ~VoidFromCharBoolean() {};
-	};
-	class VoidFromCharFloat {
-		public:
-			virtual void operator() ( const char* id, CORBA::Float val ) = 0;
-			virtual ~VoidFromCharFloat() {};
-	};
-	class VoidFromCharLong {
-		public:
-			virtual void operator() ( const char* id, CORBA::Long val ) = 0;
-			virtual ~VoidFromCharLong() {};
-	};
-
-	// for InRFInfoPort, InRFSourcePort
-	class CharFromVoid {
-		public:
-			virtual char* operator() ( void ) = 0;
-			virtual ~CharFromVoid() {};
-	};
-	class RFInfoPktFromVoid {
-		public:
-			virtual FRONTEND::RFInfoPkt* operator() ( void ) = 0;
-			virtual ~RFInfoPktFromVoid() {};
-	};
-	class RFInfoPktSeqFromVoid {
-		public:
-			virtual FRONTEND::RFInfoPktSequence* operator() ( void ) = 0;
-			virtual ~RFInfoPktSeqFromVoid() {};
-	};
-	class VoidFromChar {
-		public:
-			virtual void operator() ( const char* data ) = 0;
-			virtual ~VoidFromChar() {};
-	};
-	class VoidFromRFInfoPkt {
-		public:
-			virtual void operator() ( const FRONTEND::RFInfoPkt& data ) = 0;
-			virtual ~VoidFromRFInfoPkt() {};
-	};
-	class VoidFromRFInfoPktSeq {
-		public:
-			virtual void operator() ( const FRONTEND::RFInfoPktSequence& data ) = 0;
-			virtual ~VoidFromRFInfoPktSeq() {};
-	};
 
 	// for InGPSPort
 	class GPSInfoFromVoid {
@@ -199,364 +139,6 @@ namespace frontend {
 	/**
 	* Allow for member functions to be used as callbacks
 	*/
-
-	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
-	template <class T>
-	class MemberCharFromChar : public CharFromChar
-	{
-		public:
-			typedef boost::shared_ptr< MemberCharFromChar< T > > SPtr;
-			typedef char* (T::*MemberCharFromCharFn)( const char* id );
-			static SPtr Create( T &target, MemberCharFromCharFn func ){
-				return SPtr( new MemberCharFromChar(target, func ) );
-			};
-			virtual char* operator() (const char* id )
-			{
-				return (target_.*func_)(id);
-			}
-			MemberCharFromChar ( T& target,  MemberCharFromCharFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberCharFromCharFn func_;
-	};
-	template <class T>
-	class MemberPropFromChar : public PropFromChar
-	{
-		public:
-			typedef boost::shared_ptr< MemberPropFromChar< T > > SPtr;
-			typedef CF::Properties* (T::*MemberPropFromCharFn)( const char* id );
-			static SPtr Create( T &target, MemberPropFromCharFn func ){
-				return SPtr( new MemberPropFromChar(target, func ) );
-			};
-			virtual CF::Properties* operator() (const char* id )
-			{
-				return (target_.*func_)(id);
-			}
-			MemberPropFromChar ( T& target,  MemberPropFromCharFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberPropFromCharFn func_;
-	};
-	template <class T>
-	class MemberDoubleFromChar : public DoubleFromChar
-	{
-		public:
-			typedef boost::shared_ptr< MemberDoubleFromChar< T > > SPtr;
-			typedef CORBA::Double (T::*MemberDoubleFromCharFn)( const char* id );
-			static SPtr Create( T &target, MemberDoubleFromCharFn func ){
-				return SPtr( new MemberDoubleFromChar(target, func ) );
-			};
-			virtual CORBA::Double operator() (const char* id )
-			{
-				return (target_.*func_)(id);
-			}
-			MemberDoubleFromChar ( T& target,  MemberDoubleFromCharFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-
-		private:
-			T& target_;
-			MemberDoubleFromCharFn func_;
-	};
-	template <class T>
-	class MemberBooleanFromChar : public BooleanFromChar
-	{
-		public:
-			typedef boost::shared_ptr< MemberBooleanFromChar< T > > SPtr;
-			typedef CORBA::Boolean (T::*MemberBooleanFromCharFn)( const char* id );
-			static SPtr Create( T &target, MemberBooleanFromCharFn func ){
-				return SPtr( new MemberBooleanFromChar(target, func ) );
-			};
-			virtual CORBA::Boolean operator() (const char* id )
-			{
-				return (target_.*func_)(id);
-			}
-			MemberBooleanFromChar ( T& target,  MemberBooleanFromCharFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberBooleanFromCharFn func_;
-	};
-	template <class T>
-	class MemberFloatFromChar : public FloatFromChar
-	{
-		public:
-			typedef boost::shared_ptr< MemberFloatFromChar< T > > SPtr;
-			typedef CORBA::Float (T::*MemberFloatFromCharFn)( const char* id );
-			static SPtr Create( T &target, MemberFloatFromCharFn func ){
-				return SPtr( new MemberFloatFromChar(target, func ) );
-			};
-			virtual CORBA::Float operator() (const char* id )
-			{
-				return (target_.*func_)(id);
-			}
-			MemberFloatFromChar ( T& target,  MemberFloatFromCharFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberFloatFromCharFn func_;
-	};
-	template <class T>
-	class MemberLongFromChar : public LongFromChar
-	{
-		public:
-			typedef boost::shared_ptr< MemberLongFromChar< T > > SPtr;
-			typedef CORBA::Long (T::*MemberLongFromCharFn)( const char* id );
-			static SPtr Create( T &target, MemberLongFromCharFn func ){
-				return SPtr( new MemberLongFromChar(target, func ) );
-			};
-			virtual CORBA::Long operator() (const char* id )
-			{
-				return (target_.*func_)(id);
-			}
-			MemberLongFromChar ( T& target,  MemberLongFromCharFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberLongFromCharFn func_;
-	};
-	template <class T>
-	class MemberVoidFromCharDouble : public VoidFromCharDouble
-	{
-		public:
-			typedef boost::shared_ptr< MemberVoidFromCharDouble< T > > SPtr;
-			typedef void (T::*MemberVoidFromCharDoubleFn)( const char* id, CORBA::Double val );
-			static SPtr Create( T &target, MemberVoidFromCharDoubleFn func ){
-				return SPtr( new MemberVoidFromCharDouble(target, func ) );
-			};
-			virtual void operator() (const char* id, CORBA::Double val )
-			{
-				(target_.*func_)(id,val);
-			}
-			MemberVoidFromCharDouble ( T& target,  MemberVoidFromCharDoubleFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-
-		private:
-			T& target_;
-			MemberVoidFromCharDoubleFn func_;
-	};
-	template <class T>
-	class MemberVoidFromCharBoolean : public VoidFromCharBoolean
-	{
-		public:
-			typedef boost::shared_ptr< MemberVoidFromCharBoolean< T > > SPtr;
-			typedef void (T::*MemberVoidFromCharBooleanFn)( const char* id, CORBA::Boolean val );
-			static SPtr Create( T &target, MemberVoidFromCharBooleanFn func ){
-				return SPtr( new MemberVoidFromCharBoolean(target, func ) );
-			};
-			virtual void operator() (const char* id, CORBA::Boolean val )
-			{
-				(target_.*func_)(id,val);
-			}
-			MemberVoidFromCharBoolean ( T& target,  MemberVoidFromCharBooleanFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberVoidFromCharBooleanFn func_;
-	};
-	template <class T>
-	class MemberVoidFromCharFloat : public VoidFromCharFloat
-	{
-		public:
-			typedef boost::shared_ptr< MemberVoidFromCharFloat< T > > SPtr;
-			typedef void (T::*MemberVoidFromCharFloatFn)( const char* id, CORBA::Float val );
-			static SPtr Create( T &target, MemberVoidFromCharFloatFn func ){
-				return SPtr( new MemberVoidFromCharFloat(target, func ) );
-			};
-			virtual void operator() (const char* id, CORBA::Float val )
-			{
-				(target_.*func_)(id,val);
-			}
-			MemberVoidFromCharFloat ( T& target,  MemberVoidFromCharFloatFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberVoidFromCharFloatFn func_;
-	};
-	template <class T>
-	class MemberVoidFromCharLong : public VoidFromCharLong
-	{
-		public:
-			typedef boost::shared_ptr< MemberVoidFromCharLong< T > > SPtr;
-			typedef void (T::*MemberVoidFromCharLongFn)( const char* id, CORBA::Long val );
-			static SPtr Create( T &target, MemberVoidFromCharLongFn func ){
-				return SPtr( new MemberVoidFromCharLong(target, func ) );
-			};
-			virtual void operator() (const char* id, CORBA::Long val )
-			{
-				(target_.*func_)(id,val);
-			}
-			MemberVoidFromCharLong ( T& target,  MemberVoidFromCharLongFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberVoidFromCharLongFn func_;
-	};
-
-	// for InRFInfoPort, InRFSourcePort
-	template <class T>
-	class MemberCharFromVoid : public CharFromVoid
-	{
-		public:
-			typedef boost::shared_ptr< MemberCharFromVoid< T > > SPtr;
-			typedef char* (T::*MemberCharFromVoidFn)( void );
-			static SPtr Create( T &target, MemberCharFromVoidFn func ){
-				return SPtr( new MemberCharFromVoid(target, func ) );
-			};
-			virtual char* operator() ( void )
-			{
-				return (target_.*func_)();
-			}
-			MemberCharFromVoid ( T& target,  MemberCharFromVoidFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberCharFromVoidFn func_;
-	};
-	template <class T>
-	class MemberRFInfoPktFromVoid : public RFInfoPktFromVoid
-	{
-		public:
-			typedef boost::shared_ptr< MemberRFInfoPktFromVoid< T > > SPtr;
-			typedef FRONTEND::RFInfoPkt* (T::*MemberRFInfoPktFromVoidFn)( void );
-			static SPtr Create( T &target, MemberRFInfoPktFromVoidFn func ){
-				return SPtr( new MemberRFInfoPktFromVoid(target, func ) );
-			};
-			virtual FRONTEND::RFInfoPkt* operator() ( void )
-			{
-				return (target_.*func_)();
-			}
-			MemberRFInfoPktFromVoid ( T& target,  MemberRFInfoPktFromVoidFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberRFInfoPktFromVoidFn func_;
-	};
-	template <class T>
-	class MemberRFInfoPktSeqFromVoid : public RFInfoPktSeqFromVoid
-	{
-		public:
-			typedef boost::shared_ptr< MemberRFInfoPktSeqFromVoid< T > > SPtr;
-			typedef FRONTEND::RFInfoPktSequence* (T::*MemberRFInfoPktSeqFromVoidFn)( void );
-			static SPtr Create( T &target, MemberRFInfoPktSeqFromVoidFn func ){
-				return SPtr( new MemberRFInfoPktSeqFromVoid(target, func ) );
-			};
-			virtual FRONTEND::RFInfoPktSequence* operator() ( void )
-			{
-				return (target_.*func_)();
-			}
-			MemberRFInfoPktSeqFromVoid ( T& target,  MemberRFInfoPktSeqFromVoidFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberRFInfoPktSeqFromVoidFn func_;
-	};
-	template <class T>
-	class MemberVoidFromChar : public VoidFromChar
-	{
-		public:
-			typedef boost::shared_ptr< MemberVoidFromChar< T > > SPtr;
-			typedef void (T::*MemberVoidFromCharFn)( const char* data );
-			static SPtr Create( T &target, MemberVoidFromCharFn func ){
-				return SPtr( new MemberVoidFromChar(target, func ) );
-			};
-			virtual void operator() (const char* data )
-			{
-				(target_.*func_)(data);
-			}
-			MemberVoidFromChar ( T& target,  MemberVoidFromCharFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberVoidFromCharFn func_;
-	};
-	template <class T>
-	class MemberVoidFromRFInfoPkt : public VoidFromRFInfoPkt
-	{
-		public:
-			typedef boost::shared_ptr< MemberVoidFromRFInfoPkt< T > > SPtr;
-			typedef void (T::*MemberVoidFromRFInfoPktFn)( const FRONTEND::RFInfoPkt& data );
-			static SPtr Create( T &target, MemberVoidFromRFInfoPktFn func ){
-				return SPtr( new MemberVoidFromRFInfoPkt(target, func ) );
-			};
-			virtual void operator() (const FRONTEND::RFInfoPkt& data )
-			{
-				(target_.*func_)(data);
-			}
-			MemberVoidFromRFInfoPkt ( T& target,  MemberVoidFromRFInfoPktFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberVoidFromRFInfoPktFn func_;
-	};
-	template <class T>
-	class MemberVoidFromRFInfoPktSeq : public VoidFromRFInfoPktSeq
-	{
-		public:
-			typedef boost::shared_ptr< MemberVoidFromRFInfoPktSeq< T > > SPtr;
-			typedef void (T::*MemberVoidFromRFInfoPktSeqFn)( const FRONTEND::RFInfoPktSequence& data );
-			static SPtr Create( T &target, MemberVoidFromRFInfoPktSeqFn func ){
-				return SPtr( new MemberVoidFromRFInfoPktSeq(target, func ) );
-			};
-			virtual void operator() (const FRONTEND::RFInfoPktSequence& data )
-			{
-				(target_.*func_)(data);
-			}
-			MemberVoidFromRFInfoPktSeq ( T& target,  MemberVoidFromRFInfoPktSeqFn func) :
-				target_(target),
-				func_(func)
-				  {
-				  }
-		private:
-			T& target_;
-			MemberVoidFromRFInfoPktSeqFn func_;
-	};
 
 	// for InGPSPort
 	template <class T>
@@ -697,240 +279,6 @@ namespace frontend {
 	/**
 	* Wrap Callback functions as CB objects
 	*/
-
-	// for InDigitalTunerPort, InAnalogTunerPort, InFrontendTunerPort
-	class StaticCharFromChar : public CharFromChar
-	{
-	public:
-		virtual char* operator() ( const char* id)
-		{
-			return (*func_)(id);
-		}
-		StaticCharFromChar ( CharFromCharFn func) :
-			func_(func)
-		{
-		}
-	private:
-		CharFromCharFn func_;
-	};
-
-	class StaticPropFromChar : public PropFromChar
-	{
-	public:
-		virtual CF::Properties* operator() ( const char* id)
-		{
-			return (*func_)(id);
-		}
-		StaticPropFromChar ( PropFromCharFn func) :
-			func_(func)
-		{
-		}
-	private:
-		PropFromCharFn func_;
-	};
-
-	class StaticDoubleFromChar : public DoubleFromChar
-	{
-	public:
-		virtual CORBA::Double operator() ( const char* id)
-		{
-			return (*func_)(id);
-		}
-		StaticDoubleFromChar ( DoubleFromCharFn func) :
-			func_(func)
-		{
-		}
-	private:
-		DoubleFromCharFn func_;
-	};
-
-	class StaticBooleanFromChar : public BooleanFromChar
-	{
-	public:
-		virtual CORBA::Boolean operator() ( const char* id)
-		{
-			return (*func_)(id);
-		}
-		StaticBooleanFromChar ( BooleanFromCharFn func) :
-			func_(func)
-		{
-		}
-	private:
-		BooleanFromCharFn func_;
-	};
-
-	class StaticFloatFromChar : public FloatFromChar
-	{
-	public:
-		virtual CORBA::Float operator() ( const char* id)
-		{
-			return (*func_)(id);
-		}
-		StaticFloatFromChar ( FloatFromCharFn func) :
-			func_(func)
-		{
-		}
-	private:
-		FloatFromCharFn func_;
-	};
-
-	class StaticLongFromChar : public LongFromChar
-	{
-	public:
-		virtual CORBA::Long operator() ( const char* id)
-		{
-			return (*func_)(id);
-		}
-		StaticLongFromChar ( LongFromCharFn func) :
-			func_(func)
-		{
-		}
-	private:
-		LongFromCharFn func_;
-	};
-
-	class StaticVoidFromCharDouble : public VoidFromCharDouble
-	{
-	public:
-		virtual void operator() ( const char* id, CORBA::Double val)
-		{
-			return (*func_)(id,val);
-		}
-		StaticVoidFromCharDouble ( VoidFromCharDoubleFn func) :
-			func_(func)
-		{
-		}
-	private:
-		VoidFromCharDoubleFn func_;
-	};
-	class StaticVoidFromCharBoolean : public VoidFromCharBoolean
-	{
-	public:
-		virtual void operator() ( const char* id, CORBA::Boolean val)
-		{
-			return (*func_)(id,val);
-		}
-		StaticVoidFromCharBoolean ( VoidFromCharBooleanFn func) :
-			func_(func)
-		{
-		}
-	private:
-		VoidFromCharBooleanFn func_;
-	};
-	class StaticVoidFromCharFloat : public VoidFromCharFloat
-	{
-	public:
-		virtual void operator() ( const char* id, CORBA::Float val)
-		{
-			return (*func_)(id,val);
-		}
-		StaticVoidFromCharFloat ( VoidFromCharFloatFn func) :
-			func_(func)
-		{
-		}
-	private:
-		VoidFromCharFloatFn func_;
-	};
-	class StaticVoidFromCharLong : public VoidFromCharLong
-	{
-	public:
-		virtual void operator() ( const char* id, CORBA::Long val)
-		{
-			return (*func_)(id,val);
-		}
-		StaticVoidFromCharLong ( VoidFromCharLongFn func) :
-			func_(func)
-		{
-		}
-	private:
-		VoidFromCharLongFn func_;
-	};
-
-	// for InRFInfoPort, InRFSourcePort
-	class StaticCharFromVoid : public CharFromVoid
-	{
-	public:
-		virtual char* operator() ( void )
-		{
-			return (*func_)();
-		}
-		StaticCharFromVoid ( CharFromVoidFn func) :
-			func_(func)
-		{
-		}
-	private:
-		CharFromVoidFn func_;
-	};
-	class StaticRFInfoPktFromVoid : public RFInfoPktFromVoid
-	{
-	public:
-		virtual FRONTEND::RFInfoPkt* operator() ( void )
-		{
-			return (*func_)();
-		}
-		StaticRFInfoPktFromVoid ( RFInfoPktFromVoidFn func) :
-			func_(func)
-		{
-		}
-	private:
-		RFInfoPktFromVoidFn func_;
-	};
-	class StaticRFInfoPktSeqFromVoid : public RFInfoPktSeqFromVoid
-	{
-	public:
-		virtual FRONTEND::RFInfoPktSequence* operator() ( void )
-		{
-			return (*func_)();
-		}
-		StaticRFInfoPktSeqFromVoid ( RFInfoPktSeqFromVoidFn func) :
-			func_(func)
-		{
-		}
-	private:
-		RFInfoPktSeqFromVoidFn func_;
-	};
-	class StaticVoidFromChar : public VoidFromChar
-	{
-	public:
-		virtual void operator() ( const char* data)
-		{
-			return (*func_)(data);
-		}
-		StaticVoidFromChar ( VoidFromCharFn func) :
-			func_(func)
-		{
-		}
-	private:
-		VoidFromCharFn func_;
-	};
-	class StaticVoidFromRFInfoPkt : public VoidFromRFInfoPkt
-	{
-	public:
-		virtual void operator() ( const FRONTEND::RFInfoPkt& data)
-		{
-			return (*func_)(data);
-		}
-		StaticVoidFromRFInfoPkt ( VoidFromRFInfoPktFn func) :
-			func_(func)
-		{
-		}
-	private:
-		VoidFromRFInfoPktFn func_;
-	};
-	class StaticVoidFromRFInfoPktSeq : public VoidFromRFInfoPktSeq
-	{
-	public:
-		virtual void operator() ( const FRONTEND::RFInfoPktSequence& data)
-		{
-			return (*func_)(data);
-		}
-		StaticVoidFromRFInfoPktSeq ( VoidFromRFInfoPktSeqFn func) :
-			func_(func)
-		{
-		}
-	private:
-		VoidFromRFInfoPktSeqFn func_;
-	};
 
 	// for InGPSPort
 	class StaticGPSInfoFromVoid : public GPSInfoFromVoid
