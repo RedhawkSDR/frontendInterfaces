@@ -419,7 +419,7 @@ namespace frontend {
 			_dev_disable(tuner_id);
 			std::string streamID = std::string(tunerChannels[tuner_id].sri.streamID);
 			streamID_to_tunerID.erase(streamID);
-			bulkio::sri::zeroSRI(& tunerChannels[tuner_id].sri);
+			bulkio::sri::zeroSRI(tunerChannels[tuner_id].sri);
 		}
 
 		return true;
