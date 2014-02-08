@@ -8,6 +8,9 @@
 #include "ossie/prop_helpers.h"
 #include "bulkio/bulkio.h"
 #include "fe_tuner_struct_props.h"
+#include "fe_tuner_port_impl.h"
+#include "fe_rfinfo_port_impl.h"
+#include "fe_rfsource_port_impl.h"
 
 /*********************************************************************************************/
 /**************************              FRONTEND                   **************************/
