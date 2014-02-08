@@ -21,4 +21,8 @@ libfrontendInterfaces.la
 libtool
 ltmain.sh
 missing
-src/
+/src/
+/libsrc/java/bin/
+/libsrc/cpp/.dirstamp
+/libsrc/java/META-INF/MANIFEST.MF
+/libsrc/java/META-INF/MANIFEST.MF.src
