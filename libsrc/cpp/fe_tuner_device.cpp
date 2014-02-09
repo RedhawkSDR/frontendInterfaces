@@ -409,6 +409,7 @@ namespace frontend {
 
             _dev_disable(tuner_id);
             _dev_del_tuning(tuner_id);
+            removeAllocationIdRouting(tunerChannels[tuner_id].frontend_status->allocation_id_csv);
             std::string streamID = std::string(tunerChannels[tuner_id].sri.streamID);
             streamID_to_tunerID.erase(streamID);
             bulkio::sri::zeroSRI(tunerChannels[tuner_id].sri);

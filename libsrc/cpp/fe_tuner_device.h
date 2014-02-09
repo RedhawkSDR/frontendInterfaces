@@ -128,6 +128,7 @@ namespace frontend {
             virtual bool _dev_set_tuning(std::string &tuner_type, tuning_request &request, size_t tuner_id) = 0;
             virtual bool _dev_get_tuning(tuning_request &response, size_t tuner_id) = 0;
             virtual bool _dev_del_tuning(size_t tuner_id) = 0;
+            virtual void removeAllocationIdRouting(const std::string allocation_id) = 0;
 
             ////////////////////////////
             // Other helper functions //
