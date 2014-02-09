@@ -1,4 +1,5 @@
 #include "fe_tuner_device.h"
+#include <exception>
 
 namespace frontend {
 
@@ -182,11 +183,9 @@ namespace frontend {
 					// Check if available tuner (if not requesting device control, this is all that's needed to add listener)
 					long tuner_id = addTunerMapping(frontend_tuner_allocation);
 					if (tuner_id < 0) {
-						char msg[512];
-						sprintf(msg,"NO AVAILABLE TUNER");
-						//TODO: add back log messages
-						std::cout<<"allocateCapacity: NO AVAILABLE TUNER. Make sure that the device has an initialized frontend_tuner_status"<<std::endl;
-						throw std::logic_error(msg);
+                        std::ostringstream eout;
+                        eout<<"allocateCapacity: NO AVAILABLE TUNER. Make sure that the device has an initialized frontend_tuner_status";
+                        throw std::logic_error(eout.str());
 					}
                     
 					// Initialize the tuner (only if requesting device control)
@@ -210,52 +209,46 @@ namespace frontend {
                                 request.center_frequency = frontend_tuner_allocation.center_frequency;
                                 request.bandwidth = frontend_tuner_allocation.bandwidth;
                                 request.sample_rate = frontend_tuner_allocation.sample_rate;
-                                _dev_set_tuning(frontend_tuner_allocation.tuner_type, request, tuner_id);
+                                if (!_dev_set_tuning(frontend_tuner_allocation.tuner_type, request, tuner_id)) {
+                                    throw std::exception();
+                                }
 							}
 							catch(...){
-								char msg[512];
-								sprintf(msg,"allocateCapacity(%d): failed when configuring device hardware",int(tuner_id));
-								//TODO: add back log messages
-								std::cout<<"allocateCapacity: failed when configuring device hardware"<<std::endl;
-								throw std::logic_error(msg);
+                                std::ostringstream eout;
+                                eout<<"allocateCapacity("<<int(tuner_id)<<"): failed when configuring device hardware";
+                                throw std::logic_error(eout.str());
 							};
                             
 							try {
                                 frontend::tuning_request setting;
-                                _dev_get_tuning(setting, tuner_id);
+                                if (!_dev_get_tuning(setting, tuner_id)) {
+                                    throw std::exception();
+                                }
                                 tunerChannels[tuner_id].frontend_status->center_frequency = setting.center_frequency;
                                 tunerChannels[tuner_id].frontend_status->bandwidth = setting.bandwidth;
                                 tunerChannels[tuner_id].frontend_status->sample_rate = setting.sample_rate;
                             }
 							catch(...){
-								char msg[512];
-								sprintf(msg,"allocateCapacity(%d): failed when querying device hardware",int(tuner_id));
-								//TODO: add back log messages
-								std::cout<<"allocateCapacity: failed when querying device hardware"<<std::endl;
-								throw std::logic_error(msg);
+                                std::ostringstream eout;
+                                eout<<"allocateCapacity("<<int(tuner_id)<<"): failed when querying device hardware";
+                                throw std::logic_error(eout.str());
 							};
 
                             // Only check non-TX when bandwidth was not set to don't care
 							if( (tunerChannels[tuner_id].frontend_status->tuner_type != "TX" && frontend_tuner_allocation.bandwidth != 0.0) &&
 								(tunerChannels[tuner_id].frontend_status->bandwidth < frontend_tuner_allocation.bandwidth ||
 								tunerChannels[tuner_id].frontend_status->bandwidth > frontend_tuner_allocation.bandwidth+frontend_tuner_allocation.bandwidth * frontend_tuner_allocation.bandwidth_tolerance/100.0 )){
-								char msg[512];
-								sprintf(msg,"allocateCapacity(%d): returned bw \"%f\" does not meet tolerance criteria of \"%f + %f percent\". ",int(tuner_id),
-										tunerChannels[tuner_id].frontend_status->bandwidth,frontend_tuner_allocation.bandwidth,frontend_tuner_allocation.bandwidth_tolerance);
-								//TODO: add back log messages
-								std::cout<<"allocateCapacity: did not meet BW tolerance"<<std::endl;
-								throw std::logic_error(msg);
+                                    std::ostringstream eout;
+                                    eout<<"allocateCapacity("<<int(tuner_id)<<"): returned bw "<<tunerChannels[tuner_id].frontend_status->bandwidth<<" does not meet tolerance criteria of "<<frontend_tuner_allocation.bandwidth_tolerance<<" percent";
+                                    throw std::logic_error(eout.str());
 							}
 							// always check TX, but only check non-TX when sample_rate was not set to don't care)
                             if( (tunerChannels[tuner_id].frontend_status->tuner_type == "TX" || frontend_tuner_allocation.sample_rate != 0.0) &&
 								(tunerChannels[tuner_id].frontend_status->sample_rate < frontend_tuner_allocation.sample_rate ||
 								tunerChannels[tuner_id].frontend_status->sample_rate > frontend_tuner_allocation.sample_rate+frontend_tuner_allocation.sample_rate * frontend_tuner_allocation.sample_rate_tolerance/100.0 )){
-								char msg[512];
-								sprintf(msg,"allocateCapacity(%d): returned sample rate \"%f\" does not meet tolerance criteria of \"%f + %f percent\". ",int(tuner_id),
-										tunerChannels[tuner_id].frontend_status->sample_rate,frontend_tuner_allocation.sample_rate,frontend_tuner_allocation.sample_rate_tolerance);
-								//TODO: add back log messages
-								std::cout<<"allocateCapacity: did not meet sample rate tolerance"<<std::endl;
-								throw std::logic_error(msg);
+                                std::ostringstream eout;
+                                eout<<"allocateCapacity("<<int(tuner_id)<<"): returned bw "<<tunerChannels[tuner_id].frontend_status->sample_rate<<" does not meet tolerance criteria of "<<frontend_tuner_allocation.sample_rate_tolerance<<" percent";
+                                throw std::logic_error(eout.str());
 							}
 						} // release tuner lock
 
@@ -263,11 +256,9 @@ namespace frontend {
                         try {
 							enableTuner(tuner_id,true);
 						} catch(...){
-							char msg[512];
-							sprintf(msg,"FAILED TO ENABLE TUNER AFTER ALLOCATION");
-							//TODO: add back log messages
-							std::cout<<"allocateCapacity: FAILED TO ENABLE TUNER AFTER ALLOCATION"<<std::endl;
-							throw std::logic_error(msg);
+                            std::ostringstream eout;
+                            eout<<"Failed to enable tuner after allocation";
+                            throw std::logic_error(eout.str());
 						}
                     }
 				}
@@ -417,6 +408,7 @@ namespace frontend {
 		if (prev_enabled && !enable && !std::string(tunerChannels[tuner_id].sri.streamID).empty()) {
 
 			_dev_disable(tuner_id);
+            _dev_del_tuning(tuner_id);
 			std::string streamID = std::string(tunerChannels[tuner_id].sri.streamID);
 			streamID_to_tunerID.erase(streamID);
 			bulkio::sri::zeroSRI(tunerChannels[tuner_id].sri);
