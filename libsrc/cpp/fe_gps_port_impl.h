@@ -7,109 +7,109 @@
 
 namespace frontend {
 
-	// ----------------------------------------------------------------------------------------
-	// InGPSPort declaration
-	// ----------------------------------------------------------------------------------------
-	class InGPSPort : public POA_FRONTEND::GPS, public Port_Provides_base_impl
-	{
-	    public:
-	        InGPSPort(std::string port_name,
+    // ----------------------------------------------------------------------------------------
+    // InGPSPort declaration
+    // ----------------------------------------------------------------------------------------
+    class InGPSPort : public POA_FRONTEND::GPS, public Port_Provides_base_impl
+    {
+        public:
+            InGPSPort(std::string port_name,
                           GPSInfoFromVoid *newGPSInfoGetterCB = NULL,
                           GpsTimePosFromVoid *newGpsTimePosGetterCB = NULL,
                           VoidFromGPSInfo *newGPSInfoSetterCB = NULL,
                           VoidFromGpsTimePos *newGpsTimePosSetterCB = NULL);
-	        InGPSPort(std::string port_name,
+            InGPSPort(std::string port_name,
                           LOGGER_PTR logger,
                           GPSInfoFromVoid *newGPSInfoGetterCB = NULL,
                           GpsTimePosFromVoid *newGpsTimePosGetterCB = NULL,
                           VoidFromGPSInfo *newGPSInfoSetterCB = NULL,
                           VoidFromGpsTimePos *newGpsTimePosSetterCB = NULL);
-	        ~InGPSPort();
+            ~InGPSPort();
 
-	        FRONTEND::GPSInfo* gps_info();
-	        void gps_info(const FRONTEND::GPSInfo& data);
-	        FRONTEND::GpsTimePos* gps_time_pos();
-	        void gps_time_pos(const FRONTEND::GpsTimePos& data);
-	        void setLogger(LOGGER_PTR newLogger);
+            FRONTEND::GPSInfo* gps_info();
+            void gps_info(const FRONTEND::GPSInfo& data);
+            FRONTEND::GpsTimePos* gps_time_pos();
+            void gps_time_pos(const FRONTEND::GpsTimePos& data);
+            void setLogger(LOGGER_PTR newLogger);
 
-			// Assign gps_info callbacks - getters
-			template< typename T > inline
-			  void setGPSInfoGetterCB(T &target, FRONTEND::GPSInfo* (T::*func)( void )  ) {
-				getGPSInfoCB =  boost::make_shared< MemberGPSInfoFromVoid< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setGPSInfoGetterCB(T *target, FRONTEND::GPSInfo* (T::*func)( void )  ) {
-				getGPSInfoCB =  boost::make_shared< MemberGPSInfoFromVoid< T > >( boost::ref(*target), func );
-			};
-			void   setGPSInfoGetterCB( GPSInfoFromVoid *newCB );
-			void   setGPSInfoGetterCB( GPSInfoFromVoidFn  newCB );
+            // Assign gps_info callbacks - getters
+            template< typename T > inline
+              void setGPSInfoGetterCB(T &target, FRONTEND::GPSInfo* (T::*func)( void )  ) {
+                getGPSInfoCB =  boost::make_shared< MemberGPSInfoFromVoid< T > >( boost::ref(target), func );
+            };
+            template< typename T > inline
+              void setGPSInfoGetterCB(T *target, FRONTEND::GPSInfo* (T::*func)( void )  ) {
+                getGPSInfoCB =  boost::make_shared< MemberGPSInfoFromVoid< T > >( boost::ref(*target), func );
+            };
+            void   setGPSInfoGetterCB( GPSInfoFromVoid *newCB );
+            void   setGPSInfoGetterCB( GPSInfoFromVoidFn  newCB );
 
-			// and setters
-			template< typename T > inline
-			  void setGPSInfoSetterCB(T &target, void (T::*func)( const FRONTEND::GPSInfo& data )  ) {
-				setGPSInfoCB =  boost::make_shared< MemberVoidFromGPSInfo< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setGPSInfoSetterCB(T *target, void (T::*func)( const FRONTEND::GPSInfo& data )  ) {
-				setGPSInfoCB =  boost::make_shared< MemberVoidFromGPSInfo< T > >( boost::ref(*target), func );
-			};
-			void   setGPSInfoSetterCB( VoidFromGPSInfo *newCB );
-			void   setGPSInfoSetterCB( VoidFromGPSInfoFn  newCB );
+            // and setters
+            template< typename T > inline
+              void setGPSInfoSetterCB(T &target, void (T::*func)( const FRONTEND::GPSInfo& data )  ) {
+                setGPSInfoCB =  boost::make_shared< MemberVoidFromGPSInfo< T > >( boost::ref(target), func );
+            };
+            template< typename T > inline
+              void setGPSInfoSetterCB(T *target, void (T::*func)( const FRONTEND::GPSInfo& data )  ) {
+                setGPSInfoCB =  boost::make_shared< MemberVoidFromGPSInfo< T > >( boost::ref(*target), func );
+            };
+            void   setGPSInfoSetterCB( VoidFromGPSInfo *newCB );
+            void   setGPSInfoSetterCB( VoidFromGPSInfoFn  newCB );
 
-			// Assign gps_time_pos callbacks - getters
-			template< typename T > inline
-			  void setGpsTimePosGetterCB(T &target, FRONTEND::GpsTimePos* (T::*func)( void )  ) {
-				getGpsTimePosCB =  boost::make_shared< MemberGpsTimePosFromVoid< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setGpsTimePosGetterCB(T *target, FRONTEND::GpsTimePos* (T::*func)( void )  ) {
-				getGpsTimePosCB =  boost::make_shared< MemberGpsTimePosFromVoid< T > >( boost::ref(*target), func );
-			};
-			void   setGpsTimePosGetterCB( GpsTimePosFromVoid *newCB );
-			void   setGpsTimePosGetterCB( GpsTimePosFromVoidFn  newCB );
+            // Assign gps_time_pos callbacks - getters
+            template< typename T > inline
+              void setGpsTimePosGetterCB(T &target, FRONTEND::GpsTimePos* (T::*func)( void )  ) {
+                getGpsTimePosCB =  boost::make_shared< MemberGpsTimePosFromVoid< T > >( boost::ref(target), func );
+            };
+            template< typename T > inline
+              void setGpsTimePosGetterCB(T *target, FRONTEND::GpsTimePos* (T::*func)( void )  ) {
+                getGpsTimePosCB =  boost::make_shared< MemberGpsTimePosFromVoid< T > >( boost::ref(*target), func );
+            };
+            void   setGpsTimePosGetterCB( GpsTimePosFromVoid *newCB );
+            void   setGpsTimePosGetterCB( GpsTimePosFromVoidFn  newCB );
 
-			// and setters
-			template< typename T > inline
-			  void setGpsTimePosSetterCB(T &target, void (T::*func)( const FRONTEND::GpsTimePos& data )  ) {
-				setGpsTimePosCB =  boost::make_shared< MemberVoidFromGpsTimePos< T > >( boost::ref(target), func );
-			};
-			template< typename T > inline
-			  void setGpsTimePosSetterCB(T *target, void (T::*func)( const FRONTEND::GpsTimePos& data )  ) {
-				setGpsTimePosCB =  boost::make_shared< MemberVoidFromGpsTimePos< T > >( boost::ref(*target), func );
-			};
-			void   setGpsTimePosSetterCB( VoidFromGpsTimePos *newCB );
-			void   setGpsTimePosSetterCB( VoidFromGpsTimePosFn  newCB );
+            // and setters
+            template< typename T > inline
+              void setGpsTimePosSetterCB(T &target, void (T::*func)( const FRONTEND::GpsTimePos& data )  ) {
+                setGpsTimePosCB =  boost::make_shared< MemberVoidFromGpsTimePos< T > >( boost::ref(target), func );
+            };
+            template< typename T > inline
+              void setGpsTimePosSetterCB(T *target, void (T::*func)( const FRONTEND::GpsTimePos& data )  ) {
+                setGpsTimePosCB =  boost::make_shared< MemberVoidFromGpsTimePos< T > >( boost::ref(*target), func );
+            };
+            void   setGpsTimePosSetterCB( VoidFromGpsTimePos *newCB );
+            void   setGpsTimePosSetterCB( VoidFromGpsTimePosFn  newCB );
 
-	    protected:
-	        boost::mutex portAccess;
+        protected:
+            boost::mutex portAccess;
                 LOGGER_PTR logger;
 
-			// Callbacks
-			boost::shared_ptr< GPSInfoFromVoid > getGPSInfoCB;
-			boost::shared_ptr< GpsTimePosFromVoid > getGpsTimePosCB;
-			boost::shared_ptr< VoidFromGPSInfo > setGPSInfoCB;
-			boost::shared_ptr< VoidFromGpsTimePos > setGpsTimePosCB;
-	};
+            // Callbacks
+            boost::shared_ptr< GPSInfoFromVoid > getGPSInfoCB;
+            boost::shared_ptr< GpsTimePosFromVoid > getGpsTimePosCB;
+            boost::shared_ptr< VoidFromGPSInfo > setGPSInfoCB;
+            boost::shared_ptr< VoidFromGpsTimePos > setGpsTimePosCB;
+    };
 
-	// ----------------------------------------------------------------------------------------
-	// OutGPSPort declaration
-	// ----------------------------------------------------------------------------------------
-	class OutGPSPort : public OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>
-	{
-	    public:
-	        OutGPSPort(std::string port_name);
-	        OutGPSPort(std::string port_name, LOGGER_PTR logger);
-	        ~OutGPSPort();
+    // ----------------------------------------------------------------------------------------
+    // OutGPSPort declaration
+    // ----------------------------------------------------------------------------------------
+    class OutGPSPort : public OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>
+    {
+        public:
+            OutGPSPort(std::string port_name);
+            OutGPSPort(std::string port_name, LOGGER_PTR logger);
+            ~OutGPSPort();
 
-	        FRONTEND::GPSInfo* gps_info();
-	        void gps_info(const FRONTEND::GPSInfo& data);
-	        FRONTEND::GpsTimePos* gps_time_pos();
-	        void gps_time_pos(const FRONTEND::GpsTimePos& data);
-	        void setLogger(LOGGER_PTR newLogger);
+            FRONTEND::GPSInfo* gps_info();
+            void gps_info(const FRONTEND::GPSInfo& data);
+            FRONTEND::GpsTimePos* gps_time_pos();
+            void gps_time_pos(const FRONTEND::GpsTimePos& data);
+            void setLogger(LOGGER_PTR newLogger);
 
-	    protected:
+        protected:
                 LOGGER_PTR logger;
-	};
+    };
 
 } // end of frontend namespace
 

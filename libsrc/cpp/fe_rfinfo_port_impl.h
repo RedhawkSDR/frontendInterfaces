@@ -55,26 +55,26 @@ namespace frontend {
             boost::mutex portAccess;
     };
 
-	// ----------------------------------------------------------------------------------------
-	// OutRFInfoPort declaration
-	// ----------------------------------------------------------------------------------------
-	class OutRFInfoPort : public OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>
-	{
-	    public:
-	        OutRFInfoPort(std::string port_name);
-	        OutRFInfoPort(std::string port_name, LOGGER_PTR logger);
-	        ~OutRFInfoPort();
+    // ----------------------------------------------------------------------------------------
+    // OutRFInfoPort declaration
+    // ----------------------------------------------------------------------------------------
+    class OutRFInfoPort : public OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>
+    {
+        public:
+            OutRFInfoPort(std::string port_name);
+            OutRFInfoPort(std::string port_name, LOGGER_PTR logger);
+            ~OutRFInfoPort();
 
-	        char* rf_flow_id();
-	        void rf_flow_id(char* data);
-	        FRONTEND::RFInfoPkt* rfinfo_pkt();
-	        void rfinfo_pkt(FRONTEND::RFInfoPkt data);
-	        void setLogger(LOGGER_PTR newLogger);
+            char* rf_flow_id();
+            void rf_flow_id(char* data);
+            FRONTEND::RFInfoPkt* rfinfo_pkt();
+            void rfinfo_pkt(FRONTEND::RFInfoPkt data);
+            void setLogger(LOGGER_PTR newLogger);
 
-	    protected:
+        protected:
                 LOGGER_PTR logger;
 
-	};
+    };
 
 } // end of frontend namespace
 
