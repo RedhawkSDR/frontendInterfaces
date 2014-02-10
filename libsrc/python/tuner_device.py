@@ -71,6 +71,183 @@ class indivTuner:
             frontend_status.enabled = False
             
 
+class FrontendTunerAllocation(object):
+    tuner_type = simple_property(id_="FRONTEND::tuner_allocation::tuner_type",
+                                     name="tuner_type",
+                                     type_="string",
+                                     )
+    allocation_id = simple_property(id_="FRONTEND::tuner_allocation::allocation_id",
+                                    name="allocation_id",
+                                    type_="string",
+                                    )
+    center_frequency = simple_property(id_="FRONTEND::tuner_allocation::center_frequency",
+                                       name="center_frequency",
+                                       type_="double",
+                                       )
+    bandwidth = simple_property(id_="FRONTEND::tuner_allocation::bandwidth",
+                                name="bandwidth",
+                                type_="double",
+                                )
+    bandwidth_tolerance = simple_property(id_="FRONTEND::tuner_allocation::bandwidth_tolerance",
+                                          name="bandwidth_tolerance",
+                                          type_="double",
+                                          defvalue=10.0,
+                                          )
+    sample_rate = simple_property(id_="FRONTEND::tuner_allocation::sample_rate",
+                                  name="sample_rate",
+                                  type_="double",
+                                  )
+    sample_rate_tolerance = simple_property(id_="FRONTEND::tuner_allocation::sample_rate_tolerance",
+                                           name="sample_rate_tolerance",
+                                            type_="double",
+                                            defvalue=10.0,
+                                            )
+    device_control = simple_property(id_="FRONTEND::tuner_allocation::device_control",
+                                     name="device_control",
+                                     type_="boolean",
+                                     defvalue=True,
+                                     )
+    group_id = simple_property(id_="FRONTEND::tuner_allocation::group_id",
+                               name="group_id",
+                               type_="string",
+                               )
+    rf_flow_id = simple_property(id_="FRONTEND::tuner_allocation::rf_flow_id",
+                                 name="rf_flow_id",
+                                 type_="string",
+                                 )
+    
+    def __init__(self, **kw):
+        """Construct an initialized instance of this struct definition"""
+        for attrname, classattr in type(self).__dict__.items():
+            if type(classattr) == simple_property:
+                classattr.initialize(self)
+        for k,v in kw.items():
+            setattr(self,k,v)
+    
+    def __str__(self):
+        """Return a string representation of this structure"""
+        d = {}
+        d["tuner_type"] = self.tuner_type
+        d["allocation_id"] = self.allocation_id
+        d["center_frequency"] = self.center_frequency
+        d["bandwidth"] = self.bandwidth
+        d["bandwidth_tolerance"] = self.bandwidth_tolerance
+        d["sample_rate"] = self.sample_rate
+        d["sample_rate_tolerance"] = self.sample_rate_tolerance
+        d["device_control"] = self.device_control
+        d["group_id"] = self.group_id
+        d["rf_flow_id"] = self.rf_flow_id
+        return str(d)
+    
+    def getId(self):
+        return "FRONTEND::tuner_allocation"
+    
+    def isStruct(self):
+        return True
+    
+    def getMembers(self):
+        return [("tuner_type",self.tuner_type),("allocation_id",self.allocation_id),("center_frequency",self.center_frequency),("bandwidth",self.bandwidth),("bandwidth_tolerance",self.bandwidth_tolerance),("sample_rate",self.sample_rate),("sample_rate_tolerance",self.sample_rate_tolerance),("device_control",self.device_control),("group_id",self.group_id),("rf_flow_id",self.rf_flow_id)]
+
+class FrontendListenerAllocation(object):
+    existing_allocation_id = simple_property(id_="FRONTEND::listener_allocation::existing_allocation_id",
+                                             name="existing_allocation_id",
+                                             type_="string",
+                                             )
+    listener_allocation_id = simple_property(id_="FRONTEND::listener_allocation::listener_allocation_id",
+                                             name="listener_allocation_id",
+                                             type_="string",
+                                             )
+    
+    def __init__(self, **kw):
+        """Construct an initialized instance of this struct definition"""
+        for attrname, classattr in type(self).__dict__.items():
+            if type(classattr) == simple_property:
+                classattr.initialize(self)
+        for k,v in kw.items():
+            setattr(self,k,v)
+    
+    def __str__(self):
+        """Return a string representation of this structure"""
+        d = {}
+        d["existing_allocation_id"] = self.existing_allocation_id
+        d["listener_allocation_id"] = self.listener_allocation_id
+        return str(d)
+    
+    def getId(self):
+        return "FRONTEND::listener_allocation"
+    
+    def isStruct(self):
+        return True
+    
+    def getMembers(self):
+        return [("existing_allocation_id",self.existing_allocation_id),("listener_allocation_id",self.listener_allocation_id)]
+
+class DefaultFrontendTunerStatusStruct(object):
+    tuner_type = simple_property(id_="FRONTEND::tuner_status::tuner_type",
+                                 name="tuner_type",
+                                 type_="string",
+                                 )
+    allocation_id_csv = simple_property(id_="FRONTEND::tuner_status::allocation_id_csv",
+                                        name="allocation_id_csv",
+                                        type_="string",
+                                        )
+    center_frequency = simple_property(id_="FRONTEND::tuner_status::center_frequency",
+                                       name="center_frequency",
+                                       type_="double",
+                                       )
+    bandwidth = simple_property(id_="FRONTEND::tuner_status::bandwidth",
+                                name="bandwidth",
+                                type_="double",
+                                )
+    sample_rate = simple_property(id_="FRONTEND::tuner_status::sample_rate",
+                                  name="sample_rate",
+                                  type_="double",
+                                  )
+    group_id = simple_property(id_="FRONTEND::tuner_status::group_id",
+                               name="group_id",
+                               type_="string",
+                               )
+    rf_flow_id = simple_property(id_="FRONTEND::tuner_status::rf_flow_id",
+                                 name="rf_flow_id",
+                                 type_="string",
+                                 )
+    enabled = simple_property(id_="FRONTEND::tuner_status::enabled",
+                              name="enabled",
+                              type_="boolean",
+                              )
+    
+    def __init__(self, tuner_type="", allocation_id_csv="", center_frequency=0.0, bandwidth=0.0, sample_rate=0.0, group_id="", rf_flow_id="", enabled=False):
+        self.tuner_type = tuner_type
+        self.allocation_id_csv = allocation_id_csv
+        self.center_frequency = center_frequency
+        self.bandwidth = bandwidth
+        self.sample_rate = sample_rate
+        self.group_id = group_id
+        self.rf_flow_id = rf_flow_id
+        self.enabled = enabled
+    
+    def __str__(self):
+        """Return a string representation of this structure"""
+        d = {}
+        d["tuner_type"] = self.tuner_type
+        d["allocation_id_csv"] = self.allocation_id_csv
+        d["center_frequency"] = self.center_frequency
+        d["bandwidth"] = self.bandwidth
+        d["sample_rate"] = self.sample_rate
+        d["group_id"] = self.group_id
+        d["rf_flow_id"] = self.rf_flow_id
+        d["enabled"] = self.enabled
+        return str(d)
+    
+    def getId(self):
+        return "frontend_tuner_status_struct"
+    
+    def isStruct(self):
+        return True
+    
+    def getMembers(self):
+        return [("tuner_type",self.tuner_type),("allocation_id_csv",self.allocation_id_csv),("center_frequency",self.center_frequency),("bandwidth",self.bandwidth),("sample_rate",self.sample_rate),("group_id",self.group_id),("rf_flow_id",self.rf_flow_id),("enabled",self.enabled)]
+    
 
 class FrontendTunerDevice(CF__POA.Device, Device):
 
@@ -657,181 +834,4 @@ class FrontendTunerDevice(CF__POA.Device, Device):
                                                )
 
 
-class FrontendTunerAllocation(object):
-    tuner_type = simple_property(id_="FRONTEND::tuner_allocation::tuner_type",
-                                 name="tuner_type",
-                                 type_="string",
-                                 )
-    allocation_id = simple_property(id_="FRONTEND::tuner_allocation::allocation_id",
-                                    name="allocation_id",
-                                    type_="string",
-                                    )
-    center_frequency = simple_property(id_="FRONTEND::tuner_allocation::center_frequency",
-                                       name="center_frequency",
-                                       type_="double",
-                                       )
-    bandwidth = simple_property(id_="FRONTEND::tuner_allocation::bandwidth",
-                                name="bandwidth",
-                                type_="double",
-                                )
-    bandwidth_tolerance = simple_property(id_="FRONTEND::tuner_allocation::bandwidth_tolerance",
-                                          name="bandwidth_tolerance",
-                                          type_="double",
-                                          defvalue=10.0,
-                                          )
-    sample_rate = simple_property(id_="FRONTEND::tuner_allocation::sample_rate",
-                                  name="sample_rate",
-                                  type_="double",
-                                  )
-    sample_rate_tolerance = simple_property(id_="FRONTEND::tuner_allocation::sample_rate_tolerance",
-                                            name="sample_rate_tolerance",
-                                            type_="double",
-                                            defvalue=10.0,
-                                            )
-    device_control = simple_property(id_="FRONTEND::tuner_allocation::device_control",
-                                     name="device_control",
-                                     type_="boolean",
-                                     defvalue=True,
-                                     )
-    group_id = simple_property(id_="FRONTEND::tuner_allocation::group_id",
-                               name="group_id",
-                               type_="string",
-                               )
-    rf_flow_id = simple_property(id_="FRONTEND::tuner_allocation::rf_flow_id",
-                                 name="rf_flow_id",
-                                 type_="string",
-                                 )
-    
-    def __init__(self, **kw):
-        """Construct an initialized instance of this struct definition"""
-        for attrname, classattr in type(self).__dict__.items():
-            if type(classattr) == simple_property:
-                classattr.initialize(self)
-        for k,v in kw.items():
-            setattr(self,k,v)
-    
-    def __str__(self):
-        """Return a string representation of this structure"""
-        d = {}
-        d["tuner_type"] = self.tuner_type
-        d["allocation_id"] = self.allocation_id
-        d["center_frequency"] = self.center_frequency
-        d["bandwidth"] = self.bandwidth
-        d["bandwidth_tolerance"] = self.bandwidth_tolerance
-        d["sample_rate"] = self.sample_rate
-        d["sample_rate_tolerance"] = self.sample_rate_tolerance
-        d["device_control"] = self.device_control
-        d["group_id"] = self.group_id
-        d["rf_flow_id"] = self.rf_flow_id
-        return str(d)
-    
-    def getId(self):
-        return "FRONTEND::tuner_allocation"
-    
-    def isStruct(self):
-        return True
-    
-    def getMembers(self):
-        return [("tuner_type",self.tuner_type),("allocation_id",self.allocation_id),("center_frequency",self.center_frequency),("bandwidth",self.bandwidth),("bandwidth_tolerance",self.bandwidth_tolerance),("sample_rate",self.sample_rate),("sample_rate_tolerance",self.sample_rate_tolerance),("device_control",self.device_control),("group_id",self.group_id),("rf_flow_id",self.rf_flow_id)]
-
-class FrontendListenerAllocation(object):
-    existing_allocation_id = simple_property(id_="FRONTEND::listener_allocation::existing_allocation_id",
-                                             name="existing_allocation_id",
-                                             type_="string",
-                                             )
-    listener_allocation_id = simple_property(id_="FRONTEND::listener_allocation::listener_allocation_id",
-                                             name="listener_allocation_id",
-                                             type_="string",
-                                             )
-    
-    def __init__(self, **kw):
-        """Construct an initialized instance of this struct definition"""
-        for attrname, classattr in type(self).__dict__.items():
-            if type(classattr) == simple_property:
-                classattr.initialize(self)
-        for k,v in kw.items():
-            setattr(self,k,v)
-    
-    def __str__(self):
-        """Return a string representation of this structure"""
-        d = {}
-        d["existing_allocation_id"] = self.existing_allocation_id
-        d["listener_allocation_id"] = self.listener_allocation_id
-        return str(d)
-    
-    def getId(self):
-        return "FRONTEND::listener_allocation"
-    
-    def isStruct(self):
-        return True
-    
-    def getMembers(self):
-        return [("existing_allocation_id",self.existing_allocation_id),("listener_allocation_id",self.listener_allocation_id)]
-
-class DefaultFrontendTunerStatusStruct(object):
-    tuner_type = simple_property(id_="FRONTEND::tuner_status::tuner_type",
-                                 name="tuner_type",
-                                 type_="string",
-                                 )
-    allocation_id_csv = simple_property(id_="FRONTEND::tuner_status::allocation_id_csv",
-                                        name="allocation_id_csv",
-                                        type_="string",
-                                        )
-    center_frequency = simple_property(id_="FRONTEND::tuner_status::center_frequency",
-                                       name="center_frequency",
-                                       type_="double",
-                                       )
-    bandwidth = simple_property(id_="FRONTEND::tuner_status::bandwidth",
-                                name="bandwidth",
-                                type_="double",
-                                )
-    sample_rate = simple_property(id_="FRONTEND::tuner_status::sample_rate",
-                                  name="sample_rate",
-                                  type_="double",
-                                  )
-    group_id = simple_property(id_="FRONTEND::tuner_status::group_id",
-                               name="group_id",
-                               type_="string",
-                               )
-    rf_flow_id = simple_property(id_="FRONTEND::tuner_status::rf_flow_id",
-                                 name="rf_flow_id",
-                                 type_="string",
-                                 )
-    enabled = simple_property(id_="FRONTEND::tuner_status::enabled",
-                              name="enabled",
-                              type_="boolean",
-                              )
-    
-    def __init__(self, tuner_type="", allocation_id_csv="", center_frequency=0.0, bandwidth=0.0, sample_rate=0.0, group_id="", rf_flow_id="", enabled=False):
-        self.tuner_type = tuner_type
-        self.allocation_id_csv = allocation_id_csv
-        self.center_frequency = center_frequency
-        self.bandwidth = bandwidth
-        self.sample_rate = sample_rate
-        self.group_id = group_id
-        self.rf_flow_id = rf_flow_id
-        self.enabled = enabled
-    
-    def __str__(self):
-        """Return a string representation of this structure"""
-        d = {}
-        d["tuner_type"] = self.tuner_type
-        d["allocation_id_csv"] = self.allocation_id_csv
-        d["center_frequency"] = self.center_frequency
-        d["bandwidth"] = self.bandwidth
-        d["sample_rate"] = self.sample_rate
-        d["group_id"] = self.group_id
-        d["rf_flow_id"] = self.rf_flow_id
-        d["enabled"] = self.enabled
-        return str(d)
-    
-    def getId(self):
-        return "frontend_tuner_status_struct"
-    
-    def isStruct(self):
-        return True
-    
-    def getMembers(self):
-        return [("tuner_type",self.tuner_type),("allocation_id_csv",self.allocation_id_csv),("center_frequency",self.center_frequency),("bandwidth",self.bandwidth),("sample_rate",self.sample_rate),("group_id",self.group_id),("rf_flow_id",self.rf_flow_id),("enabled",self.enabled)]
-    
     
