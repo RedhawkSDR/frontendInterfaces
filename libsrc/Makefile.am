@@ -17,7 +17,6 @@ libfrontend_@FRONTEND_API_VERSION@_la_LDFLAGS = -version-info $(FRONTEND_SO_VERS
 
 libfrontend_@FRONTEND_API_VERSION@_la_SOURCES = \
     cpp/fe_rfsource_port_impl.cpp \
-    cpp/fe_tuner_port_impl.cpp \
     cpp/fe_tuner_device.cpp
 
 ## Define the list of public header files and their install location.
