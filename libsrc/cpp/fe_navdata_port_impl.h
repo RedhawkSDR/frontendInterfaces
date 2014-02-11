@@ -10,7 +10,7 @@ namespace frontend {
     // ----------------------------------------------------------------------------------------
     // InNavDataPort declaration
     // ----------------------------------------------------------------------------------------
-    class InNavDataPort : public POA_FRONTEND::NavData, public Port_Provides_base_impl
+    /*class InNavDataPort : public POA_FRONTEND::NavData, public Port_Provides_base_impl
     {
         public:
             InNavDataPort(std::string port_name,
@@ -57,12 +57,47 @@ namespace frontend {
             // Callbacks
             boost::shared_ptr< NavPktFromVoid > getNavPktCB;
             boost::shared_ptr< VoidFromNavPkt > setNavPktCB;
+    };*/
+    class nav_delegation {
+        public:
+            virtual frontend::NavigationPacket get_nav_packet(std::string& port_name) = 0;
+            virtual void set_nav_packet(std::string& port_name, const frontend::NavigationPacket &nav_info) = 0;
     };
-
+    // ----------------------------------------------------------------------------------------
+    // InGPSPort declaration
+    // ----------------------------------------------------------------------------------------
+    class InNavDataPort : public POA_FRONTEND::NavData, public Port_Provides_base_impl
+    {
+        public:
+            InNavDataPort(std::string port_name, nav_delegation *_parent) : 
+            Port_Provides_base_impl(port_name)
+            {
+                parent = _parent;
+            };
+            ~InNavDataPort() {};
+            
+            FRONTEND::NavigationPacket* nav_packet() {
+                boost::mutex::scoped_lock lock(portAccess);
+                frontend::NavigationPacket retval = this->parent->get_nav_packet(this->name);
+                FRONTEND::NavigationPacket* tmpVal = frontend::returnNavigationPacket(retval);
+                return tmpVal;
+            };
+            void nav_packet(const FRONTEND::NavigationPacket &gps) {
+                boost::mutex::scoped_lock lock(portAccess);
+                frontend::NavigationPacket input = frontend::returnNavigationPacket(gps);
+                this->parent->set_nav_packet(this->name, input);
+                return;
+            };
+            
+        protected:
+            nav_delegation *parent;
+            boost::mutex portAccess;
+    };
+    
     // ----------------------------------------------------------------------------------------
     // OutNavDataPort declaration
     // ----------------------------------------------------------------------------------------
-    class OutNavDataPort : public OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>
+    /*class OutNavDataPort : public OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>
     {
         public:
             OutNavDataPort(std::string port_name);
@@ -76,8 +111,64 @@ namespace frontend {
         protected:
                 LOGGER_PTR logger;
 
+    };*/
+    template<typename PortType_var, typename PortType>
+    class OutNavDataPortT : public OutFrontendPort<PortType_var,PortType>
+    {
+        public:
+            OutNavDataPortT(std::string port_name) : OutFrontendPort<PortType_var, PortType>(port_name)
+            {};
+            OutNavDataPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendPort<PortType_var, PortType>(port_name, logger)
+            {};
+            ~OutNavDataPortT(){};
+            
+            frontend::NavigationPacket nav_packet() {
+                frontend::NavigationPacket retval;
+                std::vector < std::pair < FRONTEND::NavData_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            const FRONTEND::NavigationPacket_var tmp = ((*i).first)->nav_packet();
+                            retval = frontend::returnNavigationPacket(tmp);
+                        } catch(...) {
+                            LOG_ERROR(OutNavDataPortT,"Call to gps_info by OutNavDataPortT failed");
+                        }
+                    }
+                }
+                return retval;
+            };
+            void nav_packet(const frontend::NavigationPacket &nav) {
+                std::vector < std::pair < FRONTEND::NavData_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            const FRONTEND::NavigationPacket tmp = frontend::returnNavigationPacket(nav);
+                            ((*i).first)->nav_packet(tmp);
+                        } catch(...) {
+                            LOG_ERROR(OutNavDataPortT,"Call to gps_info by OutNavDataPortT failed");
+                        }
+                    }
+                }
+                return;
+            };
+            void setLogger(LOGGER_PTR newLogger) {
+                logger = newLogger;
+            };
+            
+        protected:
+            LOGGER_PTR logger;
+            
     };
-
+    class OutNavDataPort : public OutNavDataPortT<FRONTEND::NavData_var,FRONTEND::NavData> {
+        public:
+            OutNavDataPort(std::string port_name) : OutNavDataPortT<FRONTEND::NavData_var,FRONTEND::NavData>(port_name)
+            {};
+            OutNavDataPort(std::string port_name, LOGGER_PTR logger) : OutNavDataPortT<FRONTEND::NavData_var,FRONTEND::NavData>(port_name, logger)
+            {};
+    };
+    
 } // end of frontend namespace
 
 

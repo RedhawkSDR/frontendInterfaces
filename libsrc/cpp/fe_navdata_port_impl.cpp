@@ -7,7 +7,7 @@ namespace frontend {
     // ----------------------------------------------------------------------------------------
     // InNavDataPort definition
     // ----------------------------------------------------------------------------------------
-    InNavDataPort::InNavDataPort(std::string port_name,
+    /*InNavDataPort::InNavDataPort(std::string port_name,
         NavPktFromVoid *newNavPktGetterCB,
         VoidFromNavPkt *newNavPktSetterCB) :
     Port_Provides_base_impl(port_name),
@@ -72,11 +72,11 @@ namespace frontend {
     void   InNavDataPort::setNavPktSetterCB( VoidFromNavPktFn  newCB ){
         setNavPktCB =  boost::make_shared< StaticVoidFromNavPkt >( newCB );
     }
-
+*/
     // ----------------------------------------------------------------------------------------
     // OutNavDataPort definition
     // ----------------------------------------------------------------------------------------
-    OutNavDataPort::OutNavDataPort(std::string port_name) :
+    /*OutNavDataPort::OutNavDataPort(std::string port_name) :
             OutFrontendPort<FRONTEND::NavData_var,FRONTEND::NavData>::OutFrontendPort(port_name)
         {
         }
@@ -134,5 +134,5 @@ namespace frontend {
 
         return;
     }
-
+*/
 } // end of frontend namespace

@@ -87,6 +87,46 @@ namespace frontend {
         PositionInfo position;
         BULKIO::PrecisionUTCTime timestamp;
     };
+    struct CartesianPositionInfo {
+        bool valid;
+        std::string datum;
+        double x;
+        double y;
+        double z;
+    };
+    struct AttitudeInfo {
+        bool valid;
+        double pitch;
+        double yaw;
+        double roll;
+    };
+    struct VelocityInfo {
+        bool valid;
+        std::string datum;
+        std::string coordinate_system;
+        double x;
+        double y;
+        double z;
+    };
+    struct AccelerationInfo {
+        bool valid;
+        std::string datum;
+        std::string coordinate_system;
+        double x;
+        double y;
+        double z;
+    };
+    struct NavigationPacket {
+        std::string source_id;
+        std::string rf_flow_id;
+        PositionInfo  position;
+        CartesianPositionInfo cposition;
+        VelocityInfo  velocity;
+        AccelerationInfo  acceleration;
+        AttitudeInfo  attitude;
+        BULKIO::PrecisionUTCTime timestamp;
+        CF::Properties additional_info;
+    };
     
     struct tuning_request {
         double center_frequency;
