@@ -176,339 +176,360 @@ namespace frontend {
     
     
     template<typename PortType_var, typename PortType>
-    class OutFrontendTunerPortT : OutFrontendPort<PortType_var, PortType>
+    class OutFrontendTunerPortT : public OutFrontendPort<PortType_var, PortType>
     {
-        OutFrontendTunerPortT(std::string port_name) : OutFrontendPort<PortType_var, PortType>(port_name)
-        {};
-        OutFrontendTunerPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendPort<PortType_var, PortType>(port_name, logger)
-        {};
-        ~OutFrontendTunerPortT(){};
-
-        std::string getTunerType(std::string &id) {
-            CORBA::String_var retval;
-            std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerType(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerType by OutFrontendTunerPort failed");
+        public:
+            OutFrontendTunerPortT(std::string port_name) : OutFrontendPort<PortType_var, PortType>(port_name)
+            {};
+            OutFrontendTunerPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendPort<PortType_var, PortType>(port_name, logger)
+            {};
+            ~OutFrontendTunerPortT(){};
+            
+            std::string getTunerType(std::string &id) {
+                CORBA::String_var retval;
+                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerType(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerType by OutFrontendTunerPort failed");
+                        }
                     }
                 }
-            }
-            std::string str_retval = ossie::corba::returnString(retval);
-            return str_retval;
-        };
-        bool getTunerDeviceControl(std::string &id) {
-            CORBA::Boolean retval;
-            std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerDeviceControl(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerDeviceControl by OutFrontendTunerPort failed");
+                std::string str_retval = ossie::corba::returnString(retval);
+                return str_retval;
+            };
+            bool getTunerDeviceControl(std::string &id) {
+                CORBA::Boolean retval;
+                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerDeviceControl(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerDeviceControl by OutFrontendTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
-        std::string getTunerGroupId(std::string &id) {
-            CORBA::String_var retval;
-            std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerGroupId(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerGroupId by OutFrontendTunerPort failed");
+                return retval;
+            };
+            std::string getTunerGroupId(std::string &id) {
+                CORBA::String_var retval;
+                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerGroupId(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerGroupId by OutFrontendTunerPort failed");
+                        }
                     }
                 }
-            }
-            std::string str_retval = ossie::corba::returnString(retval);
-            return str_retval;
-        };
-        std::string getTunerRfFlowId(std::string &id) {
-            CORBA::String_var retval;
-            std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerRfFlowId(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerRfFlowId by OutFrontendTunerPort failed");
+                std::string str_retval = ossie::corba::returnString(retval);
+                return str_retval;
+            };
+            std::string getTunerRfFlowId(std::string &id) {
+                CORBA::String_var retval;
+                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerRfFlowId(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerRfFlowId by OutFrontendTunerPort failed");
+                        }
                     }
                 }
-            }
-            std::string str_retval = ossie::corba::returnString(retval);
-            return str_retval;
-        };
-        CF::Properties* getTunerStatus(std::string &id) {
-            CF::Properties* retval;
-            std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerStatus(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerStatus by OutFrontendTunerPort failed");
+                std::string str_retval = ossie::corba::returnString(retval);
+                return str_retval;
+            };
+            CF::Properties* getTunerStatus(std::string &id) {
+                CF::Properties* retval;
+                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerStatus(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerStatus by OutFrontendTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
-        void setLogger(LOGGER_PTR newLogger) {
-            logger = newLogger;
-        };
-
+                return retval;
+            };
+            void setLogger(LOGGER_PTR newLogger) {
+                logger = newLogger;
+            };
+            
         protected:
             LOGGER_PTR logger;
     };
  
     template<typename PortType_var, typename PortType>
-    class OutAnalogTunerPortT : OutFrontendTunerPortT<PortType_var, PortType>
+    class OutAnalogTunerPortT : public OutFrontendTunerPortT<PortType_var, PortType>
     {
-        OutAnalogTunerPortT(std::string port_name) : OutFrontendTunerPortT<PortType_var, PortType>(port_name)
-        {};
-        OutAnalogTunerPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendTunerPortT<PortType_var, PortType>(port_name, logger)
-        {};
-        ~OutAnalogTunerPortT(){};
-
-        void setTunerCenterFrequency(std::string &id, double freq) {
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        ((*i).first)->setTunerCenterFrequency(id.c_str(), freq);
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerCenterFrequency by OutAnalogTunerPort failed");
+        public:
+            OutAnalogTunerPortT(std::string port_name) : OutFrontendTunerPortT<PortType_var, PortType>(port_name)
+            {};
+            OutAnalogTunerPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendTunerPortT<PortType_var, PortType>(port_name, logger)
+            {};
+            ~OutAnalogTunerPortT(){};
+            
+            void setTunerCenterFrequency(std::string &id, double freq) {
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            ((*i).first)->setTunerCenterFrequency(id.c_str(), freq);
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerCenterFrequency by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return;
-        };
-        double getTunerCenterFrequency(std::string &id) {
-            CORBA::Double retval;
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerCenterFrequency(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerCenterFrequency by OutAnalogTunerPort failed");
+                return;
+            };
+            double getTunerCenterFrequency(std::string &id) {
+                CORBA::Double retval;
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerCenterFrequency(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerCenterFrequency by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
-        void setTunerBandwidth(std::string &id, double bw) {
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        ((*i).first)->setTunerBandwidth(id.c_str(), bw);
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerBandwidth by OutAnalogTunerPort failed");
+                return retval;
+            };
+            void setTunerBandwidth(std::string &id, double bw) {
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            ((*i).first)->setTunerBandwidth(id.c_str(), bw);
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerBandwidth by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return;
-        };
-        double getTunerBandwidth(std::string &id) {
-            CORBA::Double retval;
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerBandwidth(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerBandwidth by OutAnalogTunerPort failed");
+                return;
+            };
+            double getTunerBandwidth(std::string &id) {
+                CORBA::Double retval;
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerBandwidth(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerBandwidth by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
-        void setTunerAgcEnable(std::string &id, bool enable) {
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        ((*i).first)->setTunerAgcEnable(id.c_str(), enable);
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerAgcEnable by OutAnalogTunerPort failed");
+                return retval;
+            };
+            void setTunerAgcEnable(std::string &id, bool enable) {
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            ((*i).first)->setTunerAgcEnable(id.c_str(), enable);
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerAgcEnable by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return;
-        };
-        bool getTunerAgcEnable(std::string &id) {
-            CORBA::Boolean retval;
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerAgcEnable(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerAgcEnable by OutAnalogTunerPort failed");
+                return;
+            };
+            bool getTunerAgcEnable(std::string &id) {
+                CORBA::Boolean retval;
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerAgcEnable(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerAgcEnable by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
-        void setTunerGain(std::string &id, float gain) {
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        ((*i).first)->setTunerGain(id.c_str(), gain);
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerGain by OutAnalogTunerPort failed");
+                return retval;
+            };
+            void setTunerGain(std::string &id, float gain) {
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            ((*i).first)->setTunerGain(id.c_str(), gain);
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerGain by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return;
-        };
-        float getTunerGain(std::string &id) {
-            CORBA::Float retval;
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerGain(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerGain by OutAnalogTunerPort failed");
+                return;
+            };
+            float getTunerGain(std::string &id) {
+                CORBA::Float retval;
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerGain(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerGain by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
-        void setTunerReferenceSource(std::string &id, int source) {
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        ((*i).first)->setTunerReferenceSource(id.c_str(), source);
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerReferenceSource by OutAnalogTunerPort failed");
+                return retval;
+            };
+            void setTunerReferenceSource(std::string &id, int source) {
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            ((*i).first)->setTunerReferenceSource(id.c_str(), source);
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerReferenceSource by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return;
-        };
-        int getTunerReferenceSource(std::string &id) {
-            CORBA::Long retval;
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerReferenceSource(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerReferenceSource by OutAnalogTunerPort failed");
+                return;
+            };
+            int getTunerReferenceSource(std::string &id) {
+                CORBA::Long retval;
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerReferenceSource(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerReferenceSource by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
-        void setTunerEnable(std::string &id, bool enable) {
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        ((*i).first)->setTunerEnable(id.c_str(), enable);
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerEnable by OutAnalogTunerPort failed");
+                return retval;
+            };
+            void setTunerEnable(std::string &id, bool enable) {
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            ((*i).first)->setTunerEnable(id.c_str(), enable);
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerEnable by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return;
-        };
-        bool getTunerEnable(std::string &id) {
-            CORBA::Boolean retval;
-            std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerEnable(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerEnable by OutAnalogTunerPort failed");
+                return;
+            };
+            bool getTunerEnable(std::string &id) {
+                CORBA::Boolean retval;
+                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerEnable(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerEnable by OutAnalogTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
+                return retval;
+            };
     };
     
     template<typename PortType_var, typename PortType>
-    class OutDigitalTunerPortT : OutAnalogTunerPortT<PortType_var, PortType>
+    class OutDigitalTunerPortT : public OutAnalogTunerPortT<PortType_var, PortType>
     {
-        OutDigitalTunerPortT(std::string port_name) : OutAnalogTunerPortT<PortType_var, PortType>(port_name)
-        {};
-        OutDigitalTunerPortT(std::string port_name, LOGGER_PTR logger) : OutAnalogTunerPortT<PortType_var, PortType>(port_name, logger)
-        {};
-        ~OutDigitalTunerPortT(){};
-        
-        void setTunerOutputSampleRate(std::string &id, double sr) {
-            std::vector < std::pair < FRONTEND::DigitalTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        ((*i).first)->setTunerOutputSampleRate(id.c_str(), sr);
-                    } catch(...) {
-                        LOG_ERROR(OutDigitalTunerPortT,"Call to setTunerOutputSampleRate by OutDigitalTunerPort failed");
+        public:
+            OutDigitalTunerPortT(std::string port_name) : OutAnalogTunerPortT<PortType_var, PortType>(port_name)
+            {};
+            OutDigitalTunerPortT(std::string port_name, LOGGER_PTR logger) : OutAnalogTunerPortT<PortType_var, PortType>(port_name, logger)
+            {};
+            ~OutDigitalTunerPortT(){};
+            
+            void setTunerOutputSampleRate(std::string &id, double sr) {
+                std::vector < std::pair < FRONTEND::DigitalTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            ((*i).first)->setTunerOutputSampleRate(id.c_str(), sr);
+                        } catch(...) {
+                            LOG_ERROR(OutDigitalTunerPortT,"Call to setTunerOutputSampleRate by OutDigitalTunerPort failed");
+                        }
                     }
                 }
-            }
-            return;
-        };
-        double getTunerOutputSampleRate(std::string &id) {
-            CORBA::Double retval;
-            std::vector < std::pair < FRONTEND::DigitalTuner_var, std::string > >::iterator i;
-            boost::mutex::scoped_lock lock(this->updatingPortsLock);
-            if (this->active) {
-                for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                    try {
-                        retval = ((*i).first)->getTunerOutputSampleRate(id.c_str());
-                    } catch(...) {
-                        LOG_ERROR(OutDigitalTunerPortT,"Call to getTunerOutputSampleRate by OutDigitalTunerPort failed");
+                return;
+            };
+            double getTunerOutputSampleRate(std::string &id) {
+                CORBA::Double retval;
+                std::vector < std::pair < FRONTEND::DigitalTuner_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->getTunerOutputSampleRate(id.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutDigitalTunerPortT,"Call to getTunerOutputSampleRate by OutDigitalTunerPort failed");
+                        }
                     }
                 }
-            }
-            return retval;
-        };
+                return retval;
+            };
     };
     
     // ----------------------------------------------------------------------------------------
     // OutFrontendTunerPort declaration
     // ----------------------------------------------------------------------------------------
-    class OutFrontendTunerPort : public OutFrontendTunerPortT<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner> {};
+    class OutFrontendTunerPort : public OutFrontendTunerPortT<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner> {
+        public:
+            OutFrontendTunerPort(std::string port_name) : OutFrontendTunerPortT<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner>(port_name)
+            {};
+            OutFrontendTunerPort(std::string port_name, LOGGER_PTR logger) : OutFrontendTunerPortT<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner>(port_name, logger)
+            {};
+    };
 
     // ----------------------------------------------------------------------------------------
     // OutAnalogTunerPort declaration
     // ----------------------------------------------------------------------------------------
-    class OutAnalogTunerPort : public OutAnalogTunerPortT<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner> {};
+    class OutAnalogTunerPort : public OutAnalogTunerPortT<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner> {
+        public:
+            OutAnalogTunerPort(std::string port_name) : OutAnalogTunerPortT<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner>(port_name)
+            {};
+            OutAnalogTunerPort(std::string port_name, LOGGER_PTR logger) : OutAnalogTunerPortT<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner>(port_name, logger)
+            {};
+    };
 
     // ----------------------------------------------------------------------------------------
     // OutDigitalTunerPort declaration
     // ----------------------------------------------------------------------------------------
-    class OutDigitalTunerPort : public OutDigitalTunerPortT<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner> {};
+    class OutDigitalTunerPort : public OutDigitalTunerPortT<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner> {
+        public:
+            OutDigitalTunerPort(std::string port_name) : OutDigitalTunerPortT<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner>(port_name)
+            {};
+            OutDigitalTunerPort(std::string port_name, LOGGER_PTR logger) : OutDigitalTunerPortT<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner>(port_name, logger)
+            {};
+    };
 
 } // end of frontend namespace
 

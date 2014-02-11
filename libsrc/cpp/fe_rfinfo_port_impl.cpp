@@ -7,7 +7,7 @@ namespace frontend {
     // ----------------------------------------------------------------------------------------
     // OutRFInfoPort definition
     // ----------------------------------------------------------------------------------------
-    OutRFInfoPort::OutRFInfoPort(std::string port_name) :
+    /*OutRFInfoPort::OutRFInfoPort(std::string port_name) :
         OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>::OutFrontendPort(port_name){
     }
 
@@ -91,7 +91,7 @@ namespace frontend {
             }
         }
     }
-
+*/
 } // end of frontend namespace
 
 

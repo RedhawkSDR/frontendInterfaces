@@ -58,24 +58,97 @@ namespace frontend {
     // ----------------------------------------------------------------------------------------
     // OutRFInfoPort declaration
     // ----------------------------------------------------------------------------------------
-    class OutRFInfoPort : public OutFrontendPort<FRONTEND::RFInfo_var,FRONTEND::RFInfo>
+    template<typename PortType_var, typename PortType>
+    class OutRFInfoPortT : public OutFrontendPort<PortType_var,PortType>
     {
         public:
-            OutRFInfoPort(std::string port_name);
-            OutRFInfoPort(std::string port_name, LOGGER_PTR logger);
-            ~OutRFInfoPort();
-
-            char* rf_flow_id();
+            OutRFInfoPortT(std::string port_name) : OutFrontendPort<PortType_var, PortType>(port_name)
+            {};
+            OutRFInfoPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendPort<PortType_var, PortType>(port_name, logger)
+            {};
+            ~OutRFInfoPortT(){};
+            
+            std::string rf_flow_id() {
+                CORBA::String_var retval;
+                std::vector < std::pair < FRONTEND::RFInfo_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            retval = ((*i).first)->rf_flow_id();
+                        } catch(...) {
+                            LOG_ERROR(OutRFInfoPortT,"Call to rf_flow_id by OutRFInfoPortT failed");
+                        }
+                    }
+                }
+                std::string str_retval = ossie::corba::returnString(retval);
+                return str_retval;
+            };
+            void rf_flow_id(std::string &data) {
+                std::vector < std::pair < FRONTEND::RFInfo_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            ((*i).first)->rf_flow_id(data.c_str());
+                        } catch(...) {
+                            LOG_ERROR(OutRFInfoPortT,"Call to rf_flow_id by OutRFInfoPortT failed");
+                        }
+                    }
+                }
+                return;
+            };
+            frontend::RFInfoPkt rfinfo_pkt() {
+                frontend::RFInfoPkt retval;
+                std::vector < std::pair < FRONTEND::RFInfo_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            const FRONTEND::RFInfoPkt_var tmp = ((*i).first)->rfinfo_pkt();
+                            retval = frontend::returnRFInfoPkt(tmp);
+                        } catch(...) {
+                            LOG_ERROR(OutRFInfoPortT,"Call to rfinfo_pkt by OutRFInfoPortT failed");
+                        }
+                    }
+                }
+                return retval;
+            };
+            void rfinfo_pkt(frontend::RFInfoPkt data) {
+                std::vector < std::pair < FRONTEND::RFInfo_var, std::string > >::iterator i;
+                boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
+                if (this->active) {
+                    for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
+                        try {
+                            const FRONTEND::RFInfoPkt_var tmp = frontend::returnRFInfoPkt(data);
+                            ((*i).first)->rfinfo_pkt(tmp);
+                        } catch(...) {
+                            LOG_ERROR(OutRFInfoPortT,"Call to rfinfo_pkt by OutRFInfoPortT failed");
+                        }
+                    }
+                }
+                return;
+            };
+            /*char* rf_flow_id();
             void rf_flow_id(char* data);
             FRONTEND::RFInfoPkt* rfinfo_pkt();
-            void rfinfo_pkt(FRONTEND::RFInfoPkt data);
-            void setLogger(LOGGER_PTR newLogger);
-
+            void rfinfo_pkt(FRONTEND::RFInfoPkt data);*/
+            void setLogger(LOGGER_PTR newLogger) {
+                logger = newLogger;
+            };
+            
         protected:
                 LOGGER_PTR logger;
 
     };
-
+    class OutRFInfoPort : public OutRFInfoPortT<FRONTEND::RFInfo_var,FRONTEND::RFInfo> {
+        public:
+            OutRFInfoPort(std::string port_name) : OutRFInfoPortT<FRONTEND::RFInfo_var,FRONTEND::RFInfo>(port_name)
+            {};
+            OutRFInfoPort(std::string port_name, LOGGER_PTR logger) : OutRFInfoPortT<FRONTEND::RFInfo_var,FRONTEND::RFInfo>(port_name, logger)
+            {};
+    };
+    
 } // end of frontend namespace
 
 
