@@ -7,7 +7,7 @@ namespace frontend {
     // ----------------------------------------------------------------------------------------
     // InGPSPort definition
     // ----------------------------------------------------------------------------------------
-    InGPSPort::InGPSPort(std::string port_name,
+    /*InGPSPort::InGPSPort(std::string port_name,
                              GPSInfoFromVoid *newGPSInfoGetterCB,
                              GpsTimePosFromVoid *newGpsTimePosGetterCB,
                              VoidFromGPSInfo *newGPSInfoSetterCB,
@@ -118,13 +118,13 @@ namespace frontend {
     }
     void   InGPSPort::setGpsTimePosSetterCB( VoidFromGpsTimePosFn  newCB ){
         setGpsTimePosCB =  boost::make_shared< StaticVoidFromGpsTimePos >( newCB );
-    }
+    }*/
 
 
     // ----------------------------------------------------------------------------------------
     // OutGPSPort definition
     // ----------------------------------------------------------------------------------------
-    OutGPSPort::OutGPSPort(std::string port_name) :
+    /*OutGPSPort::OutGPSPort(std::string port_name) :
         OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>::OutFrontendPort(port_name)
     {
     }
@@ -221,5 +221,5 @@ namespace frontend {
 
         return;
     }
-
+*/
 } // end of frontend namespace

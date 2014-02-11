@@ -85,7 +85,67 @@ namespace frontend {
         }
         return val;
     };
-
+    
+    inline FRONTEND::GPSInfo* returnGPSInfo(const frontend::GPSInfo &val) {
+        FRONTEND::GPSInfo* tmpVal = new FRONTEND::GPSInfo();
+        tmpVal->source_id = CORBA::string_dup(val.source_id.c_str());
+        tmpVal->rf_flow_id = CORBA::string_dup(val.rf_flow_id.c_str());
+        tmpVal->mode = CORBA::string_dup(val.mode.c_str());
+        tmpVal->fom = val.fom;
+        tmpVal->tfom = val.tfom;
+        tmpVal->datumID = val.datumID;
+        tmpVal->time_offset = val.time_offset;
+        tmpVal->freq_offset = val.freq_offset;
+        tmpVal->time_variance = val.time_variance;
+        tmpVal->freq_variance = val.freq_variance;
+        tmpVal->satellite_count = val.satellite_count;
+        tmpVal->snr = val.snr;
+        tmpVal->status_message = CORBA::string_dup(val.status_message.c_str());
+        tmpVal->timestamp = val.timestamp;
+        tmpVal->additional_info = val.additional_info;
+        return tmpVal;
+    };
+    inline frontend::GPSInfo returnGPSInfo(const FRONTEND::GPSInfo &tmpVal) {
+        frontend::GPSInfo val;
+        val.source_id = ossie::corba::returnString(tmpVal.source_id);
+        val.rf_flow_id = ossie::corba::returnString(tmpVal.rf_flow_id);
+        val.mode = ossie::corba::returnString(tmpVal.mode);
+        val.fom = tmpVal.fom;
+        val.tfom = tmpVal.tfom;
+        val.datumID = tmpVal.datumID;
+        val.time_offset = tmpVal.time_offset;
+        val.freq_offset = tmpVal.freq_offset;
+        val.time_variance = tmpVal.time_variance;
+        val.freq_variance = tmpVal.freq_variance;
+        val.satellite_count = tmpVal.satellite_count;
+        val.snr = tmpVal.snr;
+        val.status_message = ossie::corba::returnString(tmpVal.status_message);
+        val.timestamp = tmpVal.timestamp;
+        val.additional_info = tmpVal.additional_info;
+        return val;
+    };
+    
+    inline FRONTEND::GpsTimePos* returnGpsTimePos(const frontend::GpsTimePos &val) {
+        FRONTEND::GpsTimePos* tmpVal = new FRONTEND::GpsTimePos();
+        tmpVal->position.valid = val.position.valid;
+        tmpVal->position.datum = CORBA::string_dup(val.position.datum.c_str());
+        tmpVal->position.lat = val.position.lat;
+        tmpVal->position.lon = val.position.lon;
+        tmpVal->position.alt = val.position.alt;
+        tmpVal->timestamp = val.timestamp;
+        return tmpVal;
+    };
+    inline frontend::GpsTimePos returnGpsTimePos(const FRONTEND::GpsTimePos &tmpVal) {
+        frontend::GpsTimePos val;
+        val.position.valid = tmpVal.position.valid;
+        val.position.datum = ossie::corba::returnString(tmpVal.position.datum);
+        val.position.lat = tmpVal.position.lat;
+        val.position.lon = tmpVal.position.lon;
+        val.position.alt = tmpVal.position.alt;
+        val.timestamp = tmpVal.timestamp;
+        return val;
+    };
+    
     //
     // Callback signatures to register when functions are called (provides ports only)
     //

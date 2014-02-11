@@ -4,6 +4,7 @@
 #include <ossie/CF/cf.h>
 #include <vector>
 #include <string>
+#include <ossie/BULKIO/bulkioDataTypes.h>
 
 namespace frontend {
     
@@ -57,7 +58,36 @@ namespace frontend {
         CF::Properties additional_info;
     };
     typedef std::vector<RFInfoPkt> RFInfoPktSequence;
-
+    
+    struct PositionInfo {
+        bool valid;
+        std::string datum;
+        double lat;
+        double lon;
+        double alt;
+    };
+    struct GPSInfo {
+        std::string source_id;
+        std::string rf_flow_id;
+        std::string mode;
+        long fom;
+        long tfom;
+        long datumID;
+        double time_offset;
+        double freq_offset;
+        double time_variance;
+        double freq_variance;
+        short satellite_count;
+        float snr;
+        std::string status_message;
+        BULKIO::PrecisionUTCTime timestamp;
+        CF::Properties additional_info;
+    };
+    struct GpsTimePos {
+        PositionInfo position;
+        BULKIO::PrecisionUTCTime timestamp;
+    };
+    
     struct tuning_request {
         double center_frequency;
         double bandwidth;
