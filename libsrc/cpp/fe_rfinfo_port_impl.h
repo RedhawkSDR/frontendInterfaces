@@ -129,10 +129,6 @@ namespace frontend {
                 }
                 return;
             };
-            /*char* rf_flow_id();
-            void rf_flow_id(char* data);
-            FRONTEND::RFInfoPkt* rfinfo_pkt();
-            void rfinfo_pkt(FRONTEND::RFInfoPkt data);*/
             void setLogger(LOGGER_PTR newLogger) {
                 logger = newLogger;
             };

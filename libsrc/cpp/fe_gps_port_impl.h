@@ -60,25 +60,6 @@ namespace frontend {
     // ----------------------------------------------------------------------------------------
     // OutGPSPort declaration
     // ----------------------------------------------------------------------------------------
-    /*class OutGPSPort : public OutFrontendPort<FRONTEND::GPS_var,FRONTEND::GPS>
-    {
-        public:
-            OutGPSPort(std::string port_name);
-            OutGPSPort(std::string port_name, LOGGER_PTR logger);
-            ~OutGPSPort();
-
-            FRONTEND::GPSInfo* gps_info();
-            void gps_info(const FRONTEND::GPSInfo& data);
-            FRONTEND::GpsTimePos* gps_time_pos();
-            void gps_time_pos(const FRONTEND::GpsTimePos& data);
-            void setLogger(LOGGER_PTR newLogger);
-
-        protected:
-                LOGGER_PTR logger;
-    };*/
-    // ----------------------------------------------------------------------------------------
-    // OutRFInfoPort declaration
-    // ----------------------------------------------------------------------------------------
     template<typename PortType_var, typename PortType>
     class OutGPSPortT : public OutFrontendPort<PortType_var,PortType>
     {
@@ -151,10 +132,6 @@ namespace frontend {
                 }
                 return;
             };
-            /*char* rf_flow_id();
-            void rf_flow_id(char* data);
-            FRONTEND::RFInfoPkt* rfinfo_pkt();
-            void rfinfo_pkt(FRONTEND::RFInfoPkt data);*/
             void setLogger(LOGGER_PTR newLogger) {
                 logger = newLogger;
             };
