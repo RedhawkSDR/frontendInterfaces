@@ -18,7 +18,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 
-AC_INIT(frontendInterfaces, 2.1.1)
+AC_INIT(frontendInterfaces, 2.2.0)
 
 AM_INIT_AUTOMAKE(nostdinc)
 AC_PROG_CC
@@ -39,14 +39,14 @@ if test "$IDL" = no; then
 fi
 AC_LANG_PUSH([C++])
 PKG_CHECK_MODULES([OMNIORB], [omniORB4 >= 4.1.0])
-PKG_CHECK_MODULES([OSSIE], [ossie >= 1.7.0])
+PKG_CHECK_MODULES([OSSIE], [ossie >= 1.10.0])
 
 # If you depend on other IDL modules, such as CF or BULKIO add them here
-PKG_CHECK_MODULES([BULKIO], [bulkioInterfaces >= 1.7])
+PKG_CHECK_MODULES([BULKIO], [bulkioInterfaces >= 1.10])
 AC_CHECK_PYMODULE(bulkio.bulkioInterfaces, [], [AC_MSG_ERROR([the python bulkio.bulkioInterfaces module is required])])
 
 AC_SUBST([FRONTEND_SO_VERSION],[0:0:0])
-AC_SUBST([FRONTEND_API_VERSION],[2.1.0])
+AC_SUBST([FRONTEND_API_VERSION],[2.2.0])
 
 AX_BOOST_BASE([1.41])
 AX_BOOST_THREAD

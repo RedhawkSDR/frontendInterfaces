@@ -34,8 +34,8 @@ Prefix: %{_prefix}
 
 Summary: The frontend library for REDHAWK
 Name: frontendInterfaces
-Version: 2.1.1
-Release: 0.1%{?dist}
+Version: 2.2.0
+Release: 1%{?dist}
 License: None
 Group: REDHAWK/Interfaces
 Source: %{name}-%{version}.tar.gz 
@@ -43,10 +43,10 @@ Vendor: REDHAWK
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
-Requires: redhawk >= 1.8
-Requires: bulkioInterfaces >= 1.8
-BuildRequires: redhawk-devel >= 1.8
-BuildRequires: bulkioInterfaces >= 1.8
+Requires: redhawk >= 1.10.0
+Requires: bulkioInterfaces >= 1.10.0
+BuildRequires: redhawk-devel >= 1.10.0
+BuildRequires: bulkioInterfaces >= 1.10.0
 
 %description
 Libraries and interface definitions for frontend.
@@ -66,6 +66,18 @@ make
 rm -rf --preserve-root $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
+# The Java and Python base class libraries are not yet implemented;
+# they're just shells
+rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/python/frontend
+%if 0%{?rhel} >= 6
+rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/python/frontend-%{version}-py%{python_version}.egg-info
+%endif
+%if %{with java}
+rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/frontend.jar
+rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/frontend.src.jar
+%endif
+
+
 %clean
 rm -rf --preserve-root $RPM_BUILD_ROOT
 
@@ -73,11 +85,14 @@ rm -rf --preserve-root $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_datadir}/idl/redhawk/FRONTEND
 %{_includedir}/redhawk/FRONTEND
+%{_prefix}/lib/python/redhawk/frontendInterfaces
 %{_libdir}/libfrontendInterfaces.*
 %{_libdir}/pkgconfig/frontendInterfaces.pc
-%{_prefix}/lib/python/redhawk/frontendInterfaces
+%{_includedir}/frontend
+%{_libdir}/libfrontend-*
+%{_libdir}/pkgconfig/frontend.pc
 %if 0%{?rhel} >= 6
-%{_prefix}/lib/python/frontendInterfaces-%{version}-py%{python_version}.egg-info	
+%{_prefix}/lib/python/frontendInterfaces-%{version}-py%{python_version}.egg-info
 %endif
 %if %{with java}
 %{_prefix}/lib/FRONTENDInterfaces.jar
