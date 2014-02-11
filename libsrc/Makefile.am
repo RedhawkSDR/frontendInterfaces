@@ -16,9 +16,6 @@ lib_LTLIBRARIES = libfrontend-@FRONTEND_API_VERSION@.la
 libfrontend_@FRONTEND_API_VERSION@_la_LDFLAGS = -version-info $(FRONTEND_SO_VERSION)
 
 libfrontend_@FRONTEND_API_VERSION@_la_SOURCES = \
-    cpp/fe_gps_port_impl.cpp \
-    cpp/fe_navdata_port_impl.cpp \
-    cpp/fe_rfinfo_port_impl.cpp \
     cpp/fe_rfsource_port_impl.cpp \
     cpp/fe_tuner_port_impl.cpp \
     cpp/fe_tuner_device.cpp
