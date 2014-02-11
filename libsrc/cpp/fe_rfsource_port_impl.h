@@ -10,10 +10,10 @@ namespace frontend {
     
     class rfsource_delegation {
         public:
-            virtual std::vector<RFInfoPkt> get_available_rf_inputs() = 0;
-            virtual void set_available_rf_inputs(std::vector<RFInfoPkt> &inputs) = 0;
-            virtual RFInfoPkt get_current_rf_input() = 0;
-            virtual void set_current_rf_input(RFInfoPkt &input) = 0;
+            virtual std::vector<RFInfoPkt> get_available_rf_inputs(std::string& port_name) = 0;
+            virtual void set_available_rf_inputs(std::string& port_name, std::vector<RFInfoPkt> &inputs) = 0;
+            virtual RFInfoPkt get_current_rf_input(std::string& port_name) = 0;
+            virtual void set_current_rf_input(std::string& port_name, const RFInfoPkt &input) = 0;
     };
     
     class InRFSourcePort : public POA_FRONTEND::RFSource, public Port_Provides_base_impl
@@ -28,7 +28,7 @@ namespace frontend {
             
             FRONTEND::RFInfoPktSequence* available_rf_inputs() {
                 boost::mutex::scoped_lock lock(this->portAccess);
-                std::vector<frontend::RFInfoPkt> retval = this->parent->get_available_rf_inputs();
+                std::vector<frontend::RFInfoPkt> retval = this->parent->get_available_rf_inputs(this->name);
                 FRONTEND::RFInfoPktSequence* tmpVal = new FRONTEND::RFInfoPktSequence();
                 std::vector<frontend::RFInfoPkt>::iterator itr = retval.begin();
                 while (itr != retval.end()) {
@@ -46,18 +46,18 @@ namespace frontend {
                 for (unsigned int i=0; i<inputs.size(); i++) {
                     inputs[i] = frontend::returnRFInfoPkt(data[i]);
                 }
-                this->parent->set_available_rf_inputs(inputs);
+                this->parent->set_available_rf_inputs(this->name, inputs);
             };
             FRONTEND::RFInfoPkt* current_rf_input() {
                 boost::mutex::scoped_lock lock(this->portAccess);
-                frontend::RFInfoPkt retval = this->parent->get_current_rf_input();
+                frontend::RFInfoPkt retval = this->parent->get_current_rf_input(this->name);
                 FRONTEND::RFInfoPkt* tmpVal = frontend::returnRFInfoPkt(retval);
                 return tmpVal;
             };
             void current_rf_input( const FRONTEND::RFInfoPkt& data) {
                 boost::mutex::scoped_lock lock(this->portAccess);
                 frontend::RFInfoPkt input = frontend::returnRFInfoPkt(data);
-                this->parent->set_current_rf_input(input);
+                this->parent->set_current_rf_input(this->name, input);
             };
             
         protected:
