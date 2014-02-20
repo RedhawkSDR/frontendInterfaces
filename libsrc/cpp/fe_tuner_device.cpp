@@ -345,7 +345,6 @@ namespace frontend {
                     }
                     else {
                         // send EOS to listener connection only
-                        push_EOS_on_listener(frontend_tuner_allocation.allocation_id);
                         removeTunerMapping(frontend_tuner_allocation.allocation_id);
                     }
                     tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
@@ -355,7 +354,6 @@ namespace frontend {
                     if (tuner_id < 0)
                         throw CF::Device::InvalidState();
                     // send EOS to listener connection only
-                    push_EOS_on_listener(frontend_listener_allocation.listener_allocation_id);
                     removeTunerMapping(frontend_listener_allocation.listener_allocation_id);
                     tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
                 }

@@ -120,8 +120,6 @@ namespace frontend {
             ///////////////////////////////
             // Device specific functions // -- virtual - to be implemented by device developer
             ///////////////////////////////
-            virtual bool push_EOS_on_listener(std::string listener_allocation_id) = 0;
-
             virtual bool _dev_enable(size_t tuner_id) = 0;
             virtual bool _dev_disable(size_t tuner_id) = 0;
 
