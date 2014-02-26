@@ -3,7 +3,7 @@
 
 #include <ossie/Device_impl.h>
 #include <uuid/uuid.h>
-#include <FRONTEND/Frontend.h>
+#include <redhawk/FRONTEND/Frontend.h>
 
 #include "ossie/prop_helpers.h"
 #include "bulkio/bulkio.h"
