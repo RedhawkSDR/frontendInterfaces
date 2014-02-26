@@ -209,6 +209,7 @@ namespace frontend {
                                 request.center_frequency = frontend_tuner_allocation.center_frequency;
                                 request.bandwidth = frontend_tuner_allocation.bandwidth;
                                 request.sample_rate = frontend_tuner_allocation.sample_rate;
+                                request.allocation_id = frontend_tuner_allocation.allocation_id;
                                 if (!_dev_set_tuning(frontend_tuner_allocation.tuner_type, request, tuner_id)) {
                                     throw std::exception();
                                 }
@@ -286,6 +287,7 @@ namespace frontend {
                         std::cout<<"allocateCapacity: UNKNOWN CONTROL ALLOCATION ID"<<std::endl;
                         throw FRONTEND::BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
                     }
+                    this->assignListener(frontend_listener_allocation.listener_allocation_id,frontend_listener_allocation.existing_allocation_id);
                 }
                 else {
                     //TODO: add back log messages
@@ -354,6 +356,7 @@ namespace frontend {
                     if (tuner_id < 0)
                         throw CF::Device::InvalidState();
                     // send EOS to listener connection only
+                    this->removeListener(frontend_listener_allocation.listener_allocation_id);
                     removeTunerMapping(frontend_listener_allocation.listener_allocation_id);
                     tunerChannels[tuner_id].frontend_status->allocation_id_csv = create_allocation_id_csv(tuner_id);
                 }
@@ -499,6 +502,7 @@ namespace frontend {
     bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(std::string allocation_id) {
         //LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         exclusive_lock lock(allocationID_MappingLock);
+        this->removeListener(allocation_id);
         if(allocationID_to_tunerID.erase(allocation_id) > 0)
             return true;
         return false;
@@ -512,6 +516,8 @@ namespace frontend {
         exclusive_lock lock(allocationID_MappingLock);
         for(string_number_mapping::iterator it = allocationID_to_tunerID.begin(); it != allocationID_to_tunerID.end(); it++){
             if(it->second == tuner_id){
+                std::string allocation_id = it->first;
+                this->removeListener(allocation_id);
                 allocationID_to_tunerID.erase(it);
                 cnt++;
             }
@@ -574,6 +580,14 @@ namespace frontend {
         if( (req_cf + req_min_bw_sr/2 <= cf + min_bw_sr/2) && (req_cf - req_min_bw_sr/2 >= cf - min_bw_sr/2) )
             return true;
         return false;
+    };
+
+    template < typename TunerStatusStructType >
+    void FrontendTunerDevice<TunerStatusStructType>::assignListener(std::string& listen_alloc_id, std::string& alloc_id) {
+    };
+
+    template < typename TunerStatusStructType >
+    void FrontendTunerDevice<TunerStatusStructType>::removeListener(std::string& listen_alloc_id) {
     };
 
 }; // end frontend namespace

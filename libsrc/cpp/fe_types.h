@@ -132,6 +132,7 @@ namespace frontend {
         double center_frequency;
         double bandwidth;
         double sample_rate;
+        std::string allocation_id;
     };
     struct frontend_tuner_allocation_struct {
         frontend_tuner_allocation_struct ()

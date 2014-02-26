@@ -90,6 +90,8 @@ namespace frontend {
             virtual bool is_connectionID_controller_for_streamID(const std::string & streamID, const std::string & connectionID);
             virtual bool is_connectionID_listener_for_streamID(const std::string & streamID, const std::string & connectionID);
             virtual bool is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr);
+            virtual void assignListener(std::string& listen_alloc_id, std::string& alloc_id);
+            virtual void removeListener(std::string& listen_alloc_id);
 
             // Configure tuner - gets called during allocation
             virtual bool enableTuner(size_t tuner_id, bool enable); /* assumes collector RF and channel RF are the same. If not true, override function */
