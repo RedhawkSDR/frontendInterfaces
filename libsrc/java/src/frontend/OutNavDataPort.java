@@ -55,7 +55,7 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
 
     }
 
-    public void disconnectPort(final String connectionId) {
+    public void disconnectPort(final String connectionId) throws CF.PortPackage.InvalidPort {
         synchronized (this.updatingPortsLock) {
             super.disconnectPort(connectionId);
             this.outConnections.remove(connectionId);

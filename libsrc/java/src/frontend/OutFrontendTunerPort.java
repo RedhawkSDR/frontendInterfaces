@@ -54,7 +54,7 @@ public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperati
 
     }
 
-    public void disconnectPort(final String connectionId) {
+    public void disconnectPort(final String connectionId) throws CF.PortPackage.InvalidPort {
         synchronized (this.updatingPortsLock) {
             super.disconnectPort(connectionId);
             this.outConnections.remove(connectionId);

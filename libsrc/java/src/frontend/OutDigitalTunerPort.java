@@ -43,7 +43,7 @@ public class OutDigitalTunerPort extends QueryableUsesPort<DigitalTunerOperation
 
     }
 
-    public void disconnectPort(final String connectionId) {
+    public void disconnectPort(final String connectionId) throws CF.PortPackage.InvalidPort {
         synchronized (this.updatingPortsLock) {
             super.disconnectPort(connectionId);
             this.outConnections.remove(connectionId);
