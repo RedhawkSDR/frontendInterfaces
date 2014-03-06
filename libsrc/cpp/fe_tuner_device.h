@@ -34,18 +34,14 @@ namespace frontend {
     template < typename TunerStatusStructType >
     struct indivTuner {
         indivTuner(){
-            complex = true;
             frontend_status = NULL;
             lock = NULL;
         }
-        BULKIO::StreamSRI sri;
-        bool complex; // needed for configuring SRI
         boost::mutex *lock;
         std::string control_allocation_id;
         TunerStatusStructType* frontend_status;
 
         void reset(){
-            bulkio::sri::zeroSRI(sri);
             control_allocation_id.clear();
             if(frontend_status != NULL){
                 frontend_status->allocation_id_csv.clear();
@@ -96,7 +92,36 @@ namespace frontend {
             // Configure tuner - gets called during allocation
             virtual bool enableTuner(size_t tuner_id, bool enable); /* assumes collector RF and channel RF are the same. If not true, override function */
             virtual bool removeTuner(size_t tuner_id);
-
+            
+            BULKIO::StreamSRI create(std::string &stream_id, TunerStatusStructType &frontend_status, double collector_frequency = -1.0) {
+                BULKIO::StreamSRI sri;
+                sri.hversion = 1;
+                sri.xstart = 0.0;
+                if ( frontend_status.sample_rate <= 0.0 )
+                    sri.xdelta =  1.0;
+                else
+                    sri.xdelta = 1/frontend_status.sample_rate;
+                sri.xunits = BULKIO::UNITS_TIME;
+                sri.subsize = 0;
+                sri.ystart = 0.0;
+                sri.ydelta = 0.0;
+                sri.yunits = BULKIO::UNITS_NONE;
+                sri.mode = 0;
+                sri.blocking=false;
+                sri.streamID = stream_id.c_str();
+                long colFreq;
+                if (collector_frequency < 0)
+                    colFreq = frontend_status.center_frequency;
+                else
+                    colFreq = long(collector_frequency);
+                this->addModifyKeyword<CORBA::Double > (&sri, "COL_RF", CORBA::Double(colFreq));
+                this->addModifyKeyword<CORBA::Double > (&sri, "CHAN_RF", CORBA::Double(frontend_status.center_frequency));
+                this->addModifyKeyword<std::string> (&sri,"FRONTEND::RF_FLOW_ID",frontend_status.rf_flow_id);
+                this->addModifyKeyword<CORBA::Double> (&sri,"FRONTEND::BANDWIDTH", CORBA::Double(frontend_status.bandwidth));
+                this->addModifyKeyword<std::string> (&sri,"FRONTEND::DEVICE_ID",std::string(identifier()));
+                return sri;
+            }
+            
         protected:
             typedef std::map<std::string, size_t> string_number_mapping;
             typedef boost::mutex::scoped_lock exclusive_lock;
@@ -126,7 +151,6 @@ namespace frontend {
             virtual bool _dev_disable(size_t tuner_id) = 0;
 
             virtual bool _dev_set_tuning(std::string &tuner_type, tuning_request &request, size_t tuner_id) = 0;
-            virtual bool _dev_get_tuning(tuning_request &response, size_t tuner_id) = 0;
             virtual bool _dev_del_tuning(size_t tuner_id) = 0;
             virtual void removeAllocationIdRouting(const std::string allocation_id) = 0;
 
@@ -162,44 +186,6 @@ namespace frontend {
                 sri->keywords[keySize].id = CORBA::string_dup(id);
                 sri->keywords[keySize].value = value;
                 return true;
-            }
-
-            virtual void configureTunerSRI(BULKIO::StreamSRI *sri, double channel_frequency, double bandwidth, double sample_rate, short mode, std::string rf_flow_id, double collector_frequency = -1.0) {
-                if (sri == NULL)
-                    return;
-
-                //Convert CenterFreq into string
-                long chanFreq = long(channel_frequency);
-                char chanFreq_str[16];
-                sprintf(chanFreq_str, "%ld", chanFreq);
-
-                //Create new streamID
-                std::string streamID = "tuner_freq_" + std::string(chanFreq_str) + "_Hz_" + new_uuid();
-
-                sri->mode = mode;
-                sri->hversion = 0;
-                sri->xstart = 0;
-                sri->xdelta = (1.0 / (sample_rate));
-                sri->subsize = 0;// 1-dimensional data
-                sri->xunits = 1;
-                sri->ystart = 0;
-                sri->ydelta = 0.001;
-                sri->yunits = 1;
-                sri->streamID = CORBA::string_dup(streamID.c_str());
-                sri->blocking = false;
-
-                // for some devices, colFreq is the same as chanFreq
-                long colFreq;
-                if (collector_frequency < 0)
-                    colFreq = chanFreq;
-                else
-                    colFreq = long(collector_frequency);
-
-                addModifyKeyword<CORBA::Double > (sri, "COL_RF", CORBA::Double(colFreq));
-                addModifyKeyword<CORBA::Double > (sri, "CHAN_RF", CORBA::Double(chanFreq));
-                addModifyKeyword<std::string> (sri,"FRONTEND::RF_FLOW_ID",rf_flow_id);
-                addModifyKeyword<CORBA::Double> (sri,"FRONTEND::BANDWIDTH", CORBA::Double(bandwidth));
-                addModifyKeyword<std::string> (sri,"FRONTEND::DEVICE_ID",std::string(identifier()));
             }
 
             // This is not currently used but is available as a debugging tool

@@ -219,21 +219,6 @@ namespace frontend {
                                 eout<<"allocateCapacity("<<int(tuner_id)<<"): failed when configuring device hardware";
                                 throw std::logic_error(eout.str());
                             };
-                            
-                            try {
-                                frontend::tuning_request setting;
-                                if (!_dev_get_tuning(setting, tuner_id)) {
-                                    throw std::exception();
-                                }
-                                tunerChannels[tuner_id].frontend_status->center_frequency = setting.center_frequency;
-                                tunerChannels[tuner_id].frontend_status->bandwidth = setting.bandwidth;
-                                tunerChannels[tuner_id].frontend_status->sample_rate = setting.sample_rate;
-                            }
-                            catch(...){
-                                std::ostringstream eout;
-                                eout<<"allocateCapacity("<<int(tuner_id)<<"): failed when querying device hardware";
-                                throw std::logic_error(eout.str());
-                            };
 
                             // Only check non-TX when bandwidth was not set to don't care
                             if( (tunerChannels[tuner_id].frontend_status->tuner_type != "TX" && frontend_tuner_allocation.bandwidth != 0.0) &&
@@ -391,29 +376,18 @@ namespace frontend {
         //exclusive_lock lock(*(tunerChannels[tuner_id].lock));
         
         bool prev_enabled = tunerChannels[tuner_id].frontend_status->enabled;
-        tunerChannels[tuner_id].frontend_status->enabled = enable;
         
         // If going from disabled to enabled
         if (!prev_enabled && enable) {
-            configureTunerSRI(& tunerChannels[tuner_id].sri,
-                    tunerChannels[tuner_id].frontend_status->center_frequency,
-                    tunerChannels[tuner_id].frontend_status->bandwidth,
-                    tunerChannels[tuner_id].frontend_status->sample_rate,
-                    tunerChannels[tuner_id].complex,
-                    tunerChannels[tuner_id].frontend_status->rf_flow_id);
-            streamID_to_tunerID.insert(std::make_pair(std::string(tunerChannels[tuner_id].sri.streamID), tuner_id));
             _dev_enable(tuner_id);
         }
         
         // If going from enabled to disabled
-        if (prev_enabled && !enable && !std::string(tunerChannels[tuner_id].sri.streamID).empty()) {
+        if (prev_enabled && !enable) {
 
             _dev_disable(tuner_id);
             _dev_del_tuning(tuner_id);
             removeAllocationIdRouting(tunerChannels[tuner_id].frontend_status->allocation_id_csv);
-            std::string streamID = std::string(tunerChannels[tuner_id].sri.streamID);
-            streamID_to_tunerID.erase(streamID);
-            bulkio::sri::zeroSRI(tunerChannels[tuner_id].sri);
         }
 
         return true;
