@@ -5,13 +5,13 @@
 # Source: testPythonFeDevice.spd.xml
 from ossie.cf import CF, CF__POA
 from ossie.utils import uuid
-#from omniORB import CORBA
-from omniORB import any
+from omniORB import any, CORBA
 
 from ossie.device import Device
 from ossie.properties import simple_property
 from ossie.properties import struct_property
 from ossie.properties import structseq_property
+from ossie.utils import model
 
 #import Queue, copy, time
 import threading
@@ -70,6 +70,88 @@ class indivTuner:
             frontend_status.sample_rate = 0.0
             frontend_status.enabled = False
             
+
+def createTunerAllocation(tuner_type='DDC',allocation_id=None,center_frequency=0.0,bandwidth=0.0,sample_rate=1.0,
+                 device_control=True,group_id='',rf_flow_id='',bandwidth_tolerance=0.0,sample_rate_tolerance=0.0,returnDict=True):
+    if returnDict:
+        retval = {'FRONTEND::tuner_allocation':{'FRONTEND::tuner_allocation::tuner_type':tuner_type,'FRONTEND::tuner_allocation::allocation_id':allocation_id,
+        'FRONTEND::tuner_allocation::center_frequency':center_frequency,'FRONTEND::tuner_allocation::bandwidth':bandwidth,
+        'FRONTEND::tuner_allocation::sample_rate':sample_rate,'FRONTEND::tuner_allocation::device_control':device_control,
+        'FRONTEND::tuner_allocation::group_id':group_id,'FRONTEND::tuner_allocation::rf_flow_id':rf_flow_id,
+        'FRONTEND::tuner_allocation::bandwidth_tolerance':bandwidth_tolerance,'FRONTEND::tuner_allocation::sample_rate_tolerance':sample_rate_tolerance}}
+        if allocation_id == None:
+            retval['FRONTEND::tuner_allocation']['FRONTEND::tuner_allocation::allocation_id']=model._uuidgen()
+    else:
+        alloc=[]
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::tuner_type',value=any.to_any(tuner_type)))
+        if allocation_id == None:
+            alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::allocation_id',value=any.to_any(model._uuidgen())))
+        else:
+            alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::allocation_id',value=any.to_any(allocation_id)))
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::center_frequency',value=any.to_any(center_frequency)))
+        alloc[-1].value._t = CORBA.TC_double
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::bandwidth',value=any.to_any(bandwidth)))
+        alloc[-1].value._t = CORBA.TC_double
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::sample_rate',value=any.to_any(sample_rate)))
+        alloc[-1].value._t = CORBA.TC_double
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::device_control',value=any.to_any(device_control)))
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::group_id',value=any.to_any(group_id)))
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::rf_flow_id',value=any.to_any(rf_flow_id)))
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::bandwidth_tolerance',value=any.to_any(bandwidth_tolerance)))
+        alloc[-1].value._t = CORBA.TC_double
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::sample_rate_tolerance',value=any.to_any(sample_rate_tolerance)))
+        alloc[-1].value._t = CORBA.TC_double
+        retval = CF.DataType(id='FRONTEND::tuner_allocation',value=CORBA.Any(CF._tc_Properties,alloc))
+    return retval
+
+def createTunerGenericListenerAllocation(tuner_type='DDC',allocation_id=None,center_frequency=0.0,bandwidth=0.0,sample_rate=1.0,
+                 device_control=False,group_id='',rf_flow_id='',bandwidth_tolerance=0.0,sample_rate_tolerance=0.0,returnDict=True):
+    if returnDict:
+        retval = {'FRONTEND::tuner_allocation':{'FRONTEND::tuner_allocation::tuner_type':tuner_type,'FRONTEND::tuner_allocation::allocation_id':allocation_id,
+        'FRONTEND::tuner_allocation::center_frequency':center_frequency,'FRONTEND::tuner_allocation::bandwidth':bandwidth,
+        'FRONTEND::tuner_allocation::sample_rate':sample_rate,'FRONTEND::tuner_allocation::device_control':device_control,
+        'FRONTEND::tuner_allocation::group_id':group_id,'FRONTEND::tuner_allocation::rf_flow_id':rf_flow_id,
+        'FRONTEND::tuner_allocation::bandwidth_tolerance':bandwidth_tolerance,'FRONTEND::tuner_allocation::sample_rate_tolerance':sample_rate_tolerance}}
+        if allocation_id == None:
+            retval['FRONTEND::tuner_allocation']['FRONTEND::tuner_allocation::allocation_id']=model._uuidgen()
+    else:
+        alloc=[]
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::tuner_type',value=any.to_any(tuner_type)))
+        if allocation_id == None:
+            alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::allocation_id',value=any.to_any(model._uuidgen())))
+        else:
+            alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::allocation_id',value=any.to_any(allocation_id)))
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::center_frequency',value=any.to_any(center_frequency)))
+        alloc[-1].value._t = CORBA.TC_double
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::bandwidth',value=any.to_any(bandwidth)))
+        alloc[-1].value._t = CORBA.TC_double
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::sample_rate',value=any.to_any(sample_rate)))
+        alloc[-1].value._t = CORBA.TC_double
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::device_control',value=any.to_any(device_control)))
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::group_id',value=any.to_any(group_id)))
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::rf_flow_id',value=any.to_any(rf_flow_id)))
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::bandwidth_tolerance',value=any.to_any(bandwidth_tolerance)))
+        alloc[-1].value._t = CORBA.TC_double
+        alloc.append(CF.DataType(id='FRONTEND::tuner_allocation::sample_rate_tolerance',value=any.to_any(sample_rate_tolerance)))
+        alloc[-1].value._t = CORBA.TC_double
+        retval = CF.DataType(id='FRONTEND::tuner_allocation',value=CORBA.Any(CF._tc_Properties,alloc))
+    return retval
+
+def createTunerListenerAllocation(existing_allocation_id,listener_allocation_id=None,returnDict=True):
+    if returnDict:
+        retval = {'FRONTEND::listener_allocation':{'FRONTEND::listener_allocation::existing_allocation_id':existing_allocation_id,
+        'FRONTEND::listener_allocation::listener_allocation_id':listener_allocation_id}}
+        if listener_allocation_id == None:
+            retval['FRONTEND::listener_allocation']['FRONTEND::listener_allocation::listener_allocation_id']=model._uuidgen()
+    else:
+        alloc=[]
+        alloc.append(CF.DataType(id='FRONTEND::listener_allocation::existing_allocation_id',value=any.to_any(existing_allocation_id)))
+        if listener_allocation_id == None:
+            alloc.append(CF.DataType(id='FRONTEND::listener_allocation::listener_allocation_id',value=any.to_any(model._uuidgen())))
+        else:
+            alloc.append(CF.DataType(id='FRONTEND::listener_allocation::listener_allocation_id',value=any.to_any(listener_allocation_id)))
+        retval = CF.DataType(id='FRONTEND::listener_allocation',value=CORBA.Any(CF._tc_Properties,alloc))
+    return retval
 
 class FrontendTunerAllocation(object):
     tuner_type = simple_property(id_="FRONTEND::tuner_allocation::tuner_type",
