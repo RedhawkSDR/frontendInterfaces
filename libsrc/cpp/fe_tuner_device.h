@@ -16,12 +16,6 @@
 /**************************              FRONTEND                   **************************/
 /*********************************************************************************************/
 namespace frontend {
-
-    /** Individual Tuner. This structure contains stream specific data for channel/tuner to include:
-     *         - Additional stream metadata (sri)
-     *         - Control information (allocation id's)
-     *         - Reference to associated frontend_tuner_status property where additional information is held. Note: frontend_tuner_status structure is required by frontend interfaces v2.0
-     */
     
     inline std::string new_uuid() {
         uuid_t new_random_uuid;
@@ -30,26 +24,25 @@ namespace frontend {
         uuid_unparse(new_random_uuid, new_random_uuid_str);
         return std::string(new_random_uuid_str);
     };
+
+    /** Individual Tuner. This structure contains stream specific data for channel/tuner to include:
+     *         - Additional stream metadata (sri)
+     *         - Control information (allocation id's)
+     *         - Reference to associated frontend_tuner_status property where additional information is held. Note: frontend_tuner_status structure is required by frontend interfaces v2.0
+     */
     
-    template < typename TunerStatusStructType >
     struct indivTuner {
         indivTuner(){
-            frontend_status = NULL;
             lock = NULL;
+            reset();
         }
         boost::mutex *lock;
         std::string control_allocation_id;
-        TunerStatusStructType* frontend_status;
+        std::vector<std::string> listener_allocation_ids;
 
         void reset(){
             control_allocation_id.clear();
-            if(frontend_status != NULL){
-                frontend_status->allocation_id_csv.clear();
-                frontend_status->center_frequency = 0.0;
-                frontend_status->bandwidth = 0.0;
-                frontend_status->sample_rate = 0.0;
-                frontend_status->enabled = false;
-            }
+            listener_allocation_ids.clear();
         }
     };
 
@@ -75,24 +68,52 @@ namespace frontend {
             virtual CORBA::Boolean allocateCapacity(const CF::Properties & capacities) throw (CORBA::SystemException, CF::Device::InvalidCapacity, CF::Device::InvalidState);
             virtual void deallocateCapacity(const CF::Properties & capacities)throw (CORBA::SystemException, CF::Device::InvalidCapacity, CF::Device::InvalidState);
 
+        protected:
+            typedef std::map<std::string, size_t> string_number_mapping;
+            typedef boost::mutex::scoped_lock exclusive_lock;
+
+            // Member variables exposed as properties
+            std::string device_kind;
+            std::string device_model;
+            frontend::frontend_tuner_allocation_struct frontend_tuner_allocation;
+            frontend::frontend_listener_allocation_struct frontend_listener_allocation;
+            std::vector<TunerStatusStructType> frontend_tuner_status;
+
+            // tunerChannels is exclusively paired with property tuner_status.
+            // tunerChannels provide stream information for the channel while tuner_status provides the tuner information.
+            std::vector<frontend::indivTuner> tunerChannels;
+
+            // Provides mapping from unique allocation ID to internal tuner (channel) number
+            string_number_mapping allocationID_to_tunerID;
+            boost::mutex allocationID_MappingLock;
+
+            ///////////////////////////////
+            // Device specific functions // -- virtual - to be implemented by device developer
+            ///////////////////////////////
+            virtual bool _dev_enable(size_t tuner_id) = 0;
+            virtual bool _dev_disable(size_t tuner_id) = 0;
+            virtual bool _dev_set_tuning(frontend_tuner_allocation_struct &request, size_t tuner_id) = 0;
+            virtual bool _dev_del_tuning(size_t tuner_id) = 0;
+
+            ///////////////////////////////
             // Mapping and translation helpers. External string identifiers to internal numerical identifiers
-            virtual long addTunerMapping(const frontend::frontend_tuner_allocation_struct & frontend_alloc);
-            virtual long addListenerMapping(const frontend::frontend_listener_allocation_struct & frontend_listener_alloc);
-            virtual bool removeTunerMapping(std::string allocation_id);
+            ///////////////////////////////
+            std::string create_allocation_id_csv(size_t tuner_id);
+            virtual bool removeTunerMapping(size_t tuner_id, std::string allocation_id);
             virtual bool removeTunerMapping(size_t tuner_id);
             virtual long getTunerMapping(std::string allocation_id);
-            virtual bool is_connectionID_valid_for_tunerID( const size_t & tuner_id, const std::string & connectionID);
-            virtual bool is_connectionID_valid_for_streamID( const std::string & streamID, const std::string & connectionID);
-            virtual bool is_connectionID_controller_for_streamID(const std::string & streamID, const std::string & connectionID);
-            virtual bool is_connectionID_listener_for_streamID(const std::string & streamID, const std::string & connectionID);
-            virtual bool is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr);
             virtual void assignListener(std::string& listen_alloc_id, std::string& alloc_id);
             virtual void removeListener(std::string& listen_alloc_id);
+            virtual void removeAllocationIdRouting(const size_t tuner_id) = 0;
 
             // Configure tuner - gets called during allocation
-            virtual bool enableTuner(size_t tuner_id, bool enable); /* assumes collector RF and channel RF are the same. If not true, override function */
-            virtual bool removeTuner(size_t tuner_id);
-            
+            virtual bool enableTuner(size_t tuner_id, bool enable);
+            virtual bool is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr);
+
+
+            ////////////////////////////
+            // Other helper functions //
+            ////////////////////////////
             BULKIO::StreamSRI create(std::string &stream_id, TunerStatusStructType &frontend_status, double collector_frequency = -1.0) {
                 BULKIO::StreamSRI sri;
                 sri.hversion = 1;
@@ -120,52 +141,6 @@ namespace frontend {
                 this->addModifyKeyword<CORBA::Double> (&sri,"FRONTEND::BANDWIDTH", CORBA::Double(frontend_status.bandwidth));
                 this->addModifyKeyword<std::string> (&sri,"FRONTEND::DEVICE_ID",std::string(identifier()));
                 return sri;
-            }
-            
-        protected:
-            typedef std::map<std::string, size_t> string_number_mapping;
-            typedef boost::mutex::scoped_lock exclusive_lock;
-
-            // Member variables exposed as properties
-            std::string device_kind;
-            std::string device_model;
-            frontend::frontend_tuner_allocation_struct frontend_tuner_allocation;
-            frontend::frontend_listener_allocation_struct frontend_listener_allocation;
-            std::vector<TunerStatusStructType> frontend_tuner_status;
-
-            std::string create_allocation_id_csv(size_t tuner_id);
-
-            // tunerChannels is exclusively paired with property tuner_status.
-            // tunerChannels provide stream information for the channel while tuner_status provides the tuner information.
-            std::vector<frontend::indivTuner<TunerStatusStructType> > tunerChannels;
-
-            // Provides mapping from unique allocation ID to internal tuner (channel) number
-            string_number_mapping allocationID_to_tunerID;
-            string_number_mapping streamID_to_tunerID;
-            boost::mutex allocationID_MappingLock;
-
-            ///////////////////////////////
-            // Device specific functions // -- virtual - to be implemented by device developer
-            ///////////////////////////////
-            virtual bool _dev_enable(size_t tuner_id) = 0;
-            virtual bool _dev_disable(size_t tuner_id) = 0;
-
-            virtual bool _dev_set_tuning(std::string &tuner_type, tuning_request &request, size_t tuner_id) = 0;
-            virtual bool _dev_del_tuning(size_t tuner_id) = 0;
-            virtual void removeAllocationIdRouting(const std::string allocation_id) = 0;
-
-            ////////////////////////////
-            // Other helper functions //
-            ////////////////////////////
-
-            virtual double optimize_rate(const double& req_rate, const double& max_rate, const double& min_rate){
-                //for(size_t dec = size_t(max_rate/min_rate); dec >= 1; dec--){
-                //    if(max_rate/double(dec) >= req_rate)
-                //        return max_rate/double(dec);
-                //}
-                if(req_rate < min_rate)
-                    return min_rate;
-                return req_rate;
             }
 
             template <typename CORBAXX> bool addModifyKeyword(BULKIO::StreamSRI *sri, CORBA::String_member id, CORBAXX myValue, bool addOnly = false) {

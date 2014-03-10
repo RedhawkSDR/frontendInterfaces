@@ -128,12 +128,6 @@ namespace frontend {
         CF::Properties additional_info;
     };
     
-    struct tuning_request {
-        double center_frequency;
-        double bandwidth;
-        double sample_rate;
-        std::string allocation_id;
-    };
     struct frontend_tuner_allocation_struct {
         frontend_tuner_allocation_struct ()
         {
