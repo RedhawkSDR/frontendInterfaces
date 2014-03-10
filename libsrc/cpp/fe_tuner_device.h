@@ -108,7 +108,7 @@ namespace frontend {
 
             // Configure tuner - gets called during allocation
             virtual bool enableTuner(size_t tuner_id, bool enable);
-            virtual bool is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr);
+            virtual bool listenerRequestValidation(frontend_tuner_allocation_struct &request, size_t tuner_id);
 
 
             ////////////////////////////

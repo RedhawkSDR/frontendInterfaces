@@ -215,14 +215,7 @@ namespace frontend {
                                 throw CF::Device::InvalidCapacity(eout.str().c_str(), capacities);
                             }
                             // listener
-                            bool freq_valid = is_freq_valid(
-                                    frontend_tuner_allocation.center_frequency,
-                                    frontend_tuner_allocation.bandwidth,
-                                    frontend_tuner_allocation.sample_rate,
-                                    frontend_tuner_status[tuner_id].center_frequency,
-                                    frontend_tuner_status[tuner_id].bandwidth,
-                                    frontend_tuner_status[tuner_id].sample_rate);
-                            if(tunerChannels[tuner_id].control_allocation_id.empty() || !freq_valid){
+                            if(tunerChannels[tuner_id].control_allocation_id.empty() || !listenerRequestValidation(frontend_tuner_allocation, tuner_id)){
                                 // either not allocated or can't support listener request
                                 continue;
                             }
@@ -438,21 +431,30 @@ namespace frontend {
     }
 
     template < typename TunerStatusStructType >
-    bool FrontendTunerDevice<TunerStatusStructType>::is_freq_valid(double req_cf, double req_bw, double req_sr, double cf, double bw, double sr){
-        //LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
-    	// check for don't care values (0)
-    	double req_min_bw_sr;
-    	if (req_bw == 0 )
-    		req_min_bw_sr = req_sr;
-    	else if (req_sr == 0 )
-    		req_min_bw_sr = req_bw;
-    	else
-    		req_min_bw_sr = std::min(req_bw,req_sr);
-    	req_min_bw_sr = std::max(0.0,req_min_bw_sr);
-        double min_bw_sr = std::min(bw,sr);
-        if( (req_cf + req_min_bw_sr/2 <= cf + min_bw_sr/2) && (req_cf - req_min_bw_sr/2 >= cf - min_bw_sr/2) )
-            return true;
-        return false;
+    bool FrontendTunerDevice<TunerStatusStructType>::listenerRequestValidation(frontend_tuner_allocation_struct &request, size_t tuner_id){
+        LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
+
+        // ensure requested values are >= 0
+        if(request.center_frequency < 0 || request.bandwidth < 0 || request.sample_rate < 0 || request.bandwidth_tolerance < 0 || request.sample_rate_tolerance < 0)
+        	return false;
+    	// ensure lower end of requested band fits
+    	if(request.center_frequency - (request.bandwidth/2) < frontend_tuner_status[tuner_id].center_frequency - (frontend_tuner_status[tuner_id].bandwidth/2))
+    		return false;
+    	// ensure upper end of requested band fits
+    	if(request.center_frequency + (request.bandwidth/2) > frontend_tuner_status[tuner_id].center_frequency + (frontend_tuner_status[tuner_id].bandwidth/2))
+    		return false;
+    	// ensure tuner bandwidth meets requested tolerance
+    	if(request.bandwidth > frontend_tuner_status[tuner_id].bandwidth)
+    		return false;
+    	if(request.bandwidth != 0 && request.bandwidth+request.bandwidth*request.bandwidth_tolerance/100 < frontend_tuner_status[tuner_id].bandwidth)
+    		return false;
+    	// ensure tuner sample rate meets requested tolerance
+    	if(request.sample_rate > frontend_tuner_status[tuner_id].sample_rate)
+    		return false;
+    	if(request.sample_rate != 0 && request.sample_rate+request.sample_rate*request.sample_rate_tolerance/100 < frontend_tuner_status[tuner_id].sample_rate)
+    		return false;
+
+    	return true;
     };
 
     ////////////////////////////
