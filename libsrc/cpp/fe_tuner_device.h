@@ -33,10 +33,8 @@ namespace frontend {
     
     struct indivTuner {
         indivTuner(){
-            lock = NULL;
             reset();
         }
-        boost::mutex *lock;
         std::string control_allocation_id;
         std::vector<std::string> listener_allocation_ids;
 

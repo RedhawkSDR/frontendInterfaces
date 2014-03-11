@@ -41,10 +41,6 @@ namespace frontend {
     template < typename TunerStatusStructType >
     FrontendTunerDevice<TunerStatusStructType>::~FrontendTunerDevice()
     {
-        for (size_t tuner_id = 0; tuner_id < tunerChannels.size(); tuner_id++) {
-            if (tunerChannels[tuner_id].lock != NULL)
-                delete tunerChannels[tuner_id].lock;
-        }
         tunerChannels.clear();
     }
 
@@ -409,8 +405,6 @@ namespace frontend {
     template < typename TunerStatusStructType >
     bool FrontendTunerDevice<TunerStatusStructType>::enableTuner(size_t tuner_id, bool enable) {
         //LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
-        // Lock the tuner
-        //exclusive_lock lock(*(tunerChannels[tuner_id].lock));
         
         bool prev_enabled = frontend_tuner_status[tuner_id].enabled;
         
@@ -463,7 +457,6 @@ namespace frontend {
     long FrontendTunerDevice<TunerStatusStructType>::getTunerMapping(std::string allocation_id) {
         //LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         long NO_VALID_TUNER = -1;
-        //exclusive_lock lock(allocationID_MappingLock);
 
         string_number_mapping::iterator iter = allocationID_to_tunerID.find(allocation_id);
         if (iter != allocationID_to_tunerID.end())
