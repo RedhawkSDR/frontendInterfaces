@@ -13,9 +13,9 @@
 
 #include <ossie/CF/QueryablePort.h>
 
-#include <FRONTEND/RFInfo.h>
-#include <FRONTEND/GPS.h>
-#include <FRONTEND/NavigationData.h>
+#include <redhawk/FRONTEND/RFInfo.h>
+#include <redhawk/FRONTEND/GPS.h>
+#include <redhawk/FRONTEND/NavigationData.h>
 
 #include <ossie/CorbaUtils.h>
 #include "fe_base.h"

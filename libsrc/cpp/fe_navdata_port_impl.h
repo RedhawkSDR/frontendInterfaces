@@ -3,7 +3,7 @@
 
 #include "fe_port_impl.h"
 
-#include <FRONTEND/NavigationData.h>
+#include <redhawk/FRONTEND/NavigationData.h>
 
 namespace frontend {
 

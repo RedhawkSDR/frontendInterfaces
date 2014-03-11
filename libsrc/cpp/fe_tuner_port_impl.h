@@ -4,7 +4,7 @@
 #include "fe_port_impl.h"
 #include "fe_base.h"
 
-#include <FRONTEND/TunerControl.h>
+#include <redhawk/FRONTEND/TunerControl.h>
 
 
 namespace frontend {

@@ -3,7 +3,7 @@
 
 #include "fe_port_impl.h"
 
-#include <FRONTEND/RFInfo.h>
+#include <redhawk/FRONTEND/RFInfo.h>
 #include "fe_types.h"
 
 namespace frontend {

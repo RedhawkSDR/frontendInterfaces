@@ -3,7 +3,7 @@
 
 #include "fe_port_impl.h"
 
-#include <FRONTEND/GPS.h>
+#include <redhawk/FRONTEND/GPS.h>
 
 namespace frontend {
 
