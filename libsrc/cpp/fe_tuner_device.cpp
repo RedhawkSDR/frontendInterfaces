@@ -184,8 +184,6 @@ namespace frontend {
                             continue;
                         }
 
-                        exclusive_lock lock(* (tunerChannels[tuner_id].lock));
-
                         if(!frontend_tuner_allocation.group_id.empty() && frontend_tuner_allocation.group_id != frontend_tuner_status[tuner_id].group_id ){
                             continue;
                         }
