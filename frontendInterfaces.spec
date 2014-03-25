@@ -68,10 +68,6 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 # The Java and Python base class libraries are not yet implemented;
 # they're just shells
-rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/python/frontend
-%if 0%{?rhel} >= 6
-rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/python/frontend-%{version}-py%{python_version}.egg-info
-%endif
 %if %{with java}
 rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/frontend.jar
 rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/frontend.src.jar
@@ -86,6 +82,7 @@ rm -rf --preserve-root $RPM_BUILD_ROOT
 %{_datadir}/idl/redhawk/FRONTEND
 %{_includedir}/redhawk/FRONTEND
 %{_prefix}/lib/python/redhawk/frontendInterfaces
+%{_prefix}/lib/python/frontend
 %{_libdir}/libfrontendInterfaces.*
 %{_libdir}/pkgconfig/frontendInterfaces.pc
 %{_includedir}/frontend
@@ -93,6 +90,7 @@ rm -rf --preserve-root $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/frontend.pc
 %if 0%{?rhel} >= 6
 %{_prefix}/lib/python/frontendInterfaces-%{version}-py%{python_version}.egg-info
+%{_prefix}/lib/python/frontend-%{version}-py%{python_version}.egg-info
 %endif
 %if %{with java}
 %{_prefix}/lib/FRONTENDInterfaces.jar
