@@ -29,8 +29,8 @@ namespace frontend {
      *
      */
     
-    struct tunerAllocationIds {
-    	tunerAllocationIds(){
+    struct tunerAllocationIdsStruct {
+    	tunerAllocationIdsStruct(){
             reset();
         }
         std::string control_allocation_id;
@@ -75,9 +75,9 @@ namespace frontend {
             frontend::frontend_listener_allocation_struct frontend_listener_allocation;
             std::vector<TunerStatusStructType> frontend_tuner_status;
 
-            // tuner_allocations is exclusively paired with property frontend_tuner_status.
-            // tuner_allocations tracks allocation ids while frontend_tuner_status provides tuner information.
-            std::vector<frontend::tunerAllocationIds> tuner_allocations;
+            // tuner_allocation_ids is exclusively paired with property frontend_tuner_status.
+            // tuner_allocation_ids tracks allocation ids while frontend_tuner_status provides tuner information.
+            std::vector<frontend::tunerAllocationIdsStruct> tuner_allocation_ids;
 
             // Provides mapping from unique allocation ID to internal tuner (channel) number
             string_number_mapping allocation_id_to_tuner_id;
