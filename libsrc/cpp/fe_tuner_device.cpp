@@ -41,7 +41,7 @@ namespace frontend {
     template < typename TunerStatusStructType >
     FrontendTunerDevice<TunerStatusStructType>::~FrontendTunerDevice()
     {
-        tunerChannels.clear();
+        tuner_allocations.clear();
     }
 
     /*******************************************************************************************
@@ -99,18 +99,27 @@ namespace frontend {
     }
 
     template < typename TunerStatusStructType >
-    std::string FrontendTunerDevice<TunerStatusStructType>::create_allocation_id_csv(size_t tuner_id){
+    std::string FrontendTunerDevice<TunerStatusStructType>::createAllocationIdCsv(size_t tuner_id){
         //LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         std::string alloc_id_csv = "";
         // ensure control allocation_id is first in list
-        if (!tunerChannels[tuner_id].control_allocation_id.empty())
-            alloc_id_csv = tunerChannels[tuner_id].control_allocation_id + ",";
-        std::vector<std::string>::iterator it = tunerChannels[tuner_id].listener_allocation_ids.begin();
-        for(; it != tunerChannels[tuner_id].listener_allocation_ids.end(); it++)
+        if (!tuner_allocations[tuner_id].control_allocation_id.empty())
+            alloc_id_csv = tuner_allocations[tuner_id].control_allocation_id + ",";
+        std::vector<std::string>::iterator it = tuner_allocations[tuner_id].listener_allocation_ids.begin();
+        for(; it != tuner_allocations[tuner_id].listener_allocation_ids.end(); it++)
             alloc_id_csv += *it + ",";
         if(!alloc_id_csv.empty())
             alloc_id_csv.erase(alloc_id_csv.size()-1);
         return alloc_id_csv;
+    }
+
+    template < typename TunerStatusStructType >
+    std::string FrontendTunerDevice<TunerStatusStructType>::getControlAllocationId(size_t tuner_id){
+    	return tuner_allocations[tuner_id].control_allocation_id;
+    }
+    template < typename TunerStatusStructType >
+    std::vector<std::string> FrontendTunerDevice<TunerStatusStructType>::getListenerAllocationIds(size_t tuner_id){
+    	return tuner_allocations[tuner_id].listener_allocation_ids;
     }
 
     /*****************************************************************/
@@ -120,15 +129,15 @@ namespace frontend {
     CF::Device::UsageType FrontendTunerDevice<TunerStatusStructType>::updateUsageState() {
         //LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         size_t tunerAllocated = 0;
-        for (size_t tuner_id = 0; tuner_id < tunerChannels.size(); tuner_id++) {
-            if (!tunerChannels[tuner_id].control_allocation_id.empty())
+        for (size_t tuner_id = 0; tuner_id < tuner_allocations.size(); tuner_id++) {
+            if (!tuner_allocations[tuner_id].control_allocation_id.empty())
                 tunerAllocated++;
         }
         // If no tuners are allocated, device is idle
         if (tunerAllocated == 0)
             return CF::Device::IDLE;
         // If all tuners are allocated, device is busy
-        if (tunerAllocated == tunerChannels.size())
+        if (tunerAllocated == tuner_allocations.size())
             return CF::Device::BUSY;
         // Else, device is active
         return CF::Device::ACTIVE;
@@ -172,10 +181,10 @@ namespace frontend {
                     }
 
                     // Check if available tuner
-                    exclusive_lock lock(allocationID_MappingLock);
+                    exclusive_lock lock(allocation_id_mapping_lock);
 
                     // Next, try to allocate a new tuner
-                    for (size_t tuner_id = 0; tuner_id < tunerChannels.size(); tuner_id++) {
+                    for (size_t tuner_id = 0; tuner_id < tuner_allocations.size(); tuner_id++) {
                         if(frontend_tuner_status[tuner_id].tuner_type != frontend_tuner_allocation.tuner_type) {
                             continue;
                         }
@@ -193,13 +202,13 @@ namespace frontend {
 
                         if(frontend_tuner_allocation.device_control){
                             // device control
-                            if(!tunerChannels[tuner_id].control_allocation_id.empty() || !_dev_set_tuning(frontend_tuner_allocation, tuner_id)){
+                            if(!tuner_allocations[tuner_id].control_allocation_id.empty() || !deviceSetTuning(frontend_tuner_allocation, tuner_id)){
                                 // either not available or didn't succeed setting tuning, try next tuner
                                 continue;
                             }
-                            tunerChannels[tuner_id].control_allocation_id = frontend_tuner_allocation.allocation_id;
-                            allocationID_to_tunerID.insert(std::pair<std::string, size_t > (frontend_tuner_allocation.allocation_id, tuner_id));
-                            frontend_tuner_status[tuner_id].allocation_id_csv = create_allocation_id_csv(tuner_id);
+                            tuner_allocations[tuner_id].control_allocation_id = frontend_tuner_allocation.allocation_id;
+                            allocation_id_to_tuner_id.insert(std::pair<std::string, size_t > (frontend_tuner_allocation.allocation_id, tuner_id));
+                            frontend_tuner_status[tuner_id].allocation_id_csv = createAllocationIdCsv(tuner_id);
                         } else {
                             // channelizer allocations must specify device control = true
                             if(frontend_tuner_allocation.tuner_type == "CHANNELIZER" || frontend_tuner_allocation.tuner_type == "TX"){
@@ -209,14 +218,14 @@ namespace frontend {
                                 throw CF::Device::InvalidCapacity(eout.str().c_str(), capacities);
                             }
                             // listener
-                            if(tunerChannels[tuner_id].control_allocation_id.empty() || !listenerRequestValidation(frontend_tuner_allocation, tuner_id)){
+                            if(tuner_allocations[tuner_id].control_allocation_id.empty() || !listenerRequestValidation(frontend_tuner_allocation, tuner_id)){
                                 // either not allocated or can't support listener request
                                 continue;
                             }
-                            tunerChannels[tuner_id].listener_allocation_ids.push_back(frontend_tuner_allocation.allocation_id);
-                            allocationID_to_tunerID.insert(std::pair<std::string, size_t > (frontend_tuner_allocation.allocation_id, tuner_id));
-                            frontend_tuner_status[tuner_id].allocation_id_csv = create_allocation_id_csv(tuner_id);
-                            this->assignListener(frontend_tuner_allocation.allocation_id,tunerChannels[tuner_id].control_allocation_id);
+                            tuner_allocations[tuner_id].listener_allocation_ids.push_back(frontend_tuner_allocation.allocation_id);
+                            allocation_id_to_tuner_id.insert(std::pair<std::string, size_t > (frontend_tuner_allocation.allocation_id, tuner_id));
+                            frontend_tuner_status[tuner_id].allocation_id_csv = createAllocationIdCsv(tuner_id);
+                            this->assignListener(frontend_tuner_allocation.allocation_id,tuner_allocations[tuner_id].control_allocation_id);
                         }
                         // if we've reached here, we found an eligible tuner with correct frequency
 
@@ -270,7 +279,7 @@ namespace frontend {
                         throw CF::Device::InvalidCapacity("MISSING LISTENER ALLOCATION ID", capacities);
                     }
 
-                    exclusive_lock lock(allocationID_MappingLock);
+                    exclusive_lock lock(allocation_id_mapping_lock);
 
                     // Check if listener allocation ID has already been used
                     if(getTunerMapping(frontend_listener_allocation.listener_allocation_id) >= 0){
@@ -292,9 +301,9 @@ namespace frontend {
                         throw CF::Device::InvalidCapacity(eout.str().c_str(), capacities);
                     }
 
-                    tunerChannels[tuner_id].listener_allocation_ids.push_back(frontend_listener_allocation.listener_allocation_id);
-                    allocationID_to_tunerID.insert(std::pair<std::string, size_t > (frontend_listener_allocation.listener_allocation_id, tuner_id));
-                    frontend_tuner_status[tuner_id].allocation_id_csv = create_allocation_id_csv(tuner_id);
+                    tuner_allocations[tuner_id].listener_allocation_ids.push_back(frontend_listener_allocation.listener_allocation_id);
+                    allocation_id_to_tuner_id.insert(std::pair<std::string, size_t > (frontend_listener_allocation.listener_allocation_id, tuner_id));
+                    frontend_tuner_status[tuner_id].allocation_id_csv = createAllocationIdCsv(tuner_id);
                     this->assignListener(frontend_listener_allocation.listener_allocation_id,frontend_listener_allocation.existing_allocation_id);
                     return true;
                 }
@@ -363,17 +372,17 @@ namespace frontend {
                         throw CF::Device::InvalidCapacity("ALLOCATION_ID NOT FOUND", capacities);
                     }
                     //LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,std::string(__PRETTY_FUNCTION__)+" tuner_id = " << tuner_id);
-                    if(tunerChannels[tuner_id].control_allocation_id == frontend_tuner_allocation.allocation_id){
+                    if(tuner_allocations[tuner_id].control_allocation_id == frontend_tuner_allocation.allocation_id){
                         //LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,std::string(__PRETTY_FUNCTION__)+" deallocating control for tuner_id = " << tuner_id);
                         enableTuner(tuner_id, false);
                         removeTunerMapping(tuner_id);
-                        frontend_tuner_status[tuner_id].allocation_id_csv = create_allocation_id_csv(tuner_id);
+                        frontend_tuner_status[tuner_id].allocation_id_csv = createAllocationIdCsv(tuner_id);
                     }
                     else {
                         //LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,std::string(__PRETTY_FUNCTION__)+" deallocating listener for tuner_id = " << tuner_id);
                         // send EOS to listener connection only
                         removeTunerMapping(tuner_id,frontend_tuner_allocation.allocation_id);
-                        frontend_tuner_status[tuner_id].allocation_id_csv = create_allocation_id_csv(tuner_id);
+                        frontend_tuner_status[tuner_id].allocation_id_csv = createAllocationIdCsv(tuner_id);
                     }
                 }
                 else if (id == "FRONTEND::listener_allocation") {
@@ -386,7 +395,7 @@ namespace frontend {
                     //LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,std::string(__PRETTY_FUNCTION__)+" tuner_id = " << tuner_id);
                     // send EOS to listener connection only
                     removeTunerMapping(tuner_id,frontend_listener_allocation.listener_allocation_id);
-                    frontend_tuner_status[tuner_id].allocation_id_csv = create_allocation_id_csv(tuner_id);
+                    frontend_tuner_status[tuner_id].allocation_id_csv = createAllocationIdCsv(tuner_id);
                 }
                 else {
                     LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,"WARNING: UNKNOWN ALLOCATION PROPERTY \""+ std::string(property->name) + "\". IGNORING!");
@@ -410,13 +419,13 @@ namespace frontend {
         
         // If going from disabled to enabled
         if (!prev_enabled && enable) {
-            _dev_enable(tuner_id);
+            deviceEnable(tuner_id);
         }
         
         // If going from enabled to disabled
         if (prev_enabled && !enable) {
 
-            _dev_disable(tuner_id);
+            deviceDisable(tuner_id);
         }
 
         return true;
@@ -458,8 +467,8 @@ namespace frontend {
         //LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         long NO_VALID_TUNER = -1;
 
-        string_number_mapping::iterator iter = allocationID_to_tunerID.find(allocation_id);
-        if (iter != allocationID_to_tunerID.end())
+        string_number_mapping::iterator iter = allocation_id_to_tuner_id.find(allocation_id);
+        if (iter != allocation_id_to_tuner_id.end())
             return iter->second;
 
         return NO_VALID_TUNER;
@@ -470,16 +479,16 @@ namespace frontend {
     bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(size_t tuner_id, std::string allocation_id) {
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         removeListener(allocation_id);
-        std::vector<std::string>::iterator it = tunerChannels[tuner_id].listener_allocation_ids.begin();
-        while(it != tunerChannels[tuner_id].listener_allocation_ids.end()){
+        std::vector<std::string>::iterator it = tuner_allocations[tuner_id].listener_allocation_ids.begin();
+        while(it != tuner_allocations[tuner_id].listener_allocation_ids.end()){
             if(*it == allocation_id){
-                tunerChannels[tuner_id].listener_allocation_ids.erase(it);
+                tuner_allocations[tuner_id].listener_allocation_ids.erase(it);
             } else {
                 ++it;
             }
         }
-        exclusive_lock lock(allocationID_MappingLock);
-        if(allocationID_to_tunerID.erase(allocation_id) > 0)
+        exclusive_lock lock(allocation_id_mapping_lock);
+        if(allocation_id_to_tuner_id.erase(allocation_id) > 0)
             return true;
         return false;
     }
@@ -487,32 +496,32 @@ namespace frontend {
     template < typename TunerStatusStructType >
     bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(size_t tuner_id) {
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
-        _dev_del_tuning(tuner_id);
+        deviceDeleteTuning(tuner_id);
         removeAllocationIdRouting(tuner_id);
 
         long cnt = 0;
-        exclusive_lock lock(allocationID_MappingLock);
-        string_number_mapping::iterator it = allocationID_to_tunerID.begin();
-        while(it != allocationID_to_tunerID.end()){
+        exclusive_lock lock(allocation_id_mapping_lock);
+        string_number_mapping::iterator it = allocation_id_to_tuner_id.begin();
+        while(it != allocation_id_to_tuner_id.end()){
             if(it->second == tuner_id){
                 std::string allocation_id = it->first;
                 removeListener(allocation_id);
-                allocationID_to_tunerID.erase(it++);
+                allocation_id_to_tuner_id.erase(it++);
                 cnt++;
             } else {
                 ++it;
             }
         }
         /*
-        for(std::vector<std::string>::iterator it = tunerChannels[tuner_id].listener_allocation_ids.begin(); it != tunerChannels[tuner_id].listener_allocation_ids.end();it++){
+        for(std::vector<std::string>::iterator it = tuner_allocations[tuner_id].listener_allocation_ids.begin(); it != tuner_allocations[tuner_id].listener_allocation_ids.end();it++){
             removeListener(*it);
-            allocationID_to_tunerID.erase(*it);
+            allocation_id_to_tuner_id.erase(*it);
             cnt++;
         }
-        removeListener(tunerChannels[tuner_id].control_allocation_id);
-        allocationID_to_tunerID.erase(tunerChannels[tuner_id].control_allocation_id);
+        removeListener(tuner_allocations[tuner_id].control_allocation_id);
+        allocation_id_to_tuner_id.erase(tuner_allocations[tuner_id].control_allocation_id);
         */
-        tunerChannels[tuner_id].reset();
+        tuner_allocations[tuner_id].reset();
         return cnt > 0;
     }
 

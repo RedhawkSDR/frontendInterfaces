@@ -17,7 +17,7 @@
 /*********************************************************************************************/
 namespace frontend {
     
-    inline std::string new_uuid() {
+    inline std::string uuidGenerator() {
         uuid_t new_random_uuid;
         uuid_generate_random(new_random_uuid);
         char new_random_uuid_str[37];
@@ -25,14 +25,12 @@ namespace frontend {
         return std::string(new_random_uuid_str);
     };
 
-    /** Individual Tuner. This structure contains stream specific data for channel/tuner to include:
-     *         - Additional stream metadata (sri)
-     *         - Control information (allocation id's)
-     *         - Reference to associated frontend_tuner_status property where additional information is held. Note: frontend_tuner_status structure is required by frontend interfaces v2.0
+    /* Tuner Allocation IDs struct. This structure contains allocation tracking data.
+     *
      */
     
-    struct indivTuner {
-        indivTuner(){
+    struct tunerAllocationIds {
+    	tunerAllocationIds(){
             reset();
         }
         std::string control_allocation_id;
@@ -77,32 +75,35 @@ namespace frontend {
             frontend::frontend_listener_allocation_struct frontend_listener_allocation;
             std::vector<TunerStatusStructType> frontend_tuner_status;
 
-            // tunerChannels is exclusively paired with property tuner_status.
-            // tunerChannels provide stream information for the channel while tuner_status provides the tuner information.
-            std::vector<frontend::indivTuner> tunerChannels;
+            // tuner_allocations is exclusively paired with property frontend_tuner_status.
+            // tuner_allocations tracks allocation ids while frontend_tuner_status provides tuner information.
+            std::vector<frontend::tunerAllocationIds> tuner_allocations;
 
             // Provides mapping from unique allocation ID to internal tuner (channel) number
-            string_number_mapping allocationID_to_tunerID;
-            boost::mutex allocationID_MappingLock;
+            string_number_mapping allocation_id_to_tuner_id;
+            boost::mutex allocation_id_mapping_lock;
 
             ///////////////////////////////
             // Device specific functions // -- virtual - to be implemented by device developer
             ///////////////////////////////
-            virtual bool _dev_enable(size_t tuner_id) = 0;
-            virtual bool _dev_disable(size_t tuner_id) = 0;
-            virtual bool _dev_set_tuning(frontend_tuner_allocation_struct &request, size_t tuner_id) = 0;
-            virtual bool _dev_del_tuning(size_t tuner_id) = 0;
+            virtual bool deviceEnable(size_t tuner_id) = 0;
+            virtual bool deviceDisable(size_t tuner_id) = 0;
+            virtual bool deviceSetTuning(frontend_tuner_allocation_struct &request, size_t tuner_id) = 0;
+            virtual bool deviceDeleteTuning(size_t tuner_id) = 0;
 
             ///////////////////////////////
             // Mapping and translation helpers. External string identifiers to internal numerical identifiers
             ///////////////////////////////
-            std::string create_allocation_id_csv(size_t tuner_id);
+            virtual std::string getControlAllocationId(size_t tuner_id);
+            virtual std::vector<std::string> getListenerAllocationIds(size_t tuner_id);
+            std::string createAllocationIdCsv(size_t tuner_id);
             virtual bool removeTunerMapping(size_t tuner_id, std::string allocation_id);
             virtual bool removeTunerMapping(size_t tuner_id);
             virtual long getTunerMapping(std::string allocation_id);
             virtual void assignListener(std::string& listen_alloc_id, std::string& alloc_id);
             virtual void removeListener(std::string& listen_alloc_id);
             virtual void removeAllocationIdRouting(const size_t tuner_id) = 0;
+            virtual void setNumChannels(size_t num) = 0;
 
             // Configure tuner - gets called during allocation
             virtual bool enableTuner(size_t tuner_id, bool enable);
