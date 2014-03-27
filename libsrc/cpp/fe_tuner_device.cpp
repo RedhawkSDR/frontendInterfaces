@@ -202,7 +202,7 @@ namespace frontend {
 
                         if(frontend_tuner_allocation.device_control){
                             // device control
-                            if(!tuner_allocation_ids[tuner_id].control_allocation_id.empty() || !deviceSetTuning(frontend_tuner_allocation, tuner_id)){
+                            if(!tuner_allocation_ids[tuner_id].control_allocation_id.empty() || !deviceSetTuning(frontend_tuner_allocation, frontend_tuner_status[tuner_id], tuner_id)){
                                 // either not available or didn't succeed setting tuning, try next tuner
                                 continue;
                             }
@@ -419,13 +419,13 @@ namespace frontend {
         
         // If going from disabled to enabled
         if (!prev_enabled && enable) {
-            deviceEnable(tuner_id);
+            deviceEnable(frontend_tuner_status[tuner_id], tuner_id);
         }
         
         // If going from enabled to disabled
         if (prev_enabled && !enable) {
 
-            deviceDisable(tuner_id);
+            deviceDisable(frontend_tuner_status[tuner_id], tuner_id);
         }
 
         return true;
@@ -496,7 +496,7 @@ namespace frontend {
     template < typename TunerStatusStructType >
     bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(size_t tuner_id) {
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
-        deviceDeleteTuning(tuner_id);
+        deviceDeleteTuning(frontend_tuner_status[tuner_id], tuner_id);
         removeAllocationIdRouting(tuner_id);
 
         long cnt = 0;
