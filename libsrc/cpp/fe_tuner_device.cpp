@@ -419,13 +419,23 @@ namespace frontend {
         
         // If going from disabled to enabled
         if (!prev_enabled && enable) {
-            deviceEnable(frontend_tuner_status[tuner_id], tuner_id);
+            bool retval = deviceEnable(frontend_tuner_status[tuner_id], tuner_id);
+            if (retval) {
+                frontend_tuner_status[tuner_id].enabled = true;
+            } else {
+                frontend_tuner_status[tuner_id].enabled = false;
+            }
         }
         
         // If going from enabled to disabled
         if (prev_enabled && !enable) {
 
-            deviceDisable(frontend_tuner_status[tuner_id], tuner_id);
+            bool retval = deviceDisable(frontend_tuner_status[tuner_id], tuner_id);
+            if (retval) {
+                frontend_tuner_status[tuner_id].enabled = false;
+            } else {
+                frontend_tuner_status[tuner_id].enabled = true;
+            }
         }
 
         return true;
