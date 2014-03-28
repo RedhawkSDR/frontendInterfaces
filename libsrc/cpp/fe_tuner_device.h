@@ -88,7 +88,7 @@ namespace frontend {
             ///////////////////////////////
             virtual bool deviceEnable(TunerStatusStructType &fts, size_t tuner_id) = 0;
             virtual bool deviceDisable(TunerStatusStructType &fts, size_t tuner_id) = 0;
-            virtual bool deviceSetTuning(frontend_tuner_allocation_struct &request, TunerStatusStructType &fts, size_t tuner_id) = 0;
+            virtual bool deviceSetTuning(const frontend_tuner_allocation_struct &request, TunerStatusStructType &fts, size_t tuner_id) = 0;
             virtual bool deviceDeleteTuning(TunerStatusStructType &fts, size_t tuner_id) = 0;
 
             ///////////////////////////////

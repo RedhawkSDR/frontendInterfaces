@@ -11,31 +11,31 @@ namespace frontend {
     
     class tuner_delegation {
         public:
-            virtual std::string getTunerType(std::string& id) = 0;
-            virtual bool getTunerDeviceControl(std::string& id) = 0;
-            virtual std::string getTunerGroupId(std::string& id) = 0;
-            virtual std::string getTunerRfFlowId(std::string& id) = 0;
-            virtual CF::Properties* getTunerStatus(std::string& id) = 0;
+            virtual std::string getTunerType(const std::string& id) = 0;
+            virtual bool getTunerDeviceControl(const std::string& id) = 0;
+            virtual std::string getTunerGroupId(const std::string& id) = 0;
+            virtual std::string getTunerRfFlowId(const std::string& id) = 0;
+            virtual CF::Properties* getTunerStatus(const std::string& id) = 0;
     };
     class analog_tuner_delegation : public virtual tuner_delegation {
         public:
-            virtual void setTunerCenterFrequency(std::string& id, double freq) = 0;
-            virtual double getTunerCenterFrequency(std::string& id) = 0;
-            virtual void setTunerBandwidth(std::string& id, double bw) = 0;
-            virtual double getTunerBandwidth(std::string& id) = 0;
-            virtual void setTunerAgcEnable(std::string& id, bool enable) = 0;
-            virtual bool getTunerAgcEnable(std::string& id) = 0;
-            virtual void setTunerGain(std::string& id, float gain) = 0;
-            virtual float getTunerGain(std::string& id) = 0;
-            virtual void setTunerReferenceSource(std::string& id, long source) = 0;
-            virtual long getTunerReferenceSource(std::string& id) = 0;
-            virtual void setTunerEnable(std::string& id, bool enable) = 0;
-            virtual bool getTunerEnable(std::string& id) = 0;
+            virtual void setTunerCenterFrequency(const std::string& id, double freq) = 0;
+            virtual double getTunerCenterFrequency(const std::string& id) = 0;
+            virtual void setTunerBandwidth(const std::string& id, double bw) = 0;
+            virtual double getTunerBandwidth(const std::string& id) = 0;
+            virtual void setTunerAgcEnable(const std::string& id, bool enable) = 0;
+            virtual bool getTunerAgcEnable(const std::string& id) = 0;
+            virtual void setTunerGain(const std::string& id, float gain) = 0;
+            virtual float getTunerGain(const std::string& id) = 0;
+            virtual void setTunerReferenceSource(const std::string& id, long source) = 0;
+            virtual long getTunerReferenceSource(const std::string& id) = 0;
+            virtual void setTunerEnable(const std::string& id, bool enable) = 0;
+            virtual bool getTunerEnable(const std::string& id) = 0;
     };
     class digital_tuner_delegation : public virtual analog_tuner_delegation {
         public:
-            virtual void setTunerOutputSampleRate(std::string& id, double sr) = 0;
-            virtual double getTunerOutputSampleRate(std::string& id) = 0;
+            virtual void setTunerOutputSampleRate(const std::string& id, double sr) = 0;
+            virtual double getTunerOutputSampleRate(const std::string& id) = 0;
     };
     
     class InFrontendTunerPort : public virtual POA_FRONTEND::FrontendTuner, public Port_Provides_base_impl

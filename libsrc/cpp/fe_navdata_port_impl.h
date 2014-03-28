@@ -9,8 +9,8 @@ namespace frontend {
 
     class nav_delegation {
         public:
-            virtual frontend::NavigationPacket get_nav_packet(std::string& port_name) = 0;
-            virtual void set_nav_packet(std::string& port_name, const frontend::NavigationPacket &nav_info) = 0;
+            virtual frontend::NavigationPacket get_nav_packet(const std::string& port_name) = 0;
+            virtual void set_nav_packet(const std::string& port_name, const frontend::NavigationPacket &nav_info) = 0;
     };
     // ----------------------------------------------------------------------------------------
     // InNavDataPort declaration

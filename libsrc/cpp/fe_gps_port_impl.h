@@ -9,10 +9,10 @@ namespace frontend {
 
     class gps_delegation {
         public:
-            virtual frontend::GPSInfo get_gps_info(std::string& port_name) = 0;
-            virtual void set_gps_info(std::string& port_name, const frontend::GPSInfo &gps_info) = 0;
-            virtual frontend::GpsTimePos get_gps_time_pos(std::string& port_name) = 0;
-            virtual void set_gps_time_pos(std::string& port_name, const frontend::GpsTimePos &gps_time_pos) = 0;
+            virtual frontend::GPSInfo get_gps_info(const std::string& port_name) = 0;
+            virtual void set_gps_info(const std::string& port_name, const frontend::GPSInfo &gps_info) = 0;
+            virtual frontend::GpsTimePos get_gps_time_pos(const std::string& port_name) = 0;
+            virtual void set_gps_time_pos(const std::string& port_name, const frontend::GpsTimePos &gps_time_pos) = 0;
     };
     // ----------------------------------------------------------------------------------------
     // InGPSPort declaration
