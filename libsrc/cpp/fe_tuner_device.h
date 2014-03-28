@@ -100,8 +100,8 @@ namespace frontend {
             virtual bool removeTunerMapping(size_t tuner_id, std::string allocation_id);
             virtual bool removeTunerMapping(size_t tuner_id);
             virtual long getTunerMapping(std::string allocation_id);
-            virtual void assignListener(std::string& listen_alloc_id, std::string& alloc_id);
-            virtual void removeListener(std::string& listen_alloc_id);
+            virtual void assignListener(const std::string& listen_alloc_id, const std::string& alloc_id);
+            virtual void removeListener(const std::string& listen_alloc_id);
             virtual void removeAllocationIdRouting(const size_t tuner_id) = 0;
             virtual void setNumChannels(size_t num) = 0;
 

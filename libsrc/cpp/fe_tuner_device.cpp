@@ -536,11 +536,11 @@ namespace frontend {
     }
 
     template < typename TunerStatusStructType >
-    void FrontendTunerDevice<TunerStatusStructType>::assignListener(std::string& listen_alloc_id, std::string& alloc_id) {
+    void FrontendTunerDevice<TunerStatusStructType>::assignListener(const std::string& listen_alloc_id, const std::string& alloc_id) {
     };
 
     template < typename TunerStatusStructType >
-    void FrontendTunerDevice<TunerStatusStructType>::removeListener(std::string& listen_alloc_id) {
+    void FrontendTunerDevice<TunerStatusStructType>::removeListener(const std::string& listen_alloc_id) {
     };
 
 }; // end frontend namespace
