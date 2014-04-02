@@ -25,6 +25,14 @@ namespace frontend {
         return std::string(new_random_uuid_str);
     };
 
+    inline int compareHz(double x, double y){//, size_t places = 1){
+    	if(round(x-y) == 0)
+    		return 0; // equal
+    	if(x<y)
+    		return -1; // x < y
+    	return 1; // x > y
+    }
+
     /* Tuner Allocation IDs struct. This structure contains allocation tracking data.
      *
      */

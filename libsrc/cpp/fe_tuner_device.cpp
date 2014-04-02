@@ -435,24 +435,40 @@ namespace frontend {
     bool FrontendTunerDevice<TunerStatusStructType>::listenerRequestValidation(frontend_tuner_allocation_struct &request, size_t tuner_id){
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
 
-        // ensure requested values are >= 0
+        // ensure requested values are non-negative
         if(request.center_frequency < 0 || request.bandwidth < 0 || request.sample_rate < 0 || request.bandwidth_tolerance < 0 || request.sample_rate_tolerance < 0)
         	return false;
+
     	// ensure lower end of requested band fits
-    	if(request.center_frequency - (request.bandwidth/2) < frontend_tuner_status[tuner_id].center_frequency - (frontend_tuner_status[tuner_id].bandwidth/2))
+    	//if((request.center_frequency - (request.bandwidth*0.5)) < (frontend_tuner_status[tuner_id].center_frequency - (frontend_tuner_status[tuner_id].bandwidth*0.5))){
+        if( compareHz((request.center_frequency-(request.bandwidth*0.5)),(frontend_tuner_status[tuner_id].center_frequency-(frontend_tuner_status[tuner_id].bandwidth*0.5))) < 0 ){
+    		LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__ << " FAILED LOWER END TEST");
     		return false;
+    	}
+
     	// ensure upper end of requested band fits
-    	if(request.center_frequency + (request.bandwidth/2) > frontend_tuner_status[tuner_id].center_frequency + (frontend_tuner_status[tuner_id].bandwidth/2))
+    	//if((request.center_frequency + (request.bandwidth*0.5)) > (frontend_tuner_status[tuner_id].center_frequency + (frontend_tuner_status[tuner_id].bandwidth*0.5))){
+    	if( compareHz((request.center_frequency + (request.bandwidth*0.5)),(frontend_tuner_status[tuner_id].center_frequency + (frontend_tuner_status[tuner_id].bandwidth*0.5))) > 0 ){
+    		LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__ << " FAILED UPPER END TEST");
     		return false;
+    	}
+
     	// ensure tuner bandwidth meets requested tolerance
-    	if(request.bandwidth > frontend_tuner_status[tuner_id].bandwidth)
+    	//if(request.bandwidth > frontend_tuner_status[tuner_id].bandwidth)
+    	if( compareHz(request.bandwidth,frontend_tuner_status[tuner_id].bandwidth) > 0 )
     		return false;
-    	if(request.bandwidth != 0 && request.bandwidth+request.bandwidth*request.bandwidth_tolerance/100 < frontend_tuner_status[tuner_id].bandwidth)
+
+    	//if(request.bandwidth != 0 && (request.bandwidth+(request.bandwidth*request.bandwidth_tolerance/100)) < frontend_tuner_status[tuner_id].bandwidth)
+        if( request.bandwidth != 0 && compareHz((request.bandwidth+(request.bandwidth*request.bandwidth_tolerance/100)),frontend_tuner_status[tuner_id].bandwidth) < 0 )
     		return false;
+
     	// ensure tuner sample rate meets requested tolerance
-    	if(request.sample_rate > frontend_tuner_status[tuner_id].sample_rate)
+    	//if(request.sample_rate > frontend_tuner_status[tuner_id].sample_rate)
+    	if( compareHz(request.sample_rate,frontend_tuner_status[tuner_id].sample_rate) > 0 )
     		return false;
-    	if(request.sample_rate != 0 && request.sample_rate+request.sample_rate*request.sample_rate_tolerance/100 < frontend_tuner_status[tuner_id].sample_rate)
+
+    	//if(request.sample_rate != 0 && (request.sample_rate+(request.sample_rate*request.sample_rate_tolerance/100)) < frontend_tuner_status[tuner_id].sample_rate)
+    	if(request.sample_rate != 0 && compareHz((request.sample_rate+(request.sample_rate*request.sample_rate_tolerance/100)),frontend_tuner_status[tuner_id].sample_rate) < 0 )
     		return false;
 
     	return true;
