@@ -172,7 +172,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
     public boolean allocateTuner(frontend.FrontendTunerStructProps.frontend_tuner_allocation_struct capacity) throws CF.DevicePackage.InvalidCapacity, Exception {
         try{
             if(!_valid_tuner_type(frontend_tuner_allocation.getValue().tuner_type.getValue())){
-                //TODO: add back log messages
                 System.out.println("allocateTuner: UNKNOWN FRONTEND TUNER TYPE");
                 throw new CF.DevicePackage.InvalidCapacity("UNKNOWN FRONTEND TUNER TYPE", new CF.DataType[]{new DataType("frontend_tuner_allocation", capacity.toAny())});
             }
@@ -180,13 +179,11 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             // Check allocation_id
             if (frontend_tuner_allocation.getValue().allocation_id != null &&
                 frontend_tuner_allocation.getValue().allocation_id.getValue().isEmpty()) {
-                //TODO: add back log messages
                 System.out.println("allocateTuner: MISSING ALLOCATION_ID");
                 throw new CF.DevicePackage.InvalidCapacity("MISSING ALLOCATION ID", new CF.DataType[]{new DataType("frontend_tuner_allocation", capacity.toAny())});
             }
             // Check if allocation ID has already been used
             if(getTunerMapping(frontend_tuner_allocation.getValue().allocation_id.getValue()) >= 0){
-                //TODO: add back log messages
                 System.out.println("allocateTuner: ALLOCATION_ID ALREADY IN USE");
                 throw new CF.DevicePackage.InvalidCapacity("ALLOCATION_ID ALREADY IN USE", new CF.DataType[]{new DataType("frontend_tuner_allocation", capacity.toAny())});
             }
@@ -195,7 +192,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             if (tuner_id < 0) {
                 String msg;
                 msg = "NO AVAILABLE TUNER";
-                //TODO: add back log messages
                 System.out.println("allocateTuner: NO AVAILABLE TUNER");
                 throw new RuntimeException(msg);
             }
@@ -207,7 +203,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                         if(frontend_tuner_allocation.getValue().group_id != null &&
                            !frontend_tuner_allocation.getValue().group_id.getValue().isEmpty() && 
                            frontend_tuner_allocation.getValue().group_id.getValue() != tunerChannels.get(tuner_id).frontend_status.group_id.getValue() ){
-                            //TODO: add back log messages
                             System.out.println("allocateTuner: CANNOT ALLOCATE A TUNER WITH THAT GROUP ID");
                             throw new FRONTEND.BadParameterException("CAN NOT ALLOCATE A TUNER WITH THAT GROUP ID!");
                         }
@@ -215,23 +210,19 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                         if(frontend_tuner_allocation.getValue().rf_flow_id != null &&
                            !frontend_tuner_allocation.getValue().rf_flow_id.getValue().isEmpty() && 
                            frontend_tuner_allocation.getValue().rf_flow_id.getValue() != tunerChannels.get(tuner_id).frontend_status.rf_flow_id.getValue() ){
-                            //TODO: add back log messages
                             System.out.println("allocateTuner: CANNOT ALLOCATE A TUNER WITH THAT RF FLOW ID");
                             throw new FRONTEND.BadParameterException("CAN NOT ALLOCATE A TUNER WITH RF FLOW ID = " + frontend_tuner_allocation.getValue().rf_flow_id.getValue() + " !");
                         }
                         //Check Validity
                         if (!_valid_center_frequency(frontend_tuner_allocation.getValue().center_frequency.getValue(),tuner_id)){
-                            //TODO: add back log messages
                             System.out.println("allocateTuner: INVALID FREQUENCY");
                             throw new FRONTEND.BadParameterException("allocateTuner(): INVALID FREQUENCY");
                         }
                         if (!_valid_bandwidth(frontend_tuner_allocation.getValue().bandwidth.getValue(),tuner_id)){
-                            //TODO: add back log messages
                             System.out.println("allocateTuner: INVALID BANDWIDTH");
                             throw new FRONTEND.BadParameterException("allocateTuner(): INVALID BANDWIDTH");
                         }
                         if (!_valid_sample_rate(frontend_tuner_allocation.getValue().sample_rate.getValue(),tuner_id)){
-                            //TODO: add back log messages
                             System.out.println("allocateTuner: INVALID RATE");
                             throw new FRONTEND.BadParameterException("allocateTuner(): INVALID RATE");
                         }
@@ -244,7 +235,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                         } catch(Exception e){
                             String msg;
                             msg="allocateTuner(" + tuner_id + ") failed when configuring device hardware";
-                            //TODO: add back log messages
                             System.out.println("allocateTuner: failed when querying device hardware");
                             throw new RuntimeException(msg);
                         };
@@ -256,7 +246,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                              tunerChannels.get(tuner_id).frontend_status.bandwidth.getValue() > (frontend_tuner_allocation.getValue().bandwidth.getValue()+frontend_tuner_allocation.getValue().bandwidth.getValue() * frontend_tuner_allocation.getValue().bandwidth_tolerance.getValue()/100.0 ))){
                             String msg;
                             msg = "allocateTuner(" + tuner_id + "): returned bw \"" + tunerChannels.get(tuner_id).frontend_status.bandwidth.getValue() + "\" does not meet tolerance criteria of \"" + frontend_tuner_allocation.getValue().bandwidth.getValue() + "+" + frontend_tuner_allocation.getValue().bandwidth_tolerance.getValue() + "  percent\". ";
-                            //TODO: add back log messages
                             System.out.println("allocateTuner: did not meet BW tolerance");
                             throw new RuntimeException(msg);
                         }
@@ -266,7 +255,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                               tunerChannels.get(tuner_id).frontend_status.sample_rate.getValue() > frontend_tuner_allocation.getValue().sample_rate.getValue() +frontend_tuner_allocation.getValue().sample_rate.getValue() * frontend_tuner_allocation.getValue().sample_rate_tolerance.getValue()/100.0 )){
                             String msg;
                             msg = "allocateTuner(" + tuner_id + "): returned sample rate \"" + tunerChannels.get(tuner_id).frontend_status.sample_rate.getValue() + "\" does not meet tolerance criteria of " + frontend_tuner_allocation.getValue().sample_rate.getValue() + "+" + frontend_tuner_allocation.getValue().sample_rate_tolerance.getValue() + " percent\". ";
-                            //TODO: add back log messages
                             System.out.println("allocateTuner: did not meet sample rate tolerance");
                             throw new RuntimeException(msg);
                         }
@@ -279,7 +267,6 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                 } catch(Exception e){
                     String msg;
                     msg = "FAILED TO ENABLE TUNER AFTER ALLOCATION";
-                    //TODO: add back log messages
                     System.out.println("allocateTuner: FAILED TO ENABLE TUNER AFTER ALLOCATION");
                     throw new RuntimeException(msg);
                 }
@@ -332,24 +319,20 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             // Check validity of allocation_id's
             if (frontend_listener_allocation.getValue().existing_allocation_id == null || 
                 frontend_listener_allocation.getValue().existing_allocation_id.getValue().isEmpty()){
-                //TODO: add back log messages
                 System.out.println("allocateListener: MISSING EXISTING ALLOCATION ID");
                 throw new CF.DevicePackage.InvalidCapacity("MISSING EXISTING ALLOCATION ID", new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
             }
             if (frontend_listener_allocation.getValue().listener_allocation_id.getValue().isEmpty()){
-                //TODO: add back log messages
                 System.out.println("allocateListener: MISSING LISTENER ALLOCATION ID");
                 throw new CF.DevicePackage.InvalidCapacity("MISSING LISTENER ALLOCATION ID", new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
             }
             // Check if listener allocation ID has already been used
             if(getTunerMapping(frontend_listener_allocation.getValue().listener_allocation_id.getValue()) >= 0){
-                //TODO: add back log messages
                 System.out.println("allocateListener: LISTENER ALLOCATION ID ALREADY IN USE");
                 throw new CF.DevicePackage.InvalidCapacity("LISTENER ALLOCATION ID ALREADY IN USE", new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
             }
 
             if(addListenerMapping(capacity) < 0){
-                //TODO: add back log messages
                 System.out.println("allocateListener: UNKNOWN CONTROL ALLOCATION ID");
                 throw new FRONTEND.BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
             }

@@ -1,6 +1,5 @@
 package frontend;
 
-import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import org.ossie.component.QueryableUsesPort;
@@ -14,8 +13,6 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
 
     protected String name;
  
-    protected Logger logger = null;
-
     protected Object updatingPortsLock;
 
     /**
@@ -24,14 +21,8 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
     protected Map<String, GPSOperations> outConnections = new HashMap<String, GPSOperations>();
 
     public OutGPSPort( String portName) {
-        this( portName, null);
-    }
-
-    public OutGPSPort( String portName,
-                         Logger logger) {
         super(portName);
         this.name = portName;
-        this.logger = logger;
         this.outConnections = new HashMap<String, GPSOperations>();
     }
 
@@ -112,10 +103,6 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
                 }
             }
         }
-    }
-
-    public void setLogger( Logger newLogger ) {
-        logger = newLogger;
     }
 }
 

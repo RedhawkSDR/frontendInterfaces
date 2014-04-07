@@ -71,17 +71,12 @@ namespace frontend {
     {
         public:
             OutRFSourcePort(std::string port_name);
-            OutRFSourcePort(std::string port_name, LOGGER_PTR logger);
             ~OutRFSourcePort();
 
             FRONTEND::RFInfoPktSequence* available_rf_inputs();
             void available_rf_inputs(const FRONTEND::RFInfoPktSequence& data);
             FRONTEND::RFInfoPkt* current_rf_input();
             void current_rf_input(const FRONTEND::RFInfoPkt& data);
-                void setLogger(LOGGER_PTR newLogger);
-
-        protected:
-                LOGGER_PTR logger;
     };
 
 } // end of frontend namespace

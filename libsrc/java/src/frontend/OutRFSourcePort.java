@@ -1,6 +1,5 @@
 package frontend;
 
-import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import org.ossie.component.QueryableUsesPort;
@@ -13,8 +12,6 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
 
     protected String name;
  
-    protected Logger logger = null;
-
     protected Object updatingPortsLock;
 
     /**
@@ -23,14 +20,8 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
     protected Map<String, RFSourceOperations> outConnections = new HashMap<String, RFSourceOperations>();
 
     public OutRFSourcePort( String portName) {
-        this( portName, null);
-    }
-
-    public OutRFSourcePort( String portName,
-                            Logger logger) {
         super(portName);
         this.name = portName;
-        this.logger = logger;
         this.outConnections = new HashMap<String, RFSourceOperations>();
     }
 
@@ -105,10 +96,6 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
                 }
             }
         }
-    }
-
-    public void setLogger( Logger newLogger ) {
-        logger = newLogger;
     }
 }
 

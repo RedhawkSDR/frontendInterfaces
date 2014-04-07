@@ -1,6 +1,5 @@
 package frontend;
 
-import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import org.ossie.component.QueryableUsesPort;
@@ -13,8 +12,6 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
 
     protected String name;
  
-    protected Logger logger = null;
-
     protected Object updatingPortsLock;
 
     /**
@@ -23,14 +20,8 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
     protected Map<String, NavDataOperations> outConnections = new HashMap<String, NavDataOperations>();
 
     public OutNavDataPort( String portName) {
-        this( portName, null);
-    }
-
-    public OutNavDataPort( String portName,
-                         Logger logger) {
         super(portName);
         this.name = portName;
-        this.logger = logger;
         this.outConnections = new HashMap<String, NavDataOperations>();
     }
 
@@ -86,10 +77,6 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
                 }
             }
         }
-    }
-
-    public void setLogger( Logger newLogger ) {
-        logger = newLogger;
     }
 }
 

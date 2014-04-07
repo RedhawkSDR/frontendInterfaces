@@ -2,7 +2,6 @@
 #define FE_TUNER_PORT_H
 
 #include "fe_port_impl.h"
-#include "fe_base.h"
 
 #include <redhawk/FRONTEND/TunerControl.h>
 
@@ -181,8 +180,6 @@ namespace frontend {
         public:
             OutFrontendTunerPortT(std::string port_name) : OutFrontendPort<PortType_var, PortType>(port_name)
             {};
-            OutFrontendTunerPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendPort<PortType_var, PortType>(port_name, logger)
-            {};
             ~OutFrontendTunerPortT(){};
             
             std::string getTunerType(std::string &id) {
@@ -194,7 +191,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerType(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerType by OutFrontendTunerPort failed");
                         }
                     }
                 }
@@ -210,7 +206,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerDeviceControl(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerDeviceControl by OutFrontendTunerPort failed");
                         }
                     }
                 }
@@ -225,7 +220,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerGroupId(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerGroupId by OutFrontendTunerPort failed");
                         }
                     }
                 }
@@ -241,7 +235,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerRfFlowId(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerRfFlowId by OutFrontendTunerPort failed");
                         }
                     }
                 }
@@ -257,18 +250,11 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerStatus(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutFrontendTunerPortT,"Call to getTunerStatus by OutFrontendTunerPort failed");
                         }
                     }
                 }
                 return retval;
             };
-            void setLogger(LOGGER_PTR newLogger) {
-                logger = newLogger;
-            };
-            
-        protected:
-            LOGGER_PTR logger;
     };
  
     template<typename PortType_var, typename PortType>
@@ -276,8 +262,6 @@ namespace frontend {
     {
         public:
             OutAnalogTunerPortT(std::string port_name) : OutFrontendTunerPortT<PortType_var, PortType>(port_name)
-            {};
-            OutAnalogTunerPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendTunerPortT<PortType_var, PortType>(port_name, logger)
             {};
             ~OutAnalogTunerPortT(){};
             
@@ -289,7 +273,6 @@ namespace frontend {
                         try {
                             ((*i).first)->setTunerCenterFrequency(id.c_str(), freq);
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerCenterFrequency by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -304,7 +287,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerCenterFrequency(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerCenterFrequency by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -318,7 +300,6 @@ namespace frontend {
                         try {
                             ((*i).first)->setTunerBandwidth(id.c_str(), bw);
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerBandwidth by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -333,7 +314,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerBandwidth(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerBandwidth by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -347,7 +327,6 @@ namespace frontend {
                         try {
                             ((*i).first)->setTunerAgcEnable(id.c_str(), enable);
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerAgcEnable by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -362,7 +341,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerAgcEnable(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerAgcEnable by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -376,7 +354,6 @@ namespace frontend {
                         try {
                             ((*i).first)->setTunerGain(id.c_str(), gain);
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerGain by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -391,7 +368,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerGain(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerGain by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -405,7 +381,6 @@ namespace frontend {
                         try {
                             ((*i).first)->setTunerReferenceSource(id.c_str(), source);
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerReferenceSource by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -420,7 +395,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerReferenceSource(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerReferenceSource by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -434,7 +408,6 @@ namespace frontend {
                         try {
                             ((*i).first)->setTunerEnable(id.c_str(), enable);
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to setTunerEnable by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -449,7 +422,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerEnable(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutAnalogTunerPortT,"Call to getTunerEnable by OutAnalogTunerPort failed");
                         }
                     }
                 }
@@ -463,8 +435,6 @@ namespace frontend {
         public:
             OutDigitalTunerPortT(std::string port_name) : OutAnalogTunerPortT<PortType_var, PortType>(port_name)
             {};
-            OutDigitalTunerPortT(std::string port_name, LOGGER_PTR logger) : OutAnalogTunerPortT<PortType_var, PortType>(port_name, logger)
-            {};
             ~OutDigitalTunerPortT(){};
             
             void setTunerOutputSampleRate(std::string &id, double sr) {
@@ -475,7 +445,6 @@ namespace frontend {
                         try {
                             ((*i).first)->setTunerOutputSampleRate(id.c_str(), sr);
                         } catch(...) {
-                            LOG_ERROR(OutDigitalTunerPortT,"Call to setTunerOutputSampleRate by OutDigitalTunerPort failed");
                         }
                     }
                 }
@@ -490,7 +459,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->getTunerOutputSampleRate(id.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutDigitalTunerPortT,"Call to getTunerOutputSampleRate by OutDigitalTunerPort failed");
                         }
                     }
                 }
@@ -505,8 +473,6 @@ namespace frontend {
         public:
             OutFrontendTunerPort(std::string port_name) : OutFrontendTunerPortT<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner>(port_name)
             {};
-            OutFrontendTunerPort(std::string port_name, LOGGER_PTR logger) : OutFrontendTunerPortT<FRONTEND::FrontendTuner_var,FRONTEND::FrontendTuner>(port_name, logger)
-            {};
     };
 
     // ----------------------------------------------------------------------------------------
@@ -516,8 +482,6 @@ namespace frontend {
         public:
             OutAnalogTunerPort(std::string port_name) : OutAnalogTunerPortT<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner>(port_name)
             {};
-            OutAnalogTunerPort(std::string port_name, LOGGER_PTR logger) : OutAnalogTunerPortT<FRONTEND::AnalogTuner_var,FRONTEND::AnalogTuner>(port_name, logger)
-            {};
     };
 
     // ----------------------------------------------------------------------------------------
@@ -526,8 +490,6 @@ namespace frontend {
     class OutDigitalTunerPort : public OutDigitalTunerPortT<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner> {
         public:
             OutDigitalTunerPort(std::string port_name) : OutDigitalTunerPortT<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner>(port_name)
-            {};
-            OutDigitalTunerPort(std::string port_name, LOGGER_PTR logger) : OutDigitalTunerPortT<FRONTEND::DigitalTuner_var,FRONTEND::DigitalTuner>(port_name, logger)
             {};
     };
 

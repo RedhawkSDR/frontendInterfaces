@@ -18,7 +18,6 @@
 #include <redhawk/FRONTEND/NavigationData.h>
 
 #include <ossie/CorbaUtils.h>
-#include "fe_base.h"
 #include "fe_types.h"
 
 
@@ -226,20 +225,8 @@ namespace frontend {
                 recConnectionsRefresh = false;
                 recConnections.length(0);
             }
-            OutFrontendPort(std::string port_name,
-                                        LOGGER_PTR logger) :
-                Port_Uses_base_impl(port_name),
-                                logger(logger)
-            {
-                recConnectionsRefresh = false;
-                recConnections.length(0);
-            }
             ~OutFrontendPort(){
             }
-
-                void setLogger(LOGGER_PTR newLogger){
-                    logger = newLogger;
-                }
 
             ExtendedCF::UsesConnectionSequence * connections()
             {
@@ -291,8 +278,6 @@ namespace frontend {
             std::vector < std::pair<PortType_var, std::string> > outConnections;
             ExtendedCF::UsesConnectionSequence recConnections;
             bool recConnectionsRefresh;
-
-                LOGGER_PTR logger;
     };
 
 } // end of frontend namespace

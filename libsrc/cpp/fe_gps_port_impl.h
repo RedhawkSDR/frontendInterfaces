@@ -66,8 +66,6 @@ namespace frontend {
         public:
             OutGPSPortT(std::string port_name) : OutFrontendPort<PortType_var, PortType>(port_name)
             {};
-            OutGPSPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendPort<PortType_var, PortType>(port_name, logger)
-            {};
             ~OutGPSPortT(){};
             
             frontend::GPSInfo gps_info() {
@@ -80,7 +78,6 @@ namespace frontend {
                             const FRONTEND::GPSInfo_var tmp = ((*i).first)->gps_info();
                             retval = frontend::returnGPSInfo(tmp);
                         } catch(...) {
-                            LOG_ERROR(OutGPSPortT,"Call to gps_info by OutGPSPortT failed");
                         }
                     }
                 }
@@ -95,7 +92,6 @@ namespace frontend {
                             const FRONTEND::GPSInfo_var tmp = frontend::returnGPSInfo(gps);
                             ((*i).first)->gps_info(tmp);
                         } catch(...) {
-                            LOG_ERROR(OutGPSPortT,"Call to gps_info by OutGPSPortT failed");
                         }
                     }
                 }
@@ -111,7 +107,6 @@ namespace frontend {
                             const FRONTEND::GpsTimePos_var tmp = ((*i).first)->gps_time_pos();
                             retval = frontend::returnGpsTimePos(tmp);
                         } catch(...) {
-                            LOG_ERROR(OutGPSPortT,"Call to gps_time_pos by OutGPSPortT failed");
                         }
                     }
                 }
@@ -126,25 +121,16 @@ namespace frontend {
                             const FRONTEND::GpsTimePos_var tmp = frontend::returnGpsTimePos(gps_time_pos);
                             ((*i).first)->gps_time_pos(tmp);
                         } catch(...) {
-                            LOG_ERROR(OutGPSPortT,"Call to gps_time_pos by OutGPSPortT failed");
                         }
                     }
                 }
                 return;
             };
-            void setLogger(LOGGER_PTR newLogger) {
-                logger = newLogger;
-            };
-            
-        protected:
-            LOGGER_PTR logger;
             
     };
     class OutGPSPort : public OutGPSPortT<FRONTEND::GPS_var,FRONTEND::GPS> {
         public:
             OutGPSPort(std::string port_name) : OutGPSPortT<FRONTEND::GPS_var,FRONTEND::GPS>(port_name)
-            {};
-            OutGPSPort(std::string port_name, LOGGER_PTR logger) : OutGPSPortT<FRONTEND::GPS_var,FRONTEND::GPS>(port_name, logger)
             {};
     };
     

@@ -1,6 +1,5 @@
 package frontend;
 
-import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import org.ossie.component.QueryableUsesPort;
@@ -13,8 +12,6 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
 
     protected String name;
  
-    protected Logger logger = null;
-
     protected Object updatingPortsLock;
 
     /**
@@ -23,14 +20,8 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
     protected Map<String, RFInfoOperations> outConnections = new HashMap<String, RFInfoOperations>();
 
     public OutRFInfoPort( String portName) {
-        this( portName, null);
-    }
-
-    public OutRFInfoPort( String portName,
-                         Logger logger) {
         super(portName);
         this.name = portName;
-        this.logger = logger;
         this.outConnections = new HashMap<String, RFInfoOperations>();
     }
 
@@ -105,10 +96,6 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
                 }
             }
         }
-    }
-
-    public void setLogger( Logger newLogger ) {
-        logger = newLogger;
     }
 }
 

@@ -52,8 +52,6 @@ namespace frontend {
         public:
             OutNavDataPortT(std::string port_name) : OutFrontendPort<PortType_var, PortType>(port_name)
             {};
-            OutNavDataPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendPort<PortType_var, PortType>(port_name, logger)
-            {};
             ~OutNavDataPortT(){};
             
             frontend::NavigationPacket nav_packet() {
@@ -66,7 +64,6 @@ namespace frontend {
                             const FRONTEND::NavigationPacket_var tmp = ((*i).first)->nav_packet();
                             retval = frontend::returnNavigationPacket(tmp);
                         } catch(...) {
-                            LOG_ERROR(OutNavDataPortT,"Call to gps_info by OutNavDataPortT failed");
                         }
                     }
                 }
@@ -81,25 +78,15 @@ namespace frontend {
                             const FRONTEND::NavigationPacket tmp = frontend::returnNavigationPacket(nav);
                             ((*i).first)->nav_packet(tmp);
                         } catch(...) {
-                            LOG_ERROR(OutNavDataPortT,"Call to gps_info by OutNavDataPortT failed");
                         }
                     }
                 }
                 return;
             };
-            void setLogger(LOGGER_PTR newLogger) {
-                logger = newLogger;
-            };
-            
-        protected:
-            LOGGER_PTR logger;
-            
     };
     class OutNavDataPort : public OutNavDataPortT<FRONTEND::NavData_var,FRONTEND::NavData> {
         public:
             OutNavDataPort(std::string port_name) : OutNavDataPortT<FRONTEND::NavData_var,FRONTEND::NavData>(port_name)
-            {};
-            OutNavDataPort(std::string port_name, LOGGER_PTR logger) : OutNavDataPortT<FRONTEND::NavData_var,FRONTEND::NavData>(port_name, logger)
             {};
     };
     

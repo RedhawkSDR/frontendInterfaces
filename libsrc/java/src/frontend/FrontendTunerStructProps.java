@@ -3,8 +3,6 @@ package frontend;
 import java.util.HashMap;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
 import org.ossie.component.*;
 import org.ossie.properties.*;
 

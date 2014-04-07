@@ -1,6 +1,5 @@
 package frontend;
 
-import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import org.ossie.component.QueryableUsesPort;
@@ -14,8 +13,6 @@ public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperati
 
     protected String name;
 
-    protected Logger logger = null;
-
     protected Object updatingPortsLock;
 
     /**
@@ -23,15 +20,9 @@ public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperati
      */
     protected Map<String, FrontendTunerOperations> outConnections = new HashMap<String, FrontendTunerOperations>();
 
-    public OutFrontendTunerPort(String portName) {
-        this( portName, null);
-    }
-
-    public OutFrontendTunerPort(String portName,
-                                Logger logger) { 
+    public OutFrontendTunerPort(String portName) { 
         super(portName);
         this.name = portName;
-        this. logger = logger;
         this.outConnections = new HashMap<String, FrontendTunerOperations>();
     }
 
@@ -127,9 +118,5 @@ public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperati
             }
         }
         return retval;
-    }
-
-    public void setLogger( Logger newLogger ) {
-        logger = newLogger;
     }
  }

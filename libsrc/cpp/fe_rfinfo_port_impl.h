@@ -64,8 +64,6 @@ namespace frontend {
         public:
             OutRFInfoPortT(std::string port_name) : OutFrontendPort<PortType_var, PortType>(port_name)
             {};
-            OutRFInfoPortT(std::string port_name, LOGGER_PTR logger) : OutFrontendPort<PortType_var, PortType>(port_name, logger)
-            {};
             ~OutRFInfoPortT(){};
             
             std::string rf_flow_id() {
@@ -77,7 +75,6 @@ namespace frontend {
                         try {
                             retval = ((*i).first)->rf_flow_id();
                         } catch(...) {
-                            LOG_ERROR(OutRFInfoPortT,"Call to rf_flow_id by OutRFInfoPortT failed");
                         }
                     }
                 }
@@ -92,7 +89,6 @@ namespace frontend {
                         try {
                             ((*i).first)->rf_flow_id(data.c_str());
                         } catch(...) {
-                            LOG_ERROR(OutRFInfoPortT,"Call to rf_flow_id by OutRFInfoPortT failed");
                         }
                     }
                 }
@@ -108,7 +104,6 @@ namespace frontend {
                             const FRONTEND::RFInfoPkt_var tmp = ((*i).first)->rfinfo_pkt();
                             retval = frontend::returnRFInfoPkt(tmp);
                         } catch(...) {
-                            LOG_ERROR(OutRFInfoPortT,"Call to rfinfo_pkt by OutRFInfoPortT failed");
                         }
                     }
                 }
@@ -123,25 +118,15 @@ namespace frontend {
                             const FRONTEND::RFInfoPkt_var tmp = frontend::returnRFInfoPkt(data);
                             ((*i).first)->rfinfo_pkt(tmp);
                         } catch(...) {
-                            LOG_ERROR(OutRFInfoPortT,"Call to rfinfo_pkt by OutRFInfoPortT failed");
                         }
                     }
                 }
                 return;
             };
-            void setLogger(LOGGER_PTR newLogger) {
-                logger = newLogger;
-            };
-            
-        protected:
-                LOGGER_PTR logger;
-
     };
     class OutRFInfoPort : public OutRFInfoPortT<FRONTEND::RFInfo_var,FRONTEND::RFInfo> {
         public:
             OutRFInfoPort(std::string port_name) : OutRFInfoPortT<FRONTEND::RFInfo_var,FRONTEND::RFInfo>(port_name)
-            {};
-            OutRFInfoPort(std::string port_name, LOGGER_PTR logger) : OutRFInfoPortT<FRONTEND::RFInfo_var,FRONTEND::RFInfo>(port_name, logger)
             {};
     };
     

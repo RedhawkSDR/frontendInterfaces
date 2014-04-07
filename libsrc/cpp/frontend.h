@@ -1,5 +1,4 @@
 
-#include "fe_base.h"
 #include "fe_gps_port_impl.h"
 #include "fe_navdata_port_impl.h"
 #include "fe_rfinfo_port_impl.h"

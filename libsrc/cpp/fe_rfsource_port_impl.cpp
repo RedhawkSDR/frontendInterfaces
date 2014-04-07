@@ -1,6 +1,5 @@
 
 #include "fe_rfsource_port_impl.h"
-#include "fe_log.h"
 
 namespace frontend {
 
@@ -12,21 +11,9 @@ namespace frontend {
     {
     }
 
-    OutRFSourcePort::OutRFSourcePort(std::string port_name,
-                                         LOGGER_PTR logger) :
-        OutFrontendPort<FRONTEND::RFSource_var,FRONTEND::RFSource>::OutFrontendPort(port_name,
-                                                                                            logger)
-    {
-    }
-
     OutRFSourcePort::~OutRFSourcePort()
     {
     }
-
-    void OutRFSourcePort::setLogger(LOGGER_PTR newLogger)
-        {
-            logger = newLogger;
-        }
 
     FRONTEND::RFInfoPktSequence* OutRFSourcePort::available_rf_inputs()
     {
@@ -40,7 +27,6 @@ namespace frontend {
                 try {
                     retval = ((*i).first)->available_rf_inputs();
                 } catch(...) {
-                    //LOG_ERROR(InRFSourcePort,"Call to available_rf_inputs by InRFSourcePort failed");
                 }
             }
         }
@@ -59,7 +45,6 @@ namespace frontend {
                 try {
                     ((*i).first)->available_rf_inputs(data);
                 } catch(...) {
-                    //LOG_ERROR(InRFSourcePort,"Call to available_rf_inputs by InRFSourcePort failed");
                 }
             }
         }
@@ -79,7 +64,6 @@ namespace frontend {
                 try {
                     retval = ((*i).first)->current_rf_input();
                 } catch(...) {
-                    //LOG_ERROR(InRFSourcePort,"Call to current_rf_input by InRFSourcePort failed");
                 }
             }
         }
@@ -98,7 +82,6 @@ namespace frontend {
                 try {
                     ((*i).first)->current_rf_input(data);
                 } catch(...) {
-                    //LOG_ERROR(InRFSourcePort,"Call to current_rf_input by InRFSourcePort failed");
                 }
             }
         }

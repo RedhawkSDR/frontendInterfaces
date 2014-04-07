@@ -1,6 +1,5 @@
 package frontend;
 
-import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import org.ossie.component.QueryableUsesPort;
@@ -11,8 +10,6 @@ import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
 
 public class OutDigitalTunerPort extends QueryableUsesPort<DigitalTunerOperations> implements DigitalTunerOperations {
-
-    protected Logger logger = null;
 
     /**
      * Map of connection Ids to port objects
@@ -275,8 +272,4 @@ public class OutDigitalTunerPort extends QueryableUsesPort<DigitalTunerOperation
         }
         return retval;
     }
-
-    public void setLogger( Logger newLogger ) {
-        logger = newLogger;
-    }
- }
+}
