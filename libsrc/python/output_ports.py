@@ -668,6 +668,7 @@ class OutDigitalTunerPort(OutPort):
                     try:
                         retVal = port.getTunerOutputSampleRate(id)
                     except Exception:
+                        pass
         finally:
             self.port_lock.release()
             
