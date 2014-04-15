@@ -2,6 +2,8 @@
 #include <exception>
 
 namespace frontend {
+    template < typename TunerStatusStructType >
+    log4cxx::LoggerPtr FrontendTunerDevice<TunerStatusStructType>::__logger(log4cxx::Logger::getLogger("FrontendTunerDevice"));
 
     template < typename TunerStatusStructType >
     FrontendTunerDevice<TunerStatusStructType>::FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl) :

@@ -57,6 +57,8 @@ namespace frontend {
     template < typename TunerStatusStructType >
     class FrontendTunerDevice : public Device_impl
     {
+        ENABLE_LOGGING
+
         public:
             FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl);
             FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, char *compDev);
