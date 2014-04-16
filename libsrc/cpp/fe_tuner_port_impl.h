@@ -10,31 +10,69 @@ namespace frontend {
     
     class tuner_delegation {
         public:
-            virtual std::string getTunerType(const std::string& id) = 0;
-            virtual bool getTunerDeviceControl(const std::string& id) = 0;
-            virtual std::string getTunerGroupId(const std::string& id) = 0;
-            virtual std::string getTunerRfFlowId(const std::string& id) = 0;
+            virtual std::string getTunerType(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerType not supported");
+            }
+            virtual bool getTunerDeviceControl(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerDeviceControl not supported");
+            }
+            virtual std::string getTunerGroupId(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerGroupId not supported");
+            }
+            virtual std::string getTunerRfFlowId(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerRfFlowId not supported");
+            }
             virtual CF::Properties* getTunerStatus(const std::string& id) = 0;
     };
+
     class analog_tuner_delegation : public virtual tuner_delegation {
         public:
-            virtual void setTunerCenterFrequency(const std::string& id, double freq) = 0;
-            virtual double getTunerCenterFrequency(const std::string& id) = 0;
-            virtual void setTunerBandwidth(const std::string& id, double bw) = 0;
-            virtual double getTunerBandwidth(const std::string& id) = 0;
-            virtual void setTunerAgcEnable(const std::string& id, bool enable) = 0;
-            virtual bool getTunerAgcEnable(const std::string& id) = 0;
-            virtual void setTunerGain(const std::string& id, float gain) = 0;
-            virtual float getTunerGain(const std::string& id) = 0;
-            virtual void setTunerReferenceSource(const std::string& id, long source) = 0;
-            virtual long getTunerReferenceSource(const std::string& id) = 0;
-            virtual void setTunerEnable(const std::string& id, bool enable) = 0;
-            virtual bool getTunerEnable(const std::string& id) = 0;
+            virtual void setTunerCenterFrequency(const std::string& id, double freq) {
+                throw FRONTEND::NotSupportedException("setTunerCenterFrequency not supported");
+            }
+            virtual double getTunerCenterFrequency(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerCenterFrequency not supported");
+            }
+            virtual void setTunerBandwidth(const std::string& id, double bw) {
+                throw FRONTEND::NotSupportedException("setTunerBandwidth not supported");
+            }
+            virtual double getTunerBandwidth(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerBandwidth not supported");
+            }
+            virtual void setTunerAgcEnable(const std::string& id, bool enable) {
+                throw FRONTEND::NotSupportedException("setTunerAgcEnable not supported");
+            }
+            virtual bool getTunerAgcEnable(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerAgcEnable not supported");
+            }
+            virtual void setTunerGain(const std::string& id, float gain) {
+                throw FRONTEND::NotSupportedException("setTunerGain not supported");
+            }
+            virtual float getTunerGain(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerGain not supported");
+            }
+            virtual void setTunerReferenceSource(const std::string& id, long source) {
+                throw FRONTEND::NotSupportedException("setTunerReferenceSource not supported");
+            }
+            virtual long getTunerReferenceSource(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerReferenceSource not supported");
+            }
+            virtual void setTunerEnable(const std::string& id, bool enable) {
+                throw FRONTEND::NotSupportedException("setTunerEnable not supported");
+            }
+            virtual bool getTunerEnable(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerEnable not supported");
+            }
     };
+
     class digital_tuner_delegation : public virtual analog_tuner_delegation {
         public:
-            virtual void setTunerOutputSampleRate(const std::string& id, double sr) = 0;
-            virtual double getTunerOutputSampleRate(const std::string& id) = 0;
+            virtual void setTunerOutputSampleRate(const std::string& id, double sr) {
+                throw FRONTEND::NotSupportedException("setTunerOutputSampleRate not supported");
+            }
+            virtual double getTunerOutputSampleRate(const std::string& id) {
+                throw FRONTEND::NotSupportedException("getTunerOutputSampleRate not supported");
+            }
     };
     
     class InFrontendTunerPort : public virtual POA_FRONTEND::FrontendTuner, public Port_Provides_base_impl

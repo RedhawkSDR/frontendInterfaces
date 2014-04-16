@@ -10,10 +10,16 @@ namespace frontend {
     
     class rfinfo_delegation {
         public:
-            virtual std::string get_rf_flow_id(const std::string& port_name) = 0;
-            virtual void set_rf_flow_id(const std::string& port_name, const std::string& id) = 0;
-            virtual RFInfoPkt get_rfinfo_pkt(const std::string& port_name) = 0;
-            virtual void set_rfinfo_pkt(const std::string& port_name, const RFInfoPkt &pkt) = 0;
+            virtual std::string get_rf_flow_id(const std::string& port_name) {
+                return std::string("none");
+            }
+            virtual void set_rf_flow_id(const std::string& port_name, const std::string& id) {
+            }
+            virtual RFInfoPkt get_rfinfo_pkt(const std::string& port_name) {
+                return RFInfoPkt();
+            }
+            virtual void set_rfinfo_pkt(const std::string& port_name, const RFInfoPkt &pkt) {
+            }
     };
     
     

@@ -10,10 +10,16 @@ namespace frontend {
     
     class rfsource_delegation {
         public:
-            virtual std::vector<RFInfoPkt> get_available_rf_inputs(const std::string& port_name) = 0;
-            virtual void set_available_rf_inputs(const std::string& port_name, std::vector<RFInfoPkt> &inputs) = 0;
-            virtual RFInfoPkt get_current_rf_input(const std::string& port_name) = 0;
-            virtual void set_current_rf_input(const std::string& port_name, const RFInfoPkt &input) = 0;
+            virtual std::vector<RFInfoPkt> get_available_rf_inputs(const std::string& port_name) {
+                return std::vector<RFInfoPkt>();
+            }
+            virtual void set_available_rf_inputs(const std::string& port_name, std::vector<RFInfoPkt> &inputs) {
+            }
+            virtual RFInfoPkt get_current_rf_input(const std::string& port_name) {
+                return RFInfoPkt();
+            }
+            virtual void set_current_rf_input(const std::string& port_name, const RFInfoPkt &input) {
+            }
     };
     
     class InRFSourcePort : public POA_FRONTEND::RFSource, public Port_Provides_base_impl
