@@ -139,11 +139,11 @@ namespace frontend {
                 sri.mode = 0;
                 sri.blocking=false;
                 sri.streamID = stream_id.c_str();
-                long colFreq;
+                CORBA::Double colFreq;
                 if (collector_frequency < 0)
                     colFreq = frontend_status.center_frequency;
                 else
-                    colFreq = long(collector_frequency);
+                    colFreq = CORBA::Double(collector_frequency);
                 this->addModifyKeyword<CORBA::Double > (&sri, "COL_RF", CORBA::Double(colFreq));
                 this->addModifyKeyword<CORBA::Double > (&sri, "CHAN_RF", CORBA::Double(frontend_status.center_frequency));
                 this->addModifyKeyword<std::string> (&sri,"FRONTEND::RF_FLOW_ID",frontend_status.rf_flow_id);
