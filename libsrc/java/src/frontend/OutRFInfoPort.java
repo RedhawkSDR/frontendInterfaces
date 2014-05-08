@@ -44,7 +44,7 @@ public class OutRFInfoPort extends QueryableUsesPort<RFInfoOperations> implement
 
     }
 
-    public void disconnectPort(final String connectionId) throws CF.PortPackage.InvalidPort {
+    public void disconnectPort(final String connectionId) {
         synchronized (this.updatingPortsLock) {
             super.disconnectPort(connectionId);
             this.outConnections.remove(connectionId);

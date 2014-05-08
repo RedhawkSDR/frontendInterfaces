@@ -47,7 +47,7 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
 
     }
 
-    public void disconnectPort(final String connectionId) throws CF.PortPackage.InvalidPort {
+    public void disconnectPort(final String connectionId) {
         synchronized (this.updatingPortsLock) {
             super.disconnectPort(connectionId);
             this.outConnections.remove(connectionId);
