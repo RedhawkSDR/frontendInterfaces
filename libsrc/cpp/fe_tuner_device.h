@@ -37,12 +37,12 @@ namespace frontend {
      * uses a single decimal place of precision.
      */
     inline double compareHz(double lhs, double rhs, size_t places = 1){
-    	return round((lhs-rhs)*pow(10,places));
-    	/*if(round((lhs-rhs)*(pow(10,places))) == 0)
-    		return 0; // equal
-    	if(lhs<rhs)
-    		return -1; // lhs < rhs
-    	return 1; // lhs > rhs*/
+        return round((lhs-rhs)*pow(10,places));
+        /*if(round((lhs-rhs)*(pow(10,places))) == 0)
+            return 0; // equal
+        if(lhs<rhs)
+            return -1; // lhs < rhs
+        return 1; // lhs > rhs*/
     }
 
     /* validateRequest is a helper function to compare two ranges, returning true if the range
@@ -50,11 +50,11 @@ namespace frontend {
      * False is returned if min > max for either available for requested values
      */
     inline bool validateRequest(double available_min, double available_max, double requested_min, double requested_max){
-    	if(compareHz(requested_min,available_min) < 0) return false;
-    	if(compareHz(requested_max,available_max) > 0) return false;
-    	if(compareHz(available_min,available_max) > 0) return false;
-    	if(compareHz(requested_min,requested_max) > 0) return false;
-    	return true;
+        if(compareHz(requested_min,available_min) < 0) return false;
+        if(compareHz(requested_max,available_max) > 0) return false;
+        if(compareHz(available_min,available_max) > 0) return false;
+        if(compareHz(requested_min,requested_max) > 0) return false;
+        return true;
     }
 
     /* validateRequestVsSRI is a helper function to check that the input data stream can support
@@ -65,19 +65,19 @@ namespace frontend {
      */
     inline bool validateRequestVsSRI(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri, bool output_mode){
 
-    	// get center frequency and bandwidth from SRI keywords
-    	double upstream_cf, upstream_bw;
-    	bool found_cf(false), found_bw(false);
+        // get center frequency and bandwidth from SRI keywords
+        double upstream_cf, upstream_bw;
+        bool found_cf(false), found_bw(false);
         unsigned long key_size = upstream_sri.keywords.length();
         for (unsigned int i = 0; i < key_size; i++) {
             if (!strcmp(upstream_sri.keywords[i].id, "CHAN_RF")) {
-            	if (upstream_sri.keywords[i].value >>= upstream_cf) found_cf = true;
+                if (upstream_sri.keywords[i].value >>= upstream_cf) found_cf = true;
             } else if (!strcmp(upstream_sri.keywords[i].id, "FRONTEND::BANDWIDTH")) {
-            	if (upstream_sri.keywords[i].value >>= upstream_bw) found_bw = true;
+                if (upstream_sri.keywords[i].value >>= upstream_bw) found_bw = true;
             }
         }
         if(!found_cf || !found_bw)
-        	return false;
+            return false;
 
         // check bandwidth
         double min_upstream_freq = upstream_cf-(upstream_bw/2);
@@ -85,10 +85,10 @@ namespace frontend {
         double min_requested_freq = request.center_frequency-(request.bandwidth/2);
         double max_requested_freq = request.center_frequency+(request.bandwidth/2);
 
-    	if( !validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq) ) return false;
+        if( !validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq) ) return false;
 
         // check sample rate
-    	double upstream_sr = 1/upstream_sri.xdelta;
+        double upstream_sr = 1/upstream_sri.xdelta;
         size_t input_scaling_factor = (upstream_sri.mode) ? 2 : 4; // adjust for complex data
         min_upstream_freq = upstream_cf-(upstream_sr/input_scaling_factor);
         max_upstream_freq = upstream_cf+(upstream_sr/input_scaling_factor);
@@ -96,7 +96,7 @@ namespace frontend {
         min_requested_freq = request.center_frequency-(request.sample_rate/output_scaling_factor);
         max_requested_freq = request.center_frequency+(request.sample_rate/output_scaling_factor);
 
-    	return validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq);
+        return validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq);
     }
 
     /* validateRequestVsDevice is a helper function to check that the input data stream and the
@@ -107,21 +107,21 @@ namespace frontend {
      * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri, False is returned.
      */
     inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri,
-    		bool output_mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
+            bool output_mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
-    	// check if request can be satisfied using the available upstream data
-    	if( !validateRequestVsSRI(request,upstream_sri, output_mode) ) return false;
+        // check if request can be satisfied using the available upstream data
+        if( !validateRequestVsSRI(request,upstream_sri, output_mode) ) return false;
 
-    	// check device constraints
+        // check device constraints
 
         // check based on bandwidth
-    	// this duplicates part of check above if device freq range = input freq range
+        // this duplicates part of check above if device freq range = input freq range
         double min_requested_freq = request.center_frequency-(request.bandwidth/2);
         double max_requested_freq = request.center_frequency+(request.bandwidth/2);
-    	if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) return false;
+        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) return false;
 
         // check based on sample rate
-    	// this duplicates part of check above if device freq range = input freq range
+        // this duplicates part of check above if device freq range = input freq range
         size_t output_scaling_factor = (output_mode) ? 2 : 4; // adjust for complex data
         min_requested_freq = request.center_frequency-(request.sample_rate/output_scaling_factor);
         max_requested_freq = request.center_frequency+(request.sample_rate/output_scaling_factor);
@@ -143,21 +143,21 @@ namespace frontend {
      */
     inline bool validateRequestVsRFInfo(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo, bool mode){
 
-    	double min_analog_freq = rfinfo.rf_center_freq-(rfinfo.rf_bandwidth/2);
-    	double max_analog_freq = rfinfo.rf_center_freq+(rfinfo.rf_bandwidth/2);
+        double min_analog_freq = rfinfo.rf_center_freq-(rfinfo.rf_bandwidth/2);
+        double max_analog_freq = rfinfo.rf_center_freq+(rfinfo.rf_bandwidth/2);
 
         // check bandwidth
         double min_requested_freq = request.center_frequency-(request.bandwidth/2);
         double max_requested_freq = request.center_frequency+(request.bandwidth/2);
 
-    	if ( !validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq) ) return false;
+        if ( !validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq) ) return false;
 
         // check sample rate
         size_t scaling_factor = (mode) ? 2 : 4; // adjust for complex data
         min_requested_freq = request.center_frequency-(request.sample_rate/scaling_factor);
         max_requested_freq = request.center_frequency+(request.sample_rate/scaling_factor);
 
-    	return validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq);
+        return validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq);
     }
 
     /* validateRequestVsDevice is a helper function to check that the analog capabilities and the
@@ -166,22 +166,22 @@ namespace frontend {
      * band of the request must be available for True to be returned, not just the center frequency.
      */
     inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo,
-    		bool mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
+            bool mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
-    	// check if request can be satisfied using the available upstream data
-    	if( !validateRequestVsRFInfo(request,rfinfo, mode) ) return false;
+        // check if request can be satisfied using the available upstream data
+        if( !validateRequestVsRFInfo(request,rfinfo, mode) ) return false;
 
-    	// check device constraints
+        // check device constraints
         // see if IF center frequency is set in rfinfo packet
-    	double request_if_center_freq = request.center_frequency;
+        double request_if_center_freq = request.center_frequency;
         if(compareHz(rfinfo.if_center_freq,0) > 0)
-        	request_if_center_freq = request.center_frequency - (rfinfo.rf_center_freq-rfinfo.if_center_freq);
+            request_if_center_freq = request.center_frequency - (rfinfo.rf_center_freq-rfinfo.if_center_freq);
 
         // check based on bandwidth
-    	double min_requested_freq = request_if_center_freq-(request.bandwidth/2);
-    	double max_requested_freq = request_if_center_freq+(request.bandwidth/2);
+        double min_requested_freq = request_if_center_freq-(request.bandwidth/2);
+        double max_requested_freq = request_if_center_freq+(request.bandwidth/2);
 
-    	if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) return false;
+        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) return false;
 
         // check based on sample rate
         size_t scaling_factor = (mode) ? 2 : 4; // adjust for complex data
@@ -204,7 +204,7 @@ namespace frontend {
      */
     
     struct tunerAllocationIdsStruct {
-    	tunerAllocationIdsStruct(){
+        tunerAllocationIdsStruct(){
             reset();
         }
         std::string control_allocation_id;
