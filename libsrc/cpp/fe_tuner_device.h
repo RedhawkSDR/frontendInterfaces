@@ -45,7 +45,10 @@ namespace frontend {
     	return 1; // lhs > rhs*/
     }
 
-    // returns false if min > max for either available for requested values
+    /* validateRequest is a helper function to compare two ranges, returning true if the range
+     * [requested_min:requested_max] falls within the range [available_min:available_max]
+     * False is returned if min > max for either available for requested values
+     */
     inline bool validateRequest(double available_min, double available_max, double requested_min, double requested_max){
     	if(compareHz(requested_min,available_min) < 0) return false;
     	if(compareHz(requested_max,available_max) > 0) return false;
@@ -54,6 +57,12 @@ namespace frontend {
     	return true;
     }
 
+    /* validateRequestVsSRI is a helper function to check that the input data stream can support
+     * the allocation request. The output mode (true if complex output) is used when determining
+     * the necessary sample rate required to satisfy the request. The entire frequency band of the
+     * request must be available for True to be returned, not just the center frequency.
+     * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri, False is returned.
+     */
     inline bool validateRequestVsSRI(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri, bool output_mode){
 
     	// get center frequency and bandwidth from SRI keywords
@@ -90,7 +99,13 @@ namespace frontend {
     	return validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq);
     }
 
-    // TODO - consider making device freq max/min optional
+    /* validateRequestVsDevice is a helper function to check that the input data stream and the
+     * device can support an allocation request. The output mode (true if complex output) is used
+     * when determining the necessary sample rate required to satisfy the request. The entire
+     * frequency band of the request must be available for True to be returned, not just the center
+     * frequency.
+     * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri, False is returned.
+     */
     inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri,
     		bool output_mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
@@ -121,6 +136,11 @@ namespace frontend {
         return true;
     }
 
+    /* validateRequestVsRFInfo is a helper function to check that the analog capabilities can support
+     * the allocation request. The mode (true if complex) is used when determining the necessary
+     * sample rate required to satisfy the request. The entire frequency band of the request must be
+     * available for True to be returned, not just the center frequency.
+     */
     inline bool validateRequestVsRFInfo(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo, bool mode){
 
     	double min_analog_freq = rfinfo.rf_center_freq-(rfinfo.rf_bandwidth/2);
@@ -140,6 +160,11 @@ namespace frontend {
     	return validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq);
     }
 
+    /* validateRequestVsDevice is a helper function to check that the analog capabilities and the
+     * device can support the allocation request. The mode (true if complex) is used when
+     * determining the necessary sample rate required to satisfy the request. The entire frequency
+     * band of the request must be available for True to be returned, not just the center frequency.
+     */
     inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo,
     		bool mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
