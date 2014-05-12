@@ -25,12 +25,24 @@ namespace frontend {
         return std::string(new_random_uuid_str);
     };
 
-    inline int compareHz(double x, double y){//, size_t places = 1){
-    	if(round(x-y) == 0)
+    /* compareHz is a helper function to handle floating point comparison
+     * Return values:
+     *   if lhs == rhs: 0.0
+     *   if lhs >  rhs: 1.0 or greater
+     *   if lhs <  rhs: -1.0 or less
+     * Recommended usage is to convert a comparison such as: (lhs OP rhs)
+     * to (compareHz(lhs,rhs) OP 0), where OP is a comparison operator
+     * (==, <, >, <=, >=, !=).
+     * "places" is used to specify precision. The default is 1, which
+     * uses a single decimal place of precision.
+     */
+    inline double compareHz(double lhs, double rhs, size_t places = 1){
+    	return round((lhs-rhs)*pow(10,places));
+    	/*if(round(lhs-rhs) == 0)
     		return 0; // equal
-    	if(x<y)
-    		return -1; // x < y
-    	return 1; // x > y
+    	if(lhs<rhs)
+    		return -1; // lhs < rhs
+    	return 1; // lhs > rhs*/
     }
 
     /* Tuner Allocation IDs struct. This structure contains allocation tracking data.
