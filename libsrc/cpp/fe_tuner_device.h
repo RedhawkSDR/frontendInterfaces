@@ -45,6 +45,7 @@ namespace frontend {
     	return 1; // lhs > rhs*/
     }
 
+    // returns false if min > max for either available for requested values
     inline bool validateRequest(double available_min, double available_max, double requested_min, double requested_max){
     	if(compareHz(requested_min,available_min) < 0) return false;
     	if(compareHz(requested_max,available_max) > 0) return false;
@@ -89,6 +90,7 @@ namespace frontend {
     	return validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq);
     }
 
+    // TODO - consider making device freq max/min optional
     inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri,
     		bool output_mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
