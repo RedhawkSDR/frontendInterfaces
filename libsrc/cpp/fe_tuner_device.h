@@ -61,7 +61,9 @@ namespace frontend {
      * the allocation request. The output mode (true if complex output) is used when determining
      * the necessary sample rate required to satisfy the request. The entire frequency band of the
      * request must be available for True to be returned, not just the center frequency.
-     * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri, False is returned.
+     * True is returned upon success, otherwise FRONTEND::BadParameterException is thrown.
+     * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri,
+     * FRONTEND::BadParameterException is thrown.
      */
     inline bool validateRequestVsSRI(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri, bool output_mode){
 
@@ -76,8 +78,9 @@ namespace frontend {
                 if (upstream_sri.keywords[i].value >>= upstream_bw) found_bw = true;
             }
         }
-        if(!found_cf || !found_bw)
-            return false;
+        if(!found_cf || !found_bw){
+            throw FRONTEND::BadParameterException("CANNOT VERIFY REQUEST -- SRI missing required keywords");
+        }
 
         // check bandwidth
         double min_upstream_freq = upstream_cf-(upstream_bw/2);
@@ -85,7 +88,9 @@ namespace frontend {
         double min_requested_freq = request.center_frequency-(request.bandwidth/2);
         double max_requested_freq = request.center_frequency+(request.bandwidth/2);
 
-        if( !validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq) ) return false;
+        if( !validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- input data stream cannot support freq/bw request");
+        }
 
         // check sample rate
         double upstream_sr = 1/upstream_sri.xdelta;
@@ -96,7 +101,10 @@ namespace frontend {
         min_requested_freq = request.center_frequency-(request.sample_rate/output_scaling_factor);
         max_requested_freq = request.center_frequency+(request.sample_rate/output_scaling_factor);
 
-        return validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq);
+        if ( !validateRequest(min_upstream_freq,max_upstream_freq,min_requested_freq,max_requested_freq) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- input data stream cannot support freq/sr request");
+        }
+        return true;
     }
 
     /* validateRequestVsDevice is a helper function to check that the input data stream and the
@@ -104,13 +112,17 @@ namespace frontend {
      * when determining the necessary sample rate required to satisfy the request. The entire
      * frequency band of the request must be available for True to be returned, not just the center
      * frequency.
-     * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri, False is returned.
+     * True is returned upon success, otherwise FRONTEND::BadParameterException is thrown.
+     * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri,
+     * FRONTEND::BadParameterException is thrown.
      */
     inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri,
             bool output_mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
         // check if request can be satisfied using the available upstream data
-        if( !validateRequestVsSRI(request,upstream_sri, output_mode) ) return false;
+        if( !validateRequestVsSRI(request,upstream_sri, output_mode) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- falls outside of input data stream");
+        }
 
         // check device constraints
 
@@ -118,20 +130,28 @@ namespace frontend {
         // this duplicates part of check above if device freq range = input freq range
         double min_requested_freq = request.center_frequency-(request.bandwidth/2);
         double max_requested_freq = request.center_frequency+(request.bandwidth/2);
-        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) return false;
+        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support freq/bw request");
+        }
 
         // check based on sample rate
         // this duplicates part of check above if device freq range = input freq range
         size_t output_scaling_factor = (output_mode) ? 2 : 4; // adjust for complex data
         min_requested_freq = request.center_frequency-(request.sample_rate/output_scaling_factor);
         max_requested_freq = request.center_frequency+(request.sample_rate/output_scaling_factor);
-        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) return false;
+        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support freq/sr request");
+        }
 
         // check vs. device bandwidth capability (ensure 0 <= request <= max device capability)
-        if ( !validateRequest(0,max_device_bandwidth,request.bandwidth,request.bandwidth) ) return false;
+        if ( !validateRequest(0,max_device_bandwidth,request.bandwidth,request.bandwidth) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support bw request");
+        }
 
         // check vs. device sample rate capability (ensure 0 <= request <= max device capability)
-        if ( !validateRequest(0,max_device_sample_rate,request.sample_rate,request.sample_rate) ) return false;
+        if ( !validateRequest(0,max_device_sample_rate,request.sample_rate,request.sample_rate) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support sr request");
+        }
 
         return true;
     }
@@ -140,6 +160,7 @@ namespace frontend {
      * the allocation request. The mode (true if complex) is used when determining the necessary
      * sample rate required to satisfy the request. The entire frequency band of the request must be
      * available for True to be returned, not just the center frequency.
+     * True is returned upon success, otherwise FRONTEND::BadParameterException is thrown.
      */
     inline bool validateRequestVsRFInfo(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo, bool mode){
 
@@ -150,26 +171,34 @@ namespace frontend {
         double min_requested_freq = request.center_frequency-(request.bandwidth/2);
         double max_requested_freq = request.center_frequency+(request.bandwidth/2);
 
-        if ( !validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq) ) return false;
+        if ( !validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- RFinfo packet capabilities cannot support freq/bw request");
+        }
 
         // check sample rate
         size_t scaling_factor = (mode) ? 2 : 4; // adjust for complex data
         min_requested_freq = request.center_frequency-(request.sample_rate/scaling_factor);
         max_requested_freq = request.center_frequency+(request.sample_rate/scaling_factor);
 
-        return validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq);
+        if ( !validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- RFinfo packet capabilities cannot support freq/sr request");
+        }
+        return true;
     }
 
     /* validateRequestVsDevice is a helper function to check that the analog capabilities and the
      * device can support the allocation request. The mode (true if complex) is used when
      * determining the necessary sample rate required to satisfy the request. The entire frequency
      * band of the request must be available for True to be returned, not just the center frequency.
+     * True is returned upon success, otherwise FRONTEND::BadParameterException is thrown.
      */
     inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo,
             bool mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
         // check if request can be satisfied using the available upstream data
-        if( !validateRequestVsRFInfo(request,rfinfo, mode) ) return false;
+        if( !validateRequestVsRFInfo(request,rfinfo, mode) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- falls outside of RFInfo packet capabilities");
+        }
 
         // check device constraints
         // see if IF center frequency is set in rfinfo packet
@@ -181,20 +210,28 @@ namespace frontend {
         double min_requested_freq = request_if_center_freq-(request.bandwidth/2);
         double max_requested_freq = request_if_center_freq+(request.bandwidth/2);
 
-        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) return false;
+        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) {
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support freq/bw request");
+        }
 
         // check based on sample rate
         size_t scaling_factor = (mode) ? 2 : 4; // adjust for complex data
         min_requested_freq = request_if_center_freq-(request.sample_rate/scaling_factor);
         max_requested_freq = request_if_center_freq+(request.sample_rate/scaling_factor);
 
-        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ) return false;
+        if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support freq/sr request");
+        }
 
         // check vs. device bandwidth capability (ensure 0 <= request <= max device capability)
-        if ( !validateRequest(0,max_device_bandwidth,request.bandwidth,request.bandwidth) ) return false;
+        if ( !validateRequest(0,max_device_bandwidth,request.bandwidth,request.bandwidth) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support bw request");
+        }
 
         // check vs. device sample rate capability (ensure 0 <= request <= max device capability)
-        if ( !validateRequest(0,max_device_sample_rate,request.sample_rate,request.sample_rate) ) return false;
+        if ( !validateRequest(0,max_device_sample_rate,request.sample_rate,request.sample_rate) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support sr request");
+        }
 
         return true;
     }
