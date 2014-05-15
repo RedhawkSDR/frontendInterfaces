@@ -65,7 +65,7 @@ namespace frontend {
      * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri,
      * FRONTEND::BadParameterException is thrown.
      */
-    inline bool validateRequestVsSRI(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri, bool output_mode){
+    bool validateRequestVsSRI(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri, bool output_mode){
 
         // get center frequency and bandwidth from SRI keywords
         double upstream_cf, upstream_bw;
@@ -116,7 +116,7 @@ namespace frontend {
      * If the CHAN_RF and FRONTEND::BANDWIDTH keywords are not found in the sri,
      * FRONTEND::BadParameterException is thrown.
      */
-    inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri,
+    bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri,
             bool output_mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
         // check if request can be satisfied using the available upstream data
@@ -162,7 +162,7 @@ namespace frontend {
      * available for True to be returned, not just the center frequency.
      * True is returned upon success, otherwise FRONTEND::BadParameterException is thrown.
      */
-    inline bool validateRequestVsRFInfo(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo, bool mode){
+    bool validateRequestVsRFInfo(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo, bool mode){
 
         double min_analog_freq = rfinfo.rf_center_freq-(rfinfo.rf_bandwidth/2);
         double max_analog_freq = rfinfo.rf_center_freq+(rfinfo.rf_bandwidth/2);
@@ -172,7 +172,7 @@ namespace frontend {
         double max_requested_freq = request.center_frequency+(request.bandwidth/2);
 
         if ( !validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq) ){
-            throw FRONTEND::BadParameterException("INVALID REQUEST -- RFinfo packet capabilities cannot support freq/bw request");
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- analog freq range (RFinfo) cannot support freq/bw request");
         }
 
         // check sample rate
@@ -181,7 +181,7 @@ namespace frontend {
         max_requested_freq = request.center_frequency+(request.sample_rate/scaling_factor);
 
         if ( !validateRequest(min_analog_freq,max_analog_freq,min_requested_freq,max_requested_freq) ){
-            throw FRONTEND::BadParameterException("INVALID REQUEST -- RFinfo packet capabilities cannot support freq/sr request");
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- analog freq range (RFinfo) cannot support freq/sr request");
         }
         return true;
     }
@@ -192,18 +192,18 @@ namespace frontend {
      * band of the request must be available for True to be returned, not just the center frequency.
      * True is returned upon success, otherwise FRONTEND::BadParameterException is thrown.
      */
-    inline bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo,
+    bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo,
             bool mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
 
         // check if request can be satisfied using the available upstream data
         if( !validateRequestVsRFInfo(request,rfinfo, mode) ){
-            throw FRONTEND::BadParameterException("INVALID REQUEST -- falls outside of RFInfo packet capabilities");
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- analog freq range (RFinfo) cannot support request");
         }
 
         // check device constraints
         // see if IF center frequency is set in rfinfo packet
         double request_if_center_freq = request.center_frequency;
-        if(compareHz(rfinfo.if_center_freq,0) > 0)
+        if(compareHz(rfinfo.if_center_freq,0) > 0 && compareHz(rfinfo.rf_center_freq,rfinfo.if_center_freq) > 0)
             request_if_center_freq = request.center_frequency - (rfinfo.rf_center_freq-rfinfo.if_center_freq);
 
         // check based on bandwidth
