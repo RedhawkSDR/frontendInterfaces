@@ -25,18 +25,18 @@ namespace frontend {
         return std::string(new_random_uuid_str);
     };
 
-    /* compareHz is a helper function to handle floating point comparison
+    /* floatingPointCompare is a helper function to handle floating point comparison
      * Return values:
      *   if lhs == rhs: 0.0
      *   if lhs >  rhs: 1.0 or greater
      *   if lhs <  rhs: -1.0 or less
      * Recommended usage is to convert a comparison such as: (lhs OP rhs)
-     * to (compareHz(lhs,rhs) OP 0), where OP is a comparison operator
+     * to (floatingPointCompare(lhs,rhs) OP 0), where OP is a comparison operator
      * (==, <, >, <=, >=, !=).
      * "places" is used to specify precision. The default is 1, which
      * uses a single decimal place of precision.
      */
-    inline double compareHz(double lhs, double rhs, size_t places = 1){
+    inline double floatingPointCompare(double lhs, double rhs, size_t places = 1){
         return round((lhs-rhs)*pow(10,places));
         /*if(round((lhs-rhs)*(pow(10,places))) == 0)
             return 0; // equal
@@ -50,10 +50,10 @@ namespace frontend {
      * False is returned if min > max for either available for requested values
      */
     inline bool validateRequest(double available_min, double available_max, double requested_min, double requested_max){
-        if(compareHz(requested_min,available_min) < 0) return false;
-        if(compareHz(requested_max,available_max) > 0) return false;
-        if(compareHz(available_min,available_max) > 0) return false;
-        if(compareHz(requested_min,requested_max) > 0) return false;
+        if(floatingPointCompare(requested_min,available_min) < 0) return false;
+        if(floatingPointCompare(requested_max,available_max) > 0) return false;
+        if(floatingPointCompare(available_min,available_max) > 0) return false;
+        if(floatingPointCompare(requested_min,requested_max) > 0) return false;
         return true;
     }
 
