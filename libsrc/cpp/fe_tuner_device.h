@@ -45,6 +45,17 @@ namespace frontend {
         return 1; // lhs > rhs*/
     }
 
+    /* validateRequest is a helper function to verify a value is within a range, returning
+     * true if the value requested_val falls within the range [available_min:available_max]
+     * False is returned if min > max
+     */
+    inline bool validateRequest(double available_min, double available_max, double requested_val){
+        if(floatingPointCompare(requested_val,available_min) < 0) return false;
+        if(floatingPointCompare(requested_val,available_max) > 0) return false;
+        if(floatingPointCompare(available_min,available_max) > 0) return false;
+        return true;
+    }
+
     /* validateRequest is a helper function to compare two ranges, returning true if the range
      * [requested_min:requested_max] falls within the range [available_min:available_max]
      * False is returned if min > max for either available for requested values
