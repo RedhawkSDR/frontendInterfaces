@@ -66,7 +66,7 @@ namespace frontend {
      * FRONTEND::BadParameterException is thrown.
      */
     bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri,
-            bool output_mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
+            bool output_mode, double min_device_center_freq, double max_device_center_freq, double max_device_bandwidth, double max_device_sample_rate){
 
         // check if request can be satisfied using the available upstream data
         if( !validateRequestVsSRI(request,upstream_sri, output_mode) ){
@@ -74,6 +74,26 @@ namespace frontend {
         }
 
         // check device constraints
+
+        // check vs. device center frequency capability (ensure 0 <= request <= max device capability)
+        if ( !validateRequest(min_device_center_freq,max_device_center_freq,request.center_frequency) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support freq request");
+        }
+
+        // check vs. device bandwidth capability (ensure 0 <= request <= max device capability)
+        if ( !validateRequest(0,max_device_bandwidth,request.bandwidth) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support bw request");
+        }
+
+        // check vs. device sample rate capability (ensure 0 <= request <= max device capability)
+        if ( !validateRequest(0,max_device_sample_rate,request.sample_rate) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support sr request");
+        }
+
+        // calculate overall frequency range of the device (not just CF range)
+        const size_t output_scaling_factor = (output_mode) ? 2 : 4; // adjust for complex data
+        const double min_device_freq = min_device_center_freq-(max_device_sample_rate/output_scaling_factor);
+        const double max_device_freq = max_device_center_freq+(max_device_sample_rate/output_scaling_factor);
 
         // check based on bandwidth
         // this duplicates part of check above if device freq range = input freq range
@@ -85,21 +105,10 @@ namespace frontend {
 
         // check based on sample rate
         // this duplicates part of check above if device freq range = input freq range
-        size_t output_scaling_factor = (output_mode) ? 2 : 4; // adjust for complex data
         min_requested_freq = request.center_frequency-(request.sample_rate/output_scaling_factor);
         max_requested_freq = request.center_frequency+(request.sample_rate/output_scaling_factor);
         if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ){
             throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support freq/sr request");
-        }
-
-        // check vs. device bandwidth capability (ensure 0 <= request <= max device capability)
-        if ( !validateRequest(0,max_device_bandwidth,request.bandwidth,request.bandwidth) ){
-            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support bw request");
-        }
-
-        // check vs. device sample rate capability (ensure 0 <= request <= max device capability)
-        if ( !validateRequest(0,max_device_sample_rate,request.sample_rate,request.sample_rate) ){
-            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support sr request");
         }
 
         return true;
@@ -142,7 +151,7 @@ namespace frontend {
      * True is returned upon success, otherwise FRONTEND::BadParameterException is thrown.
      */
     bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo,
-            bool mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate){
+            bool mode, double min_device_center_freq, double max_device_center_freq, double max_device_bandwidth, double max_device_sample_rate){
 
         // check if request can be satisfied using the available upstream data
         if( !validateRequestVsRFInfo(request,rfinfo, mode) ){
@@ -155,6 +164,26 @@ namespace frontend {
         if(floatingPointCompare(rfinfo.if_center_freq,0) > 0 && floatingPointCompare(rfinfo.rf_center_freq,rfinfo.if_center_freq) > 0)
             request_if_center_freq = request.center_frequency - (rfinfo.rf_center_freq-rfinfo.if_center_freq);
 
+        // check vs. device center freq capability (ensure 0 <= request <= max device capability)
+        if ( !validateRequest(min_device_center_freq,max_device_center_freq,request_if_center_freq) ) {
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support freq request");
+        }
+
+        // check vs. device bandwidth capability (ensure 0 <= request <= max device capability)
+        if ( !validateRequest(0,max_device_bandwidth,request.bandwidth) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support bw request");
+        }
+
+        // check vs. device sample rate capability (ensure 0 <= request <= max device capability)
+        if ( !validateRequest(0,max_device_sample_rate,request.sample_rate) ){
+            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support sr request");
+        }
+
+        // calculate overall frequency range of the device (not just CF range)
+        const size_t scaling_factor = (mode) ? 2 : 4; // adjust for complex data
+        const double min_device_freq = min_device_center_freq-(max_device_sample_rate/scaling_factor);
+        const double max_device_freq = max_device_center_freq+(max_device_sample_rate/scaling_factor);
+
         // check based on bandwidth
         double min_requested_freq = request_if_center_freq-(request.bandwidth/2);
         double max_requested_freq = request_if_center_freq+(request.bandwidth/2);
@@ -164,22 +193,11 @@ namespace frontend {
         }
 
         // check based on sample rate
-        size_t scaling_factor = (mode) ? 2 : 4; // adjust for complex data
         min_requested_freq = request_if_center_freq-(request.sample_rate/scaling_factor);
         max_requested_freq = request_if_center_freq+(request.sample_rate/scaling_factor);
 
         if ( !validateRequest(min_device_freq,max_device_freq,min_requested_freq,max_requested_freq) ){
             throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support freq/sr request");
-        }
-
-        // check vs. device bandwidth capability (ensure 0 <= request <= max device capability)
-        if ( !validateRequest(0,max_device_bandwidth,request.bandwidth,request.bandwidth) ){
-            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support bw request");
-        }
-
-        // check vs. device sample rate capability (ensure 0 <= request <= max device capability)
-        if ( !validateRequest(0,max_device_sample_rate,request.sample_rate,request.sample_rate) ){
-            throw FRONTEND::BadParameterException("INVALID REQUEST -- device capabilities cannot support sr request");
         }
 
         return true;

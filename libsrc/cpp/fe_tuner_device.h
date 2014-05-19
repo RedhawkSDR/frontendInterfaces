@@ -88,7 +88,7 @@ namespace frontend {
      * FRONTEND::BadParameterException is thrown.
      */
     bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const BULKIO::StreamSRI& upstream_sri,
-            bool output_mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate);
+            bool output_mode, double min_device_center_freq, double max_device_center_freq, double max_device_bandwidth, double max_device_sample_rate);
 
     /* validateRequestVsRFInfo is a helper function to check that the analog capabilities can support
      * the allocation request. The mode (true if complex) is used when determining the necessary
@@ -105,7 +105,7 @@ namespace frontend {
      * True is returned upon success, otherwise FRONTEND::BadParameterException is thrown.
      */
     bool validateRequestVsDevice(const frontend_tuner_allocation_struct& request, const frontend::RFInfoPkt& rfinfo,
-            bool mode, double min_device_freq, double max_device_freq, double max_device_bandwidth, double max_device_sample_rate);
+            bool mode, double min_device_center_freq, double max_device_center_freq, double max_device_bandwidth, double max_device_sample_rate);
 
     /* Tuner Allocation IDs struct. This structure contains allocation tracking data.
      *
