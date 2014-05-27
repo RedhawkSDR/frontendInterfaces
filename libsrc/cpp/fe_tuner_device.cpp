@@ -378,7 +378,7 @@ namespace frontend {
                     // Check if allocation ID has already been used
                     if(getTunerMapping(frontend_tuner_allocation.allocation_id) >= 0){
                         LOG_INFO(FrontendTunerDevice<TunerStatusStructType>,"allocateCapacity: ALLOCATION_ID ALREADY IN USE: [" << frontend_tuner_allocation.allocation_id << "]");
-                        throw CF::Device::InvalidCapacity("ALLOCATION_ID ALREADY IN USE", capacities);
+                        throw AllocationAlreadyExists("ALLOCATION_ID ALREADY IN USE", capacities);
                     }
 
                     // Check if available tuner
@@ -387,10 +387,14 @@ namespace frontend {
                     // Next, try to allocate a new tuner
                     for (size_t tuner_id = 0; tuner_id < tuner_allocation_ids.size(); tuner_id++) {
                         if(frontend_tuner_status[tuner_id].tuner_type != frontend_tuner_allocation.tuner_type) {
+                            LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,
+                              "allocateCapacity: Requested tuner type '"<<frontend_tuner_allocation.tuner_type <<"' does not match tuner[" << tuner_id << "].tuner_type ("<<frontend_tuner_status[tuner_id].tuner_type<<")");
                             continue;
                         }
 
                         if(!frontend_tuner_allocation.group_id.empty() && frontend_tuner_allocation.group_id != frontend_tuner_status[tuner_id].group_id ){
+                            LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,
+                              "allocateCapacity: Requested group_id '"<<frontend_tuner_allocation.group_id <<"' does not match tuner[" << tuner_id << "].group_id ("<<frontend_tuner_status[tuner_id].group_id<<")");
                             continue;
                         }
 
@@ -398,6 +402,8 @@ namespace frontend {
                         if(!frontend_tuner_allocation.rf_flow_id.empty()
                             && frontend_tuner_allocation.rf_flow_id != frontend_tuner_status[tuner_id].rf_flow_id
                             && frontend_tuner_allocation.tuner_type != "CHANNELIZER"){
+                            LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,
+                              "allocateCapacity: Requested rf_flow_id '"<<frontend_tuner_allocation.rf_flow_id <<"' does not match tuner[" << tuner_id << "].rf_flow_id ("<<frontend_tuner_status[tuner_id].rf_flow_id<<")");
                             continue;
                         }
 
@@ -405,6 +411,8 @@ namespace frontend {
                             // device control
                             if(!tuner_allocation_ids[tuner_id].control_allocation_id.empty() || !deviceSetTuning(frontend_tuner_allocation, frontend_tuner_status[tuner_id], tuner_id)){
                                 // either not available or didn't succeed setting tuning, try next tuner
+                                LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,
+                                    "allocateCapacity: Tuner["<<tuner_id<<"] is either not available or didn't succeed while setting tuning ");
                                 continue;
                             }
                             tuner_allocation_ids[tuner_id].control_allocation_id = frontend_tuner_allocation.allocation_id;
@@ -421,6 +429,8 @@ namespace frontend {
                             // listener
                             if(tuner_allocation_ids[tuner_id].control_allocation_id.empty() || !listenerRequestValidation(frontend_tuner_allocation, tuner_id)){
                                 // either not allocated or can't support listener request
+                                LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,
+                                    "allocateCapacity: Tuner["<<tuner_id<<"] is either not available or can not support listener request ");
                                 continue;
                             }
                             tuner_allocation_ids[tuner_id].listener_allocation_ids.push_back(frontend_tuner_allocation.allocation_id);
@@ -485,7 +495,7 @@ namespace frontend {
                     // Check if listener allocation ID has already been used
                     if(getTunerMapping(frontend_listener_allocation.listener_allocation_id) >= 0){
                         LOG_INFO(FrontendTunerDevice<TunerStatusStructType>,"allocateCapacity: LISTENER ALLOCATION ID ALREADY IN USE: [" << frontend_listener_allocation.listener_allocation_id << "]");
-                        throw CF::Device::InvalidCapacity("LISTENER ALLOCATION ID ALREADY IN USE", capacities);
+                        throw AllocationAlreadyExists("LISTENER ALLOCATION ID ALREADY IN USE", capacities);
                     }
                     // Do not allocate if existing allocation ID does not exist
                     long tuner_id = getTunerMapping(frontend_listener_allocation.existing_allocation_id);
@@ -518,15 +528,13 @@ namespace frontend {
             deallocateCapacity(capacities);
             return false;
         }
+        catch(AllocationAlreadyExists &e) {
+            // Don't call deallocateCapacity if the allocationId already exists
+            //   - Would end up deallocating a valid tuner/listener
+            throw static_cast<CF::Device::InvalidCapacity>(e); 
+        }
         catch(CF::Device::InvalidCapacity &e) {
-            // without the following check, a valid allocation could be deallocated due to an attempt to alloc w/ an existing alloc id
-            std::stringstream ss;
-            ss << e.msg;
-            if (ss.str() != "ALLOCATION_ID ALREADY IN USE") {
-                deallocateCapacity(capacities);
-            }
-            //else {
-            //}
+            deallocateCapacity(capacities);
             throw e;
         }
         catch(FRONTEND::BadParameterException &e) {

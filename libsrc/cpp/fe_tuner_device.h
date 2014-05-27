@@ -16,6 +16,13 @@
 /**************************              FRONTEND                   **************************/
 /*********************************************************************************************/
 namespace frontend {
+
+    class AllocationAlreadyExists : public CF::Device::InvalidCapacity {
+      public:
+        AllocationAlreadyExists(const char* msg, const CF::Properties& props) :
+          CF::Device::InvalidCapacity(msg, props)
+        {}
+    };
     
     inline std::string uuidGenerator() {
         uuid_t new_random_uuid;
