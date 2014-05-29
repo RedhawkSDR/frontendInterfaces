@@ -347,7 +347,7 @@ namespace frontend {
     template < typename TunerStatusStructType >
     CORBA::Boolean FrontendTunerDevice<TunerStatusStructType>::allocateCapacity(const CF::Properties & capacities)
     throw (CORBA::SystemException, CF::Device::InvalidCapacity, CF::Device::InvalidState) {
-        //LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
+        LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         CORBA::ULong ii;
         try{
             for (ii = 0; ii < capacities.length(); ++ii) {
@@ -442,20 +442,24 @@ namespace frontend {
 
                         // check tolerances
                         // only check when sample_rate was not set to don't care)
-                        if( (frontend_tuner_allocation.sample_rate != 0.0) &&
-                            (frontend_tuner_status[tuner_id].sample_rate < frontend_tuner_allocation.sample_rate ||
-                            frontend_tuner_status[tuner_id].sample_rate > frontend_tuner_allocation.sample_rate+frontend_tuner_allocation.sample_rate * frontend_tuner_allocation.sample_rate_tolerance/100.0 )){
+                        LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>, std::fixed << " allocateCapacity - SR requested: " << frontend_tuner_allocation.sample_rate
+                                                                                                           << "  SR got: " << frontend_tuner_status[tuner_id].sample_rate);
+                        if( (floatingPointCompare(frontend_tuner_allocation.sample_rate,0)!=0) &&
+                            (floatingPointCompare(frontend_tuner_status[tuner_id].sample_rate,frontend_tuner_allocation.sample_rate)<0 ||
+                            floatingPointCompare(frontend_tuner_status[tuner_id].sample_rate,frontend_tuner_allocation.sample_rate+frontend_tuner_allocation.sample_rate * frontend_tuner_allocation.sample_rate_tolerance/100.0)>0 )){
                             std::ostringstream eout;
-                            eout<<"allocateCapacity("<<int(tuner_id)<<"): returned bw "<<frontend_tuner_status[tuner_id].sample_rate<<" does not meet tolerance criteria of "<<frontend_tuner_allocation.sample_rate_tolerance<<" percent";
+                            eout<<std::fixed<<"allocateCapacity("<<int(tuner_id)<<"): returned sr "<<frontend_tuner_status[tuner_id].sample_rate<<" does not meet tolerance criteria of "<<frontend_tuner_allocation.sample_rate_tolerance<<" percent";
                             LOG_INFO(FrontendTunerDevice<TunerStatusStructType>, eout.str());
                             throw std::logic_error(eout.str().c_str());
                         }
+                        LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>, std::fixed << " allocateCapacity - BW requested: " << frontend_tuner_allocation.bandwidth
+                                                                                                           << "  BW got: " << frontend_tuner_status[tuner_id].bandwidth);
                         // Only check when bandwidth was not set to don't care
-                        if( (frontend_tuner_allocation.bandwidth != 0.0) &&
-                            (frontend_tuner_status[tuner_id].bandwidth < frontend_tuner_allocation.bandwidth ||
-                            frontend_tuner_status[tuner_id].bandwidth > frontend_tuner_allocation.bandwidth+frontend_tuner_allocation.bandwidth * frontend_tuner_allocation.bandwidth_tolerance/100.0 )){
+                        if( (floatingPointCompare(frontend_tuner_allocation.bandwidth,0)!=0) &&
+                            (floatingPointCompare(frontend_tuner_status[tuner_id].bandwidth,frontend_tuner_allocation.bandwidth)<0 ||
+                            floatingPointCompare(frontend_tuner_status[tuner_id].bandwidth,frontend_tuner_allocation.bandwidth+frontend_tuner_allocation.bandwidth * frontend_tuner_allocation.bandwidth_tolerance/100.0)>0 )){
                             std::ostringstream eout;
-                            eout<<"allocateCapacity("<<int(tuner_id)<<"): returned bw "<<frontend_tuner_status[tuner_id].bandwidth<<" does not meet tolerance criteria of "<<frontend_tuner_allocation.bandwidth_tolerance<<" percent";
+                            eout<<std::fixed<<"allocateCapacity("<<int(tuner_id)<<"): returned bw "<<frontend_tuner_status[tuner_id].bandwidth<<" does not meet tolerance criteria of "<<frontend_tuner_allocation.bandwidth_tolerance<<" percent";
                             LOG_INFO(FrontendTunerDevice<TunerStatusStructType>, eout.str());
                             throw std::logic_error(eout.str().c_str());
                         }
@@ -645,7 +649,7 @@ namespace frontend {
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
 
         // ensure requested values are non-negative
-        if(request.center_frequency < 0 || request.bandwidth < 0 || request.sample_rate < 0 || request.bandwidth_tolerance < 0 || request.sample_rate_tolerance < 0)
+        if(floatingPointCompare(request.center_frequency,0)<0 || floatingPointCompare(request.bandwidth,0)<0 || floatingPointCompare(request.sample_rate,0)<0 || floatingPointCompare(request.bandwidth_tolerance,0)<0 || floatingPointCompare(request.sample_rate_tolerance,0)<0)
             return false;
 
         // ensure lower end of requested band fits
@@ -668,7 +672,7 @@ namespace frontend {
             return false;
 
         //if(request.bandwidth != 0 && (request.bandwidth+(request.bandwidth*request.bandwidth_tolerance/100)) < frontend_tuner_status[tuner_id].bandwidth)
-        if( request.bandwidth != 0 && floatingPointCompare((request.bandwidth+(request.bandwidth*request.bandwidth_tolerance/100)),frontend_tuner_status[tuner_id].bandwidth) < 0 )
+        if( floatingPointCompare(request.bandwidth,0)!=0 && floatingPointCompare((request.bandwidth+(request.bandwidth*request.bandwidth_tolerance/100)),frontend_tuner_status[tuner_id].bandwidth) < 0 )
             return false;
 
         // ensure tuner sample rate meets requested tolerance
@@ -677,7 +681,7 @@ namespace frontend {
             return false;
 
         //if(request.sample_rate != 0 && (request.sample_rate+(request.sample_rate*request.sample_rate_tolerance/100)) < frontend_tuner_status[tuner_id].sample_rate)
-        if(request.sample_rate != 0 && floatingPointCompare((request.sample_rate+(request.sample_rate*request.sample_rate_tolerance/100)),frontend_tuner_status[tuner_id].sample_rate) < 0 )
+        if(floatingPointCompare(request.sample_rate,0)!=0 && floatingPointCompare((request.sample_rate+(request.sample_rate*request.sample_rate_tolerance/100)),frontend_tuner_status[tuner_id].sample_rate) < 0 )
             return false;
 
         return true;
