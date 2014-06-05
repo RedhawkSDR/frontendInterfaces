@@ -13,6 +13,10 @@ public class InDigitalTunerPort extends FRONTEND.DigitalTunerPOA {
 
     protected DigitalTunerDelegate delegate = null;
 
+    public InDigitalTunerPort( String portName) {
+        this(portName, null);
+    }
+
     public InDigitalTunerPort( String portName,
                                 DigitalTunerDelegate d) {
         this.name = portName;

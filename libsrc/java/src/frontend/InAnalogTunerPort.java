@@ -13,6 +13,10 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
 
     protected AnalogTunerDelegate delegate = null;
 
+    public InAnalogTunerPort(String portName) {
+        this(portName, null);
+    }
+
     public InAnalogTunerPort(String portName,
                              AnalogTunerDelegate d){
         this.name = portName;

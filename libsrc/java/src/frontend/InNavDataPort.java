@@ -14,6 +14,10 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
 
     protected NavDataDelegate delegate = null;
 
+    public InNavDataPort( String portName) {
+        this(portName, null);
+    }
+
     public InNavDataPort( String portName,
                           NavDataDelegate d){
         this.name = portName;

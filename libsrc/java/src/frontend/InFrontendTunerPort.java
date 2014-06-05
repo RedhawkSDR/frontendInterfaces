@@ -13,6 +13,10 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
 
     protected FrontendTunerDelegate delegate = null;
 
+    public InFrontendTunerPort( String portName) {
+        this(portName, null);
+    }
+
     public InFrontendTunerPort( String portName,
                                 FrontendTunerDelegate d) {
         this.name = portName;

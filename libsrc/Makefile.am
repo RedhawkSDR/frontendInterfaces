@@ -98,7 +98,7 @@ RFInfoDelegate.java \
 InRFSourcePort.java \
 OutRFSourcePort.java \
 RFSourceDelegate.java \
-FrontendTunerStructProps.java \
+FETypes.java \
 FrontendTunerDevice.java
 JAVA_SRCS_ABS := $(addprefix $(JAVA_SRCDIR)/frontend/, $(JAVA_SRCS))
 

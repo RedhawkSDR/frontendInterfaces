@@ -11,6 +11,10 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
 
     protected RFSourceDelegate delegate = null;    
 
+    public InRFSourcePort( String portName) {
+        this(portName, null);
+    }
+
     public InRFSourcePort( String portName,
                          RFSourceDelegate d) {
         this.name = portName;

@@ -11,6 +11,10 @@ public class InGPSPort extends FRONTEND.GPSPOA {
 
     protected GPSDelegate delegate = null;    
 
+    public InGPSPort( String portName) {
+        this(portName, null);
+    }
+
     public InGPSPort( String portName,
                          GPSDelegate d) {
         this.name = portName;
