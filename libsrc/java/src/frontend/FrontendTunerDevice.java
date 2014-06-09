@@ -41,7 +41,7 @@ import org.ossie.properties.StringProperty;
 import org.ossie.properties.StructProperty;
 import org.ossie.properties.StructSequenceProperty;
 
-public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend.FETypes.default_frontend_tuner_status_struct_struct> extends Device {
+public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend.FETypes.default_frontend_tuner_status_struct_struct> extends ThreadedDevice {
 
     /* validateRequestVsSRI is a helper function to check that the input data stream can support
      * the allocation request. The output mode (true if complex output) is used when determining
