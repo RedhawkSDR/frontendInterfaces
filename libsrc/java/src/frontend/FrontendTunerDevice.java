@@ -31,7 +31,7 @@ import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
-import org.ossie.component.Device;
+import org.ossie.component.ThreadedDevice;
 import org.ossie.properties.Action;
 import org.ossie.properties.Allocator;
 import org.ossie.properties.AnyUtils;
@@ -244,12 +244,12 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
     }
 
     public FrontendTunerDevice(DeviceManager devMgr, String compId, String label, String softwareProfile, ORB orb, POA poa) throws InvalidObjectReference, ServantNotActive, WrongPolicy, CF.DevicePackage.InvalidCapacity {
-        super(devMgr,compId,label,softwareProfile,orb,poa);
+        super();
         construct();
     }
  
     public FrontendTunerDevice(DeviceManager devMgr, AggregateDevice compositeDevice, String compId, String label, String softwareProfile, ORB orb, POA poa) throws InvalidObjectReference, ServantNotActive, WrongPolicy, CF.DevicePackage.InvalidCapacity {
-        super(devMgr,compositeDevice,compId,label,softwareProfile,orb,poa);
+        super();
         construct();
     }
 
