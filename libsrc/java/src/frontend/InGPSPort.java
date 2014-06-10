@@ -26,7 +26,7 @@ public class InGPSPort extends FRONTEND.GPSPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ) {
-                    return delegate.fe_getGPSInfo();
+                    return delegate.get_gps_info(this.name);
                 }
             }catch(Exception e){
                 System.out.println("InGPSPort gps_info() exception " + e.getMessage());
@@ -39,7 +39,7 @@ public class InGPSPort extends FRONTEND.GPSPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null) {
-                    delegate.fe_setGPSInfo(data);
+                    delegate.set_gps_info(this.name, data);
                 }
             }catch(Exception e){
                 System.out.println("InGPSPort gps_info(GPSInfo data) exception " + e.getMessage());
@@ -51,7 +51,7 @@ public class InGPSPort extends FRONTEND.GPSPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null) {
-                    return (delegate.fe_getGpsTimePos());
+                    return (delegate.get_gps_time_pos(this.name));
                 }
             }catch(Exception e){
                 System.out.println("InGPSPort gps_time_pos() exception " + e.getMessage());
@@ -64,7 +64,7 @@ public class InGPSPort extends FRONTEND.GPSPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null) {
-                    delegate.fe_setGpsTimePos(data);
+                    delegate.set_gps_time_pos(this.name, data);
                 }
             }catch(Exception e){
                 System.out.println("InGPSPort gps_time_pos(GpsTimePos data) exception " + e.getMessage());

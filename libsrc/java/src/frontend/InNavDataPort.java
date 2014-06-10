@@ -29,7 +29,7 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ) {
-                    return delegate.fe_getNavPkt();
+                    return delegate.get_nav_packet(this.name);
                 }
             }catch(Exception e){
                 System.out.println("InNavDataPort nav_packet() exception " + e.getMessage());
@@ -42,7 +42,7 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
         synchronized(this.portAccess){
             try{
                 if ( delegate != null) {
-                    delegate.fe_setNavPkt(data);
+                    delegate.set_nav_packet(this.name, data);
                 }
             }catch(Exception e){
                 System.out.println("InNavDataPort nav_packet(NavigationPacket data) exception " + e.getMessage());

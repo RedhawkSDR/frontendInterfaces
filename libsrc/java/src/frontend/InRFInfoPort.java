@@ -26,7 +26,7 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){ 
-                    return delegate.fe_getRFFlowId();
+                    return delegate.get_rf_flow_id(this.name);
                 }
             }catch(Exception e){
                 System.out.println("InRFInfoPort rf_flow_id() exception " + e.getMessage());
@@ -39,7 +39,7 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null) {
-                    delegate.fe_setRFFlowId(data);
+                    delegate.set_rf_flow_id(this.name, data);
                 }
             }catch(Exception e){
                 System.out.println("InRFInfoPort rf_flow_id(String data) exception " + e.getMessage());
@@ -51,7 +51,7 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null) {
-                    return (delegate.fe_getRFInfoPkt());
+                    return (delegate.get_rfinfo_pkt(this.name));
                 } else { 
                     return null;
                 }
@@ -66,7 +66,7 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null) {
-                    delegate.fe_setRFInfoPkt(data);
+                    delegate.set_rfinfo_pkt(this.name, data);
                 }
             }catch(Exception e){
                 System.out.println("InRFInfoPort rfinfo_pkt(RFInfoPkt data) exception " + e.getMessage());

@@ -28,7 +28,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerType(id);
+                    return delegate.getTunerType(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerType(String id) callback delegate not defined");
                 }
@@ -46,7 +46,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerDeviceControl(id);
+                    return delegate.getTunerDeviceControl(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerDeviceControl(String id) callback delegate not defined");
                 }
@@ -64,7 +64,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerGroupId(id);
+                    return delegate.getTunerGroupId(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerGroupId(String id) callback delegate not defined");
                 }
@@ -82,7 +82,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerRfFlowId(id);
+                    return delegate.getTunerRfFlowId(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerRfFlowId(String id) callback delegate not defined");
                 }
@@ -100,7 +100,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerStatus(id);
+                    return delegate.getTunerStatus(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerStatus(String id) callback delegate not defined");
                 }
@@ -118,7 +118,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    delegate.fe_setTunerCenterFrequency(id, freq);
+                    delegate.setTunerCenterFrequency(id, freq);
                 } else {
                     throw new FrontendException("InAnalogTunerPort setTunerCenterFrequency(String id, double freq) callback delegate not defined");
                 }
@@ -136,7 +136,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerCenterFrequency(id);
+                    return delegate.getTunerCenterFrequency(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerCenterFrequency(String id) callback delegate not defined");
                 }
@@ -154,7 +154,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    delegate.fe_setTunerBandwidth(id, bw);
+                    delegate.setTunerBandwidth(id, bw);
                 } else {
                     throw new FrontendException("InAnalogTunerPort setTunerBandwidth(String id, double bw) callback delegate not defined");
                 }
@@ -172,7 +172,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerBandwidth(id);
+                    return delegate.getTunerBandwidth(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerBandwidth(String id) callback delegate not defined");
                 }
@@ -190,7 +190,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    delegate.fe_setTunerAgcEnable(id, enable);
+                    delegate.setTunerAgcEnable(id, enable);
                 } else {
                     throw new FrontendException("InAnalogTunerPort setTunerAgcEnable(String id, boolean enable) callback delegate not defined");
                 }
@@ -208,7 +208,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerAgcEnable(id);
+                    return delegate.getTunerAgcEnable(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerAgcEnable(String id) callback delegate not defined");
                 }
@@ -226,7 +226,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    delegate.fe_setTunerGain(id, gain);
+                    delegate.setTunerGain(id, gain);
                 } else {
                     throw new FrontendException("InAnalogTunerPort setTunerGain(String id, float gain) callback delegate not defined");
                 }
@@ -244,7 +244,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerGain(id);
+                    return delegate.getTunerGain(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerGain(String id) callback delegate not defined");
                 }
@@ -262,7 +262,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    delegate.fe_setTunerReferenceSource(id, source);
+                    delegate.setTunerReferenceSource(id, source);
                 } else {
                     throw new FrontendException("InAnalogTunerPort setTunerReferenceSource(String id, int source) callback delegate not defined");
                 }
@@ -280,7 +280,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerReferenceSource(id);
+                    return delegate.getTunerReferenceSource(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerReferenceSource(String id) callback delegate not defined");
                 }
@@ -298,7 +298,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    delegate.fe_setTunerEnable(id, enable);
+                    delegate.setTunerEnable(id, enable);
                 } else {
                     throw new FrontendException("InAnalogTunerPort setTunerEnable(String id, boolean enable) callback delegate not defined");
                 }
@@ -316,7 +316,7 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerEnable(id);
+                    return delegate.getTunerEnable(id);
                 } else {
                     throw new FrontendException("InAnalogTunerPort getTunerEnable(String id) callback delegate not defined");
                 }

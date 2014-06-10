@@ -26,7 +26,7 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){ 
-                    return delegate.fe_getAvailableRFInputs();
+                    return delegate.get_available_rf_inputs(this.name);
                 }
             }catch(Exception e){
                 System.out.println("InRFSourcePort available_rf_inputs() exception " + e.getMessage());
@@ -39,7 +39,7 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null){ 
-                    delegate.fe_setAvailableRFInputs(data);
+                    delegate.set_available_rf_inputs(this.name, data);
                 }
             }catch(Exception e){
                 System.out.println("InRFSourcePort available_rf_inputs(RFInfoPkt[] data) exception " + e.getMessage());
@@ -51,7 +51,7 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null){
-                    return (delegate.fe_getCurrentRFInput());
+                    return (delegate.get_current_rf_input(this.name));
                 }
             }catch(Exception e){
                 System.out.println("InRFSourcePort current_rf_input() exception " + e.getMessage());
@@ -64,7 +64,7 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null) {
-                    delegate.fe_setCurrentRFInput(data);
+                    delegate.set_current_rf_input(this.name, data);
                 }
             }catch(Exception e){
                 System.out.println("InRFSourcePort current_rf_input(RFInfoPkt data) exception " + e.getMessage());

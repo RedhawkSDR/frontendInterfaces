@@ -29,7 +29,7 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerType(id);
+                    return delegate.getTunerType(id);
                 } else {
                     throw new FrontendException("InFrontendTunerPort getTunerType(String id) callback delegate not defined");
                 }
@@ -47,7 +47,7 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerDeviceControl(id);
+                    return delegate.getTunerDeviceControl(id);
                 } else {
                     throw new FrontendException("InFrontendTunerPort getTunerDeviceControl(String id) callback delegate not defined");
                 }
@@ -65,7 +65,7 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerGroupId(id);
+                    return delegate.getTunerGroupId(id);
                 } else {
                     throw new FrontendException("InFrontendTunerPort getTunerGroupId(String id) callback delegate not defined");
                 }
@@ -83,7 +83,7 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerRfFlowId(id);
+                    return delegate.getTunerRfFlowId(id);
                 } else {
                     throw new FrontendException("InFrontendTunerPort getTunerRfFlowId(String id) callback delegate not defined");
                 }
@@ -101,7 +101,7 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
-                    return delegate.fe_getTunerStatus(id);
+                    return delegate.getTunerStatus(id);
                 } else {
                     throw new FrontendException("InFrontendTunerPort getTunerStatus(String id) callback delegate not defined");
                 }
