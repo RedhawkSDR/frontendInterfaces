@@ -154,14 +154,14 @@ namespace frontend {
             bool mode, double min_device_center_freq, double max_device_center_freq, double max_device_bandwidth, double max_device_sample_rate){
 
         // check if request can be satisfied using the available upstream data
-        if( !validateRequestVsRFInfo(request,rfinfo, mode) ){
+        if( request.tuner_type != "TX" && !validateRequestVsRFInfo(request,rfinfo, mode) ){
             throw FRONTEND::BadParameterException("INVALID REQUEST -- analog freq range (RFinfo) cannot support request");
         }
 
         // check device constraints
         // see if IF center frequency is set in rfinfo packet
         double request_if_center_freq = request.center_frequency;
-        if(floatingPointCompare(rfinfo.if_center_freq,0) > 0 && floatingPointCompare(rfinfo.rf_center_freq,rfinfo.if_center_freq) > 0)
+        if(request.tuner_type != "TX" && floatingPointCompare(rfinfo.if_center_freq,0) > 0 && floatingPointCompare(rfinfo.rf_center_freq,rfinfo.if_center_freq) > 0)
             request_if_center_freq = request.center_frequency - (rfinfo.rf_center_freq-rfinfo.if_center_freq);
 
         // check vs. device center freq capability (ensure 0 <= request <= max device capability)
