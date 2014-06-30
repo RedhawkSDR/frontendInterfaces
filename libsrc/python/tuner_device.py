@@ -153,7 +153,7 @@ def createTunerListenerAllocation(existing_allocation_id,listener_allocation_id=
         retval = CF.DataType(id='FRONTEND::listener_allocation',value=CORBA.Any(CF._tc_Properties,alloc))
     return retval
 
-def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=95100000,bandwidth=250000,sample_rate=500000,device_control=True,group_id='',rf_flow_id='',bandwidth_tolerance=0.0,sample_rate_tolerance=0.0,returnDict=True,gain=None):
+def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=None,bandwidth=256000,sample_rate=None,device_control=True,group_id='',rf_flow_id='',bandwidth_tolerance=0.0,sample_rate_tolerance=0.0,returnDict=True,gain=None):
     tuners = len(device.frontend_tuner_status)
     newAllocation = False
     #No tuners found on device
@@ -166,6 +166,8 @@ def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=95
                 if id == allocation_id:
                     break
                 if id == '' and not newAllocation:
+                    if sample_rate == None or center_frequency == None:
+                        print "set center_frequency and sample_rate"
                     alloc=createTunerAllocation(tuner_type, allocation_id,center_frequency,bandwidth, sample_rate,device_control,group_id,rf_flow_id,bandwidth_tolerance,sample_rate_tolerance,returnDict)
                     alloc_results = device.allocateCapacity(alloc)
                     print alloc_results
@@ -193,9 +195,9 @@ def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=95
                 return allocation_status.allocation_id_csv
             allocation_id = allocation_status.allocation_id_csv
             allocation_id = ''.join(allocation_id)
-            if tuner.getTunerCenterFrequency(allocation_id) != center_frequency or center_frequency != 95100000:
+            if center_frequency != None:
                 tuner.setTunerCenterFrequency(allocation_id, center_frequency)
-            if tuner.getTunerOutputSampleRate(allocation_id) != sample_rate or sample_rate != 500000 and tuner_type == "DigitalTuner":
+            if sample_rate != None:
                 tuner.setTunerOutputSampleRate(allocation_id, sample_rate)
             if gain != None:
                 tuner.setTunerGain(allocation_id, gain)
