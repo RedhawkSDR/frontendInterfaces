@@ -153,6 +153,81 @@ def createTunerListenerAllocation(existing_allocation_id,listener_allocation_id=
         retval = CF.DataType(id='FRONTEND::listener_allocation',value=CORBA.Any(CF._tc_Properties,alloc))
     return retval
 
+def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=None,bandwidth=256000,sample_rate=None,device_control=True,group_id='',rf_flow_id='',bandwidth_tolerance=0.0,sample_rate_tolerance=0.0,returnDict=True,gain=None):
+    tuners = len(device.frontend_tuner_status)
+    newAllocation = False
+    #No tuners found on device
+    if tuners == 0:
+        print "No Available Tuner"
+    else:
+        if tuners >= 1:
+            for index, key in enumerate(device.frontend_tuner_status):
+                id = device.frontend_tuner_status[index].allocation_id_csv
+                if id == allocation_id:
+                    break
+                if id == '' and not newAllocation:
+                    if sample_rate == None or center_frequency == None:
+                        print "set center_frequency and sample_rate"
+                    alloc=createTunerAllocation(tuner_type, allocation_id,center_frequency,bandwidth, sample_rate,device_control,group_id,rf_flow_id,bandwidth_tolerance,sample_rate_tolerance,returnDict)
+                    alloc_results = device.allocateCapacity(alloc)
+                    print alloc_results
+                    newAllocation = True
+
+        if allocation_id == None and not newAllocation and tuners > 1:
+            print "All ", len(device.frontend_tune_status), " tuners have been allocated"
+            print "Specify an allocation_id to change tuning properties"
+
+        if not newAllocation:
+            tuner=None
+            tuner_type=None
+            allocation_status = _getAllocationStatus(device, tuners, allocation_id) 
+            if allocation_status == None:
+                print "no matching allocation ID's", allocation_id
+                return  allocation_status
+            elif "DigitalTuner_in" in device._providesPortDict.keys():
+                tuner_type = "DigitalTuner"
+                tuner = device.getPort("DigitalTuner_in")
+            elif "AnalogTuner_in" in device._providesPortDict.keys():
+                tuner_type = "AnalogTuner"
+                tuner = device.getPort("AnalogTuner_in")
+            else:
+                print "No DigitalTuner_in or AnalogTuner_in found"
+                return allocation_status.allocation_id_csv
+            allocation_id = allocation_status.allocation_id_csv
+            allocation_id = ''.join(allocation_id)
+            if center_frequency != None:
+                tuner.setTunerCenterFrequency(allocation_id, center_frequency)
+            if sample_rate != None:
+                tuner.setTunerOutputSampleRate(allocation_id, sample_rate)
+            if gain != None:
+                tuner.setTunerGain(allocation_id, gain)
+            return allocation_status.allocation_id_csv
+    
+    return None
+
+def _getAllocationStatus(device, tuners, allocation_id):
+    if tuners == 1 and allocation_id == None:
+        return device.frontend_tuner_status[0]
+    else:
+        for i in range(len(device.frontend_tuner_status)):
+            if device.frontend_tuner_status[i].allocation_id == allocation_id:
+                return device.frontend_tuner_status[i]
+    return None
+
+def deallocate(device,allocation_id=None):
+    deallocated = False
+    if len(device.frontend_tuner_status) == 1:
+        device.deallocateCapacity(device._alloc[0])
+        deallocated = True
+    else:
+        if allocation_id == None:
+            print "no allocation_id given"
+        for i in range(len(device._alloc)):
+            if device._alloc[i].values()[0]['FRONTEND::tuner_allocation::allocation_id'] == allocation_id:
+                device.deallocateCapacity(device._alloc[i])
+                deallocated = True
+    return deallocated
+
 class FrontendTunerAllocation(object):
     tuner_type = simple_property(id_="FRONTEND::tuner_allocation::tuner_type",
                                      name="tuner_type",
@@ -329,7 +404,7 @@ class DefaultFrontendTunerStatusStruct(object):
     
     def getMembers(self):
         return [("tuner_type",self.tuner_type),("allocation_id_csv",self.allocation_id_csv),("center_frequency",self.center_frequency),("bandwidth",self.bandwidth),("sample_rate",self.sample_rate),("group_id",self.group_id),("rf_flow_id",self.rf_flow_id),("enabled",self.enabled)]
-    
+
 
 class FrontendTunerDevice(CF__POA.Device, Device):
 
