@@ -10,8 +10,9 @@ namespace frontend {
     
     // Time Type Definition
     enum timeTypes {
-        J1970 = 1,
-        JCY = 2
+        J1950 = 1,
+        J1970 = 2,
+        JCY = 3
     };
     
     struct FreqRange {
