@@ -61,9 +61,10 @@ def zeroSRI(sri):
         
         
 # Time Type Definition
-J1970 = 1
-JCY = 2
-#timeTypes = {'J1970':J1970,'JCY':JCY}
+J1950 = 1
+J1970 = 2
+JCY = 3
+#timeTypes = {'J1950':J1950,'J1970':J1970,'JCY':JCY}
     
 ''' Individual Tuner. This structure contains stream specific data for channel/tuner to include:
          - Additional stream metadata (sri)
