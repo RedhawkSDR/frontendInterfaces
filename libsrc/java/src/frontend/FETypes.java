@@ -35,6 +35,7 @@ import org.ossie.properties.StructProperty;
 public class FETypes {
 
     public enum timeTypes {
+        J1950,
         J1970, 
         JCY;
     }
