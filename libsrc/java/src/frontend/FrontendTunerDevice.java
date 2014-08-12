@@ -790,7 +790,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         new StringProperty(
             "DCE:0f99b2e4-9903-4631-9846-ff349d18ecfb", //id
             "device_model", //name
-            "USRP", //default value
+            "", //default value
             Mode.READONLY, //mode
             Action.EQ, //action
             new Kind[] {Kind.ALLOCATION,Kind.CONFIGURE} //kind
