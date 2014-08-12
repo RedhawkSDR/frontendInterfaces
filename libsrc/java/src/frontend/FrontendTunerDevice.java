@@ -776,7 +776,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
     // tuner_allocation_ids tracks allocation ids while frontend_tuner_status provides tuner information.
     protected List<tunerAllocationIdsStruct> tuner_allocation_ids;
 
-    protected final StringProperty device_kind =
+    protected StringProperty device_kind =
         new StringProperty(
             "DCE:cdc5ee18-7ceb-4ae6-bf4c-31f983179b4d", //id
             "device_kind", //name
@@ -786,7 +786,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             new Kind[] {Kind.ALLOCATION,Kind.CONFIGURE} //kind
             );
 
-    protected final StringProperty device_model =
+    protected StringProperty device_model =
         new StringProperty(
             "DCE:0f99b2e4-9903-4631-9846-ff349d18ecfb", //id
             "device_model", //name
@@ -796,7 +796,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             new Kind[] {Kind.ALLOCATION,Kind.CONFIGURE} //kind
             );
 
-    protected final StructProperty<frontend.FETypes.frontend_tuner_allocation_struct> frontend_tuner_allocation =
+    protected StructProperty<frontend.FETypes.frontend_tuner_allocation_struct> frontend_tuner_allocation =
         new StructProperty<frontend.FETypes.frontend_tuner_allocation_struct>(
             "FRONTEND::tuner_allocation", //id
             "frontend_tuner_allocation", //name
@@ -806,7 +806,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             new Kind[] {Kind.ALLOCATION} //kind
             );
 
-    protected final StructProperty<frontend.FETypes.frontend_listener_allocation_struct> frontend_listener_allocation =
+    protected StructProperty<frontend.FETypes.frontend_listener_allocation_struct> frontend_listener_allocation =
         new StructProperty<frontend.FETypes.frontend_listener_allocation_struct>(
             "FRONTEND::listener_allocation", //id
             "frontend_listener_allocation", //name
@@ -818,7 +818,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
 
     private Class<TunerStatusStructType> frontend_tuner_status_class_type;
 
-    protected final StructSequenceProperty<TunerStatusStructType> frontend_tuner_status =
+    protected StructSequenceProperty<TunerStatusStructType> frontend_tuner_status =
         new StructSequenceProperty<TunerStatusStructType> (
             "FRONTEND::tuner_status", //id
             "frontend_tuner_status", //name
