@@ -22,11 +22,7 @@ from ossie.cf import CF, CF__POA, ExtendedCF
 from ossie.cf.CF import Port
 from ossie.utils import uuid
 
-#import copy, time
 import threading
-#from ossie.resource import usesport, providesport
-#import bulkio
-#from redhawk.frontendInterfaces import FRONTEND__POA
 from redhawk.frontendInterfaces import FRONTEND
 
 
