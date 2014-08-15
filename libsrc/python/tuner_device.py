@@ -452,7 +452,7 @@ def deallocate(device,allocation_id=None):
                 deallocated = True
     return deallocated
 
-class FrontendTunerDevice(CF__POA.Device, Device):
+class FrontendTunerDevice(Device):
 
     def __init__(self, devmgr, uuid, label, softwareProfile, compositeDevice, execparams):
         Device.__init__(self, devmgr, uuid, label, softwareProfile, compositeDevice, execparams)
