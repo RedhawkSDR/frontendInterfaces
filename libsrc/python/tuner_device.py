@@ -925,7 +925,7 @@ class FrontendTunerDevice(Device):
     # TODO - need to have this use the updated non-default tuner status struct class in the device's auto generated base class
     frontend_tuner_status = structseq_property(id_="FRONTEND::tuner_status",
                                                name="frontend_tuner_status",
-                                               structdef=default_frontend_tuner_status_struct,
+                                               structdef=default_frontend_tuner_status_struct_struct,
                                                defvalue=[],
                                                configurationkind=("configure",),
                                                mode="readonly",

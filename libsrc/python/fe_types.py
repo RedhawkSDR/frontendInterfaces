@@ -263,7 +263,7 @@ class frontend_listener_allocation(object):
     def getMembers(self):
         return [("existing_allocation_id",self.existing_allocation_id),("listener_allocation_id",self.listener_allocation_id)]
 
-class default_frontend_tuner_status_struct(object):
+class default_frontend_tuner_status_struct_struct(object):
     tuner_type = simple_property(id_="FRONTEND::tuner_status::tuner_type",
                                  name="tuner_type",
                                  type_="string",
