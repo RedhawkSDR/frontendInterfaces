@@ -267,16 +267,11 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         return true;
     }
 
-    public FrontendTunerDevice(DeviceManager devMgr, String compId, String label, String softwareProfile, ORB orb, POA poa) throws InvalidObjectReference, ServantNotActive, WrongPolicy, CF.DevicePackage.InvalidCapacity {
+    public FrontendTunerDevice() {
         super();
         construct();
     }
  
-    public FrontendTunerDevice(DeviceManager devMgr, AggregateDevice compositeDevice, String compId, String label, String softwareProfile, ORB orb, POA poa) throws InvalidObjectReference, ServantNotActive, WrongPolicy, CF.DevicePackage.InvalidCapacity {
-        super();
-        construct();
-    }
-
     private void construct() {
         loadProperties();
         frontend_tuner_allocation.setAllocator(new Allocator<frontend.FETypes.frontend_tuner_allocation_struct>() {
