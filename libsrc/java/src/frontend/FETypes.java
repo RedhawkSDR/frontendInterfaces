@@ -35,9 +35,13 @@ import org.ossie.properties.StructProperty;
 public class FETypes {
 
     public enum timeTypes {
-        J1950,
-        J1970, 
-        JCY;
+        J1950(1),
+        J1970(2),
+        JCY(3);
+        public int value;
+        private timeTypes(int value){
+            this.value = value;
+        }
     }
 
     public class FreqRange {
