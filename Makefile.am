@@ -51,7 +51,7 @@ IDL_EXTERNS := CF BULKIO
 
 # In some cases, you may need to define python externs 
 #     f:p   Assume Python stub file for file f is in package p.
-PYTHON_EXTERNS := PortTypes:ossie.cf cf:ossie.cf bulkioDataTypes:bulkio.bulkioInterfaces LogInterfaces:ossie.cf
+PYTHON_EXTERNS := PortTypes:ossie.cf cf:ossie.cf bulkioDataTypes:bulkio.bulkioInterfaces LogInterfaces:ossie.cf CosNaming:omniORB.COS
 
 # Relative path to the location of the IDL files
 IDL_SOURCE_PATH := .
@@ -124,7 +124,7 @@ AM_LIBS = $(OSSIE_LIBS)
 
 src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%DynSK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%SK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%.h: build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
 	@mkdir -p "src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)"
-	$(IDL) -I build/idl $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -C src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE) -bcxx -Wba -Wbd=DynSK.cpp -Wbh=.h -Wbs=SK.cpp -Wbkeep_inc_path $<
+	$(IDL) -I build/idl $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -I$(OMNICOS_IDLDIR) -I$(OMNIORB_IDLDIR) -C src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE) -bcxx -Wba -Wbd=DynSK.cpp -Wbh=.h -Wbs=SK.cpp -Wbkeep_inc_path $<
 
 clean-cpp:
 	rm -rf src/cpp
@@ -162,7 +162,7 @@ PY_IDL_INCLUDES := -I build/idl
 
 $(PY_SRC_OUT_DIR)/%_idl.py: build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
 	mkdir -p $(PY_SRC_OUT_DIR)
-	$(IDL) $(PY_IDL_INCLUDES) $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -C src/python -bpython -Wbpackage=$(PYTHON_PACKAGE) $(PY_IDL_EXTERNS) $<
+	$(IDL) $(PY_IDL_INCLUDES) $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -I$(OMNICOS_IDLDIR) -I$(OMNIORB_IDLDIR) -C src/python -bpython -Wbpackage=$(PYTHON_PACKAGE) $(PY_IDL_EXTERNS) $<
 
 setup.py: Makefile.am
 # Build up a setup.py line-by-line
