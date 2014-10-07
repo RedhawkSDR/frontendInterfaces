@@ -34,7 +34,7 @@ Prefix: %{_prefix}
 
 Summary:        The frontend library for REDHAWK
 Name:           frontendInterfaces
-Version:        2.2.1
+Version:        2.3.0
 Release:        1%{?dist}
 License:        LGPLv3+
 Group:          REDHAWK/Interfaces
@@ -43,10 +43,10 @@ Vendor:         REDHAWK
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
-Requires:       redhawk >= 1.10.0, redhawk < 1.11.0
-Requires:       bulkioInterfaces >= 1.10.0, bulkioInterfaces < 1.11.0
-BuildRequires:  redhawk-devel >= 1.10.0, redhawk-devel < 1.11.0
-BuildRequires:  bulkioInterfaces >= 1.10.0, bulkioInterfaces < 1.11.0
+Requires:       redhawk >= 1.11.0, redhawk < 1.12.0
+Requires:       bulkioInterfaces >= 1.11.0, bulkioInterfaces < 1.12.0
+BuildRequires:  redhawk-devel >= 1.11.0, redhawk-devel < 1.12.0
+BuildRequires:  bulkioInterfaces >= 1.11.0, bulkioInterfaces < 1.12.0
 
 %description
 Libraries and interface definitions for frontend.
