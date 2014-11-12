@@ -1,20 +1,20 @@
 #
-# This file is protected by Copyright. Please refer to the COPYRIGHT file 
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
-# 
+#
 # This file is part of REDHAWK core.
-# 
-# REDHAWK core is free software: you can redistribute it and/or modify it under 
-# the terms of the GNU Lesser General Public License as published by the Free 
-# Software Foundation, either version 3 of the License, or (at your option) any 
+#
+# REDHAWK core is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
 # later version.
-# 
-# REDHAWK core is distributed in the hope that it will be useful, but WITHOUT 
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+#
+# REDHAWK core is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
 # details.
-# 
-# You should have received a copy of the GNU Lesser General Public License 
+#
+# You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 
@@ -32,21 +32,21 @@ Prefix: %{_prefix}
 # Assume Java support by default. Use "rpmbuild --without java" to disable
 %bcond_without java
 
-Summary: The frontend library for REDHAWK
-Name: frontendInterfaces
-Version: 2.2.0
-Release: 10%{?dist}
-License: None
-Group: REDHAWK/Interfaces
-Source: %{name}-%{version}.tar.gz 
-Vendor: REDHAWK
+Summary:        The frontend library for REDHAWK
+Name:           frontendInterfaces
+Version:        2.3.0
+Release:        1%{?dist}
+License:        LGPLv3+
+Group:          REDHAWK/Interfaces
+Source:         %{name}-%{version}.tar.gz
+Vendor:         REDHAWK
 
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
-Requires: redhawk >= 1.10.0
-Requires: bulkioInterfaces >= 1.10.0
-BuildRequires: redhawk-devel >= 1.10.0
-BuildRequires: bulkioInterfaces >= 1.10.0
+Requires:       redhawk >= 1.11.0, redhawk < 1.12.0
+Requires:       bulkioInterfaces >= 1.11.0, bulkioInterfaces < 1.12.0
+BuildRequires:  redhawk-devel >= 1.11.0, redhawk-devel < 1.12.0
+BuildRequires:  bulkioInterfaces >= 1.11.0, bulkioInterfaces < 1.12.0
 
 %description
 Libraries and interface definitions for frontend.

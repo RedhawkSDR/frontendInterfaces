@@ -1,24 +1,24 @@
 #
-# This file is protected by Copyright. Please refer to the COPYRIGHT file 
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
-# 
+#
 # This file is part of REDHAWK core.
-# 
-# REDHAWK core is free software: you can redistribute it and/or modify it under 
-# the terms of the GNU Lesser General Public License as published by the Free 
-# Software Foundation, either version 3 of the License, or (at your option) any 
+#
+# REDHAWK core is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
 # later version.
-# 
-# REDHAWK core is distributed in the hope that it will be useful, but WITHOUT 
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+#
+# REDHAWK core is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
 # details.
-# 
-# You should have received a copy of the GNU Lesser General Public License 
+#
+# You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 
-AC_INIT(frontendInterfaces, 2.2.0)
+AC_INIT(frontendInterfaces, 2.3.0)
 
 AM_INIT_AUTOMAKE(nostdinc)
 AC_PROG_CC
@@ -39,14 +39,19 @@ if test "$IDL" = no; then
 fi
 AC_LANG_PUSH([C++])
 PKG_CHECK_MODULES([OMNIORB], [omniORB4 >= 4.1.0])
-PKG_CHECK_MODULES([OSSIE], [ossie >= 1.10.0])
+RH_PKG_IDLDIR([OMNIORB], [omniORB4])
+PKG_CHECK_MODULES([OSSIE], [ossie >= 1.11.0])
+RH_PKG_IDLDIR([OSSIE], [ossie])
+PKG_CHECK_MODULES([OMNICOS], [omniCOS4 >= 4.0.0])
+RH_PKG_IDLDIR([OMNICOS], [omniCOS4])
 
 # If you depend on other IDL modules, such as CF or BULKIO add them here
-PKG_CHECK_MODULES([BULKIO], [bulkioInterfaces >= 1.10])
+PKG_CHECK_MODULES([BULKIO], [bulkioInterfaces >= 1.11])
 AC_CHECK_PYMODULE(bulkio.bulkioInterfaces, [], [AC_MSG_ERROR([the python bulkio.bulkioInterfaces module is required])])
+RH_PKG_IDLDIR([BULKIO], [bulkioInterfaces])
 
 AC_SUBST([FRONTEND_SO_VERSION],[0:0:0])
-AC_SUBST([FRONTEND_API_VERSION],[2.2.0])
+AC_SUBST([FRONTEND_API_VERSION],[2.3.0])
 
 AX_BOOST_BASE([1.41])
 AX_BOOST_THREAD
