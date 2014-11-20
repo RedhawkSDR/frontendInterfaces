@@ -119,7 +119,8 @@ inline bool operator!= (const frontend::frontend_tuner_allocation_struct& s1, co
 
 template<> inline short StructProperty<frontend::frontend_tuner_allocation_struct>::compare (const CORBA::Any& a) {
     if (super::isNil_) {
-        if (a.type()->kind() == (CORBA::tk_null)) {
+        CORBA::TypeCode_var aType = a.type();
+        if (aType->kind() == (CORBA::tk_null)) {
             return 0;
         }
         return 1;
@@ -176,7 +177,8 @@ inline bool operator!= (const frontend::frontend_listener_allocation_struct& s1,
 
 template<> inline short StructProperty<frontend::frontend_listener_allocation_struct>::compare (const CORBA::Any& a) {
     if (super::isNil_) {
-        if (a.type()->kind() == (CORBA::tk_null)) {
+        CORBA::TypeCode_var aType = a.type();
+        if (aType->kind() == (CORBA::tk_null)) {
             return 0;
         }
         return 1;
@@ -275,7 +277,8 @@ inline bool operator!= (const frontend::default_frontend_tuner_status_struct_str
 
 template<> inline short StructProperty<frontend::default_frontend_tuner_status_struct_struct>::compare (const CORBA::Any& a) {
     if (super::isNil_) {
-        if (a.type()->kind() == (CORBA::tk_null)) {
+        CORBA::TypeCode_var aType = a.type();
+        if (aType->kind() == (CORBA::tk_null)) {
             return 0;
         }
         return 1;
@@ -311,7 +314,8 @@ inline bool operator!= (const std::vector<frontend::default_frontend_tuner_statu
 
 template<> inline short StructSequenceProperty<frontend::default_frontend_tuner_status_struct_struct>::compare (const CORBA::Any& a) {
     if (super::isNil_) {
-        if (a.type()->kind() == (CORBA::tk_null)) {
+        CORBA::TypeCode_var aType = a.type();
+        if (aType->kind() == (CORBA::tk_null)) {
             return 0;
         }
         return 1;
