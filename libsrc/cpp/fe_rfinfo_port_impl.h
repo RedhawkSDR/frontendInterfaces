@@ -93,7 +93,7 @@ namespace frontend {
             
             std::string rf_flow_id() {
                 CORBA::String_var retval;
-                std::vector < std::pair < FRONTEND::RFInfo_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -107,7 +107,7 @@ namespace frontend {
                 return str_retval;
             };
             void rf_flow_id(std::string &data) {
-                std::vector < std::pair < FRONTEND::RFInfo_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -121,7 +121,7 @@ namespace frontend {
             };
             frontend::RFInfoPkt rfinfo_pkt() {
                 frontend::RFInfoPkt retval;
-                std::vector < std::pair < FRONTEND::RFInfo_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -135,7 +135,7 @@ namespace frontend {
                 return retval;
             };
             void rfinfo_pkt(frontend::RFInfoPkt data) {
-                std::vector < std::pair < FRONTEND::RFInfo_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {

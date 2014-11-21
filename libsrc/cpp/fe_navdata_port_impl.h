@@ -78,7 +78,7 @@ namespace frontend {
             
             frontend::NavigationPacket nav_packet() {
                 frontend::NavigationPacket retval;
-                std::vector < std::pair < FRONTEND::NavData_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -92,7 +92,7 @@ namespace frontend {
                 return retval;
             };
             void nav_packet(const frontend::NavigationPacket &nav) {
-                std::vector < std::pair < FRONTEND::NavData_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
