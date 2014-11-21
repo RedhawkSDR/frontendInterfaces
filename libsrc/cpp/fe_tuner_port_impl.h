@@ -241,7 +241,7 @@ namespace frontend {
             
             std::string getTunerType(std::string &id) {
                 CORBA::String_var retval;
-                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -256,7 +256,7 @@ namespace frontend {
             };
             bool getTunerDeviceControl(std::string &id) {
                 CORBA::Boolean retval;
-                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -270,7 +270,7 @@ namespace frontend {
             };
             std::string getTunerGroupId(std::string &id) {
                 CORBA::String_var retval;
-                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -285,7 +285,7 @@ namespace frontend {
             };
             std::string getTunerRfFlowId(std::string &id) {
                 CORBA::String_var retval;
-                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -300,7 +300,7 @@ namespace frontend {
             };
             CF::Properties* getTunerStatus(std::string &id) {
                 CF::Properties* retval;
-                std::vector < std::pair < FRONTEND::FrontendTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -323,7 +323,7 @@ namespace frontend {
             ~OutAnalogTunerPortT(){};
             
             void setTunerCenterFrequency(std::string &id, double freq) {
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -337,7 +337,7 @@ namespace frontend {
             };
             double getTunerCenterFrequency(std::string &id) {
                 CORBA::Double retval;
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -350,7 +350,7 @@ namespace frontend {
                 return retval;
             };
             void setTunerBandwidth(std::string &id, double bw) {
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -364,7 +364,7 @@ namespace frontend {
             };
             double getTunerBandwidth(std::string &id) {
                 CORBA::Double retval;
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -377,7 +377,7 @@ namespace frontend {
                 return retval;
             };
             void setTunerAgcEnable(std::string &id, bool enable) {
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -391,7 +391,7 @@ namespace frontend {
             };
             bool getTunerAgcEnable(std::string &id) {
                 CORBA::Boolean retval;
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -404,7 +404,7 @@ namespace frontend {
                 return retval;
             };
             void setTunerGain(std::string &id, float gain) {
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -418,7 +418,7 @@ namespace frontend {
             };
             float getTunerGain(std::string &id) {
                 CORBA::Float retval;
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -431,7 +431,7 @@ namespace frontend {
                 return retval;
             };
             void setTunerReferenceSource(std::string &id, int source) {
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -445,7 +445,7 @@ namespace frontend {
             };
             int getTunerReferenceSource(std::string &id) {
                 CORBA::Long retval;
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -458,7 +458,7 @@ namespace frontend {
                 return retval;
             };
             void setTunerEnable(std::string &id, bool enable) {
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -472,7 +472,7 @@ namespace frontend {
             };
             bool getTunerEnable(std::string &id) {
                 CORBA::Boolean retval;
-                std::vector < std::pair < FRONTEND::AnalogTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -495,7 +495,7 @@ namespace frontend {
             ~OutDigitalTunerPortT(){};
             
             void setTunerOutputSampleRate(std::string &id, double sr) {
-                std::vector < std::pair < FRONTEND::DigitalTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
@@ -509,7 +509,7 @@ namespace frontend {
             };
             double getTunerOutputSampleRate(std::string &id) {
                 CORBA::Double retval;
-                std::vector < std::pair < FRONTEND::DigitalTuner_var, std::string > >::iterator i;
+                typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
