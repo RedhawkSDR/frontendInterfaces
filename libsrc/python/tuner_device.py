@@ -378,35 +378,37 @@ def createTunerListenerAllocation(existing_allocation_id,listener_allocation_id=
     return retval
 
 def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=None,bandwidth=256000,sample_rate=None,device_control=True,group_id='',rf_flow_id='',bandwidth_tolerance=0.0,sample_rate_tolerance=0.0,returnDict=True,gain=None):
-    tuners = len(device.frontend_tuner_status)
+    numTuners = len(device.frontend_tuner_status)
     newAllocation = False
     #No tuners found on device
-    if tuners == 0:
+    if numTuners == 0:
         print "No Available Tuner"
     else:
-        if tuners >= 1:
+        if numTuners >= 1:
             for index, key in enumerate(device.frontend_tuner_status):
-                id = device.frontend_tuner_status[index].allocation_id_csv
-                if id == allocation_id:
+                id_csv = device.frontend_tuner_status[index].allocation_id_csv
+                if allocation_id != None and allocation_id in id_csv:
                     break
-                if id == '' and not newAllocation:
+                if id_csv == '':
                     if sample_rate == None or center_frequency == None:
-                        print "set center_frequency and sample_rate"
-                    alloc=createTunerAllocation(tuner_type, allocation_id,center_frequency,bandwidth, sample_rate,device_control,group_id,rf_flow_id,bandwidth_tolerance,sample_rate_tolerance,returnDict)
-                    alloc_results = device.allocateCapacity(alloc)
-                    print alloc_results
-                    newAllocation = True
+                        print "tune(): tune did not occur, must set center_frequency and sample_rate"
+                        return None
+                    else:
+                        alloc=createTunerAllocation(tuner_type, allocation_id,center_frequency,bandwidth, sample_rate,device_control,group_id,rf_flow_id,bandwidth_tolerance,sample_rate_tolerance,returnDict)
+                        alloc_results = device.allocateCapacity(alloc)
+                        print alloc_results
+                        newAllocation = True
+                        break
 
-        if allocation_id == None and not newAllocation and tuners > 1:
-            print "All ", len(device.frontend_tune_status), " tuners have been allocated"
-            print "Specify an allocation_id to change tuning properties"
+        if allocation_id == None and not newAllocation and numTuners >= 1:
+            print "tune(): All tuners (", len(device.frontend_tuner_status), ") have been allocated.  Specify an allocation_id to change tuning properties"
 
-        if not newAllocation:
+        elif not newAllocation:
             tuner=None
             tuner_type=None
-            allocation_status = _getAllocationStatus(device, tuners, allocation_id) 
+            allocation_status = _getAllocationStatus(device, numTuners, allocation_id)
             if allocation_status == None:
-                print "no matching allocation ID's", allocation_id
+                print "tune(): no matching allocation ID's for ",allocation_id
                 return  allocation_status
             elif "DigitalTuner_in" in device._providesPortDict.keys():
                 tuner_type = "DigitalTuner"
@@ -415,41 +417,53 @@ def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=No
                 tuner_type = "AnalogTuner"
                 tuner = device.getPort("AnalogTuner_in")
             else:
-                print "No DigitalTuner_in or AnalogTuner_in found"
+                print "tune(): No DigitalTuner_in or AnalogTuner_in found"
                 return allocation_status.allocation_id_csv
-            allocation_id = allocation_status.allocation_id_csv
-            allocation_id = ''.join(allocation_id)
-            if center_frequency != None:
-                tuner.setTunerCenterFrequency(allocation_id, center_frequency)
-            if sample_rate != None:
-                tuner.setTunerOutputSampleRate(allocation_id, sample_rate)
-            if gain != None:
-                tuner.setTunerGain(allocation_id, gain)
+            if len(allocation_status.allocation_id_csv) > 0:
+                # Get the control allocation_id
+                allocation_id = allocation_status.allocation_id_csv.split(",")[0]
+                if center_frequency != None:
+                    tuner.setTunerCenterFrequency(allocation_id, center_frequency)
+                if sample_rate != None:
+                    tuner.setTunerOutputSampleRate(allocation_id, sample_rate)
+                if gain != None:
+                    tuner.setTunerGain(allocation_id, gain)
             return allocation_status.allocation_id_csv
     
     return None
 
-def _getAllocationStatus(device, tuners, allocation_id):
-    if tuners == 1 and allocation_id == None:
+def _getAllocationStatus(device, numTuners, allocation_id):
+    if numTuners == 1 and allocation_id == None:
         return device.frontend_tuner_status[0]
     else:
         for i in range(len(device.frontend_tuner_status)):
-            if device.frontend_tuner_status[i].allocation_id == allocation_id:
+            if allocation_id in device.frontend_tuner_status[i].allocation_id_csv:
                 return device.frontend_tuner_status[i]
     return None
 
-def deallocate(device,allocation_id=None):
+def deallocate(device,allocation_id=None,allTuners=False):
     deallocated = False
     if len(device.frontend_tuner_status) == 1:
-        device.deallocateCapacity(device._alloc[0])
-        deallocated = True
+        if len(device.frontend_tuner_status[0].allocation_id_csv) > 0:
+            allocProps = createTunerAllocation(allocation_id=device.frontend_tuner_status[0].allocation_id_csv.split(",")[0])
+            device.deallocateCapacity(allocProps)
+            deallocated = True
     else:
-        if allocation_id == None:
-            print "no allocation_id given"
-        for i in range(len(device._alloc)):
-            if device._alloc[i].values()[0]['FRONTEND::tuner_allocation::allocation_id'] == allocation_id:
-                device.deallocateCapacity(device._alloc[i])
-                deallocated = True
+        if allocation_id == None and allTuners == False:
+            print "deallocate(): no tuner deallocated because no allocation_id specified and allTuners set to False"
+        else:
+            if allTuners == True:
+                for i in range(len(device.frontend_tuner_status)):
+                    if len(device.frontend_tuner_status[i].allocation_id_csv) > 0:
+                        allocProps = createTunerAllocation(allocation_id=device.frontend_tuner_status[i].allocation_id_csv.split(",")[0])
+                        device.deallocateCapacity(allocProps)
+                        deallocated = True
+            else:
+                for i in range(len(device.frontend_tuner_status)):
+                    if allocation_id in device.frontend_tuner_status[i].allocation_id_csv:
+                        allocProps = createTunerAllocation(allocation_id=allocation_id)
+                        device.deallocateCapacity(allocProps)
+                        deallocated = True
     return deallocated
 
 class FrontendTunerDevice(Device):
