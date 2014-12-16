@@ -397,8 +397,23 @@ def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=No
                         alloc=createTunerAllocation(tuner_type, allocation_id,center_frequency,bandwidth, sample_rate,device_control,group_id,rf_flow_id,bandwidth_tolerance,sample_rate_tolerance,returnDict)
                         alloc_results = device.allocateCapacity(alloc)
                         print alloc_results
-                        newAllocation = True
-                        break
+                        if alloc_results == True:
+                            newAllocation = True
+                            allocation_id = alloc['FRONTEND::tuner_allocation']['FRONTEND::tuner_allocation::allocation_id']
+                            if gain != None:
+                                tuner = None
+                                if "DigitalTuner_in" in device._providesPortDict.keys():
+                                    tuner_type = "DigitalTuner"
+                                    tuner = device.getPort("DigitalTuner_in")
+                                elif "AnalogTuner_in" in device._providesPortDict.keys():
+                                    tuner_type = "AnalogTuner"
+                                    tuner = device.getPort("AnalogTuner_in")
+                                if tuner != None:
+                                    if tuner.getTunerAgcEnable(allocation_id) == True:
+                                        print "tune(): Agc is enabled, disabling to allow setting of the gain to " + str(gain)
+                                        tuner.setTunerAgcEnable(allocation_id,False)
+                                    tuner.setTunerGain(allocation_id, gain)
+                            break
 
         if allocation_id == None and not newAllocation and numTuners >= 1:
             print "tune(): All tuners (", len(device.frontend_tuner_status), ") have been allocated.  Specify an allocation_id to change tuning properties"
@@ -427,7 +442,11 @@ def tune(device,tuner_type='RX_DIGITIZER',allocation_id=None,center_frequency=No
                 if sample_rate != None:
                     tuner.setTunerOutputSampleRate(allocation_id, sample_rate)
                 if gain != None:
+                    if tuner.getTunerAgcEnable(allocation_id) == True:
+                        print "tune(): Agc is enabled, disabling to allow setting of the gain to " + str(gain)
+                        tuner.setTunerAgcEnable(allocation_id,False)
                     tuner.setTunerGain(allocation_id, gain)
+
             return allocation_status.allocation_id_csv
     
     return None
