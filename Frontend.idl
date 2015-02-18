@@ -21,7 +21,7 @@
 #ifndef _FRONTEND_IDL_
 #define _FRONTEND_IDL_
 
-#include "ossie/CF/cf.idl"
+#include "ossie/CF/DataType.idl"
 
 
 /************************************************************************/
