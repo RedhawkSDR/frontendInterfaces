@@ -51,7 +51,7 @@ IDL_EXTERNS := CF BULKIO
 
 # In some cases, you may need to define python externs 
 #     f:p   Assume Python stub file for file f is in package p.
-PYTHON_EXTERNS := PortTypes:ossie.cf cf:ossie.cf bulkioDataTypes:bulkio.bulkioInterfaces LogInterfaces:ossie.cf
+PYTHON_EXTERNS := bulkioDataTypes:bulkio.bulkioInterfaces DataType:ossie.cf
 
 # Relative path to the location of the IDL files
 IDL_SOURCE_PATH := .
