@@ -27,8 +27,9 @@ import FRONTEND.FrontendTunerHelper;
 import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
+import org.ossie.component.PortBase;
 
-public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperations> implements FrontendTunerOperations {
+public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperations> implements FrontendTunerOperations, PortBase {
 
     protected String name;
 
@@ -137,5 +138,13 @@ public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperati
             }
         }
         return retval;
+    }
+
+    public String getRepid() {
+        return FrontendTunerHelper.id();
+    }
+
+    public String getDirection() {
+        return "Uses";
     }
  }

@@ -22,9 +22,11 @@ package frontend;
 import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
+import FRONTEND.FrontendTunerHelper;
 import frontend.FrontendTunerDelegate;
+import org.ossie.component.PortBase;
 
-public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
+public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA implements PortBase {
 
     protected String name;
 
@@ -136,5 +138,13 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA {
 
     public void setDelegate( FrontendTunerDelegate d ) {
         delegate = d;
+    }
+
+    public String getRepid() {
+        return FrontendTunerHelper.id();
+    }
+
+    public String getDirection() {
+        return "Provides";
     }
 }

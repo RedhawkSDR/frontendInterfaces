@@ -74,6 +74,9 @@ namespace frontend {
                 this->parent->set_rfinfo_pkt(this->name, input);
                 return;
             };
+            std::string getRepid() const {
+                return "IDL:FRONTEND/RFInfo:1.0";
+            };
             
         protected:
             rfinfo_delegation *parent;

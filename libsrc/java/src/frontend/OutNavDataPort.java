@@ -25,9 +25,9 @@ import org.ossie.component.QueryableUsesPort;
 import FRONTEND.NavDataOperations;
 import FRONTEND.NavDataHelper;
 import FRONTEND.NavigationPacket;
+import org.ossie.component.PortBase;
 
-
-public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> implements NavDataOperations {
+public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> implements NavDataOperations, PortBase {
 
     protected String name;
  
@@ -96,6 +96,14 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
                 }
             }
         }
+    }
+
+    public String getRepid() {
+        return NavDataHelper.id();
+    }
+
+    public String getDirection() {
+        return "Uses";
     }
 }
 

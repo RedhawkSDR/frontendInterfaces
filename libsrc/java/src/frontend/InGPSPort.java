@@ -21,8 +21,11 @@ package frontend;
 
 import FRONTEND.GpsTimePos;
 import FRONTEND.GPSInfo;
+import FRONTEND.GPSHelper;
 import frontend.GPSDelegate;
-public class InGPSPort extends FRONTEND.GPSPOA {
+import org.ossie.component.PortBase;
+
+public class InGPSPort extends FRONTEND.GPSPOA implements PortBase {
 
     protected String name;
  
@@ -93,5 +96,13 @@ public class InGPSPort extends FRONTEND.GPSPOA {
 
     public void setDelegate( GPSDelegate d ) {
         delegate = d;
+    }
+
+    public String getRepid() {
+        return GPSHelper.id();
+    }
+
+    public String getDirection() {
+        return "Provides";
     }
 }

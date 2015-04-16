@@ -22,9 +22,11 @@ package frontend;
 import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
+import FRONTEND.DigitalTunerHelper;
 import frontend.DigitalTunerDelegate;
+import org.ossie.component.PortBase;
 
-public class InDigitalTunerPort extends FRONTEND.DigitalTunerPOA {
+public class InDigitalTunerPort extends FRONTEND.DigitalTunerPOA implements PortBase {
 
     protected String name;
 
@@ -387,5 +389,13 @@ public class InDigitalTunerPort extends FRONTEND.DigitalTunerPOA {
 
     public void setDelegate( DigitalTunerDelegate d ) {
         delegate = d;
+    }
+
+    public String getRepid() {
+        return DigitalTunerHelper.id();
+    }
+
+    public String getDirection() {
+        return "Provides";
     }
 }

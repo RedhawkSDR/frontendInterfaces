@@ -20,12 +20,14 @@
 package frontend;
 
 import FRONTEND.NavigationPacket;
+import FRONTEND.NavDataHelper;
 import frontend.NavDataDelegate;
+import org.ossie.component.PortBase;
 
 // ----------------------------------------------------------------------------------------
 // InNavDataPort definition
 // ----------------------------------------------------------------------------------------
-public class InNavDataPort extends FRONTEND.NavDataPOA{
+public class InNavDataPort extends FRONTEND.NavDataPOA implements PortBase {
 
     protected String name;
 
@@ -71,5 +73,13 @@ public class InNavDataPort extends FRONTEND.NavDataPOA{
 
     public void setDelegate( NavDataDelegate d ) {
         delegate = d;
+    }
+
+    public String getRepid() {
+        return NavDataHelper.id();
+    }
+
+    public String getDirection() {
+        return "Provides";
     }
 }

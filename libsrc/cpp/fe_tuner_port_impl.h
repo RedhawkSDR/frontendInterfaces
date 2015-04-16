@@ -128,6 +128,9 @@ namespace frontend {
                 std::string _id(id);
                 return (this->parent->getTunerStatus(_id));
             };
+            std::string getRepid() const {
+                return "IDL:FRONTEND/FrontendTuner:1.0";
+            };
         protected:
             boost::mutex portAccess;
         private:
@@ -203,6 +206,9 @@ namespace frontend {
                 std::string _id(id);
                 return (this->parent->getTunerEnable(_id));
             };
+            std::string getRepid() const {
+                return "IDL:FRONTEND/AnalogTuner:1.0";
+            };
         private:
             analog_tuner_delegation *parent;
     };
@@ -225,6 +231,9 @@ namespace frontend {
                 boost::mutex::scoped_lock lock(this->portAccess);
                 std::string _id(id);
                 return (this->parent->getTunerOutputSampleRate(_id));
+            };
+            std::string getRepid() const {
+                return "IDL:FRONTEND/DigitalTuner:1.0";
             };
         private:
             digital_tuner_delegation *parent;

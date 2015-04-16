@@ -27,8 +27,9 @@ import FRONTEND.AnalogTunerHelper;
 import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
+import org.ossie.component.PortBase;
 
-public class OutAnalogTunerPort extends QueryableUsesPort<AnalogTunerOperations> implements AnalogTunerOperations {
+public class OutAnalogTunerPort extends QueryableUsesPort<AnalogTunerOperations> implements AnalogTunerOperations, PortBase {
 
     /**
      * Map of connection Ids to port objects
@@ -272,5 +273,13 @@ public class OutAnalogTunerPort extends QueryableUsesPort<AnalogTunerOperations>
             }
         }
         return retval;
+    }
+
+    public String getRepid() {
+        return AnalogTunerHelper.id();
+    }
+
+    public String getDirection() {
+        return "Uses";
     }
  }

@@ -21,8 +21,10 @@ package frontend;
 
 import frontend.RFInfoDelegate;
 import FRONTEND.RFInfoPkt;
+import FRONTEND.RFInfoHelper;
+import org.ossie.component.PortBase;
 
-public class InRFInfoPort extends FRONTEND.RFInfoPOA {
+public class InRFInfoPort extends FRONTEND.RFInfoPOA implements PortBase {
 
     protected String name;
  
@@ -95,5 +97,13 @@ public class InRFInfoPort extends FRONTEND.RFInfoPOA {
 
     public void setDelegate( RFInfoDelegate d ) {
         delegate = d;
+    }
+
+    public String getRepid() {
+        return RFInfoHelper.id();
+    }
+
+    public String getDirection() {
+        return "Provides";
     }
 }

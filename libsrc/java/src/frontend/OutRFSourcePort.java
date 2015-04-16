@@ -25,9 +25,9 @@ import org.ossie.component.QueryableUsesPort;
 import FRONTEND.RFSourceOperations;
 import FRONTEND.RFSourceHelper;
 import FRONTEND.RFInfoPkt;
+import org.ossie.component.PortBase;
 
-
-public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> implements RFSourceOperations {
+public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> implements RFSourceOperations, PortBase {
 
     protected String name;
  
@@ -115,6 +115,14 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
                 }
             }
         }
+    }
+
+    public String getRepid() {
+        return RFSourceHelper.id();
+    }
+
+    public String getDirection() {
+        return "Uses";
     }
 }
 

@@ -22,9 +22,11 @@ package frontend;
 import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
+import FRONTEND.AnalogTunerHelper;
 import frontend.AnalogTunerDelegate;
+import org.ossie.component.PortBase;
 
-public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
+public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA implements PortBase {
 
     protected String name;
 
@@ -351,5 +353,13 @@ public class InAnalogTunerPort extends FRONTEND.AnalogTunerPOA {
 
     public void setDelegate( AnalogTunerDelegate d ) {
         delegate = d;
+    }
+
+    public String getRepid() {
+        return AnalogTunerHelper.id();
+    }
+
+    public String getDirection() {
+        return "Provides";
     }
 }

@@ -59,6 +59,9 @@ namespace frontend {
                 this->parent->set_nav_packet(this->name, input);
                 return;
             };
+            std::string getRepid() const {
+                return "IDL:FRONTEND/NavData:1.0";
+            };
             
         protected:
             nav_delegation *parent;

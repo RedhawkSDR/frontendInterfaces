@@ -27,8 +27,9 @@ import FRONTEND.DigitalTunerHelper;
 import FRONTEND.FrontendException;
 import FRONTEND.BadParameterException;
 import FRONTEND.NotSupportedException;
+import org.ossie.component.PortBase;
 
-public class OutDigitalTunerPort extends QueryableUsesPort<DigitalTunerOperations> implements DigitalTunerOperations {
+public class OutDigitalTunerPort extends QueryableUsesPort<DigitalTunerOperations> implements DigitalTunerOperations, PortBase {
 
     /**
      * Map of connection Ids to port objects
@@ -290,5 +291,13 @@ public class OutDigitalTunerPort extends QueryableUsesPort<DigitalTunerOperation
             }
         }
         return retval;
+    }
+
+    public String getRepid() {
+        return DigitalTunerHelper.id();
+    }
+
+    public String getDirection() {
+        return "Uses";
     }
 }

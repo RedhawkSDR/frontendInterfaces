@@ -76,6 +76,9 @@ namespace frontend {
                 this->parent->set_gps_time_pos(this->name, input);
                 return;
             };
+            std::string getRepid() const {
+                return "IDL:FRONTEND/GPS:1.0";
+            };
             
         protected:
             gps_delegation *parent;

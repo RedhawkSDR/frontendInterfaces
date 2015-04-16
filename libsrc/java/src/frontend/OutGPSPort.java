@@ -26,9 +26,9 @@ import FRONTEND.GPSOperations;
 import FRONTEND.GPSHelper;
 import FRONTEND.GPSInfo;
 import FRONTEND.GpsTimePos;
+import org.ossie.component.PortBase;
 
-
-public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSOperations {
+public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSOperations, PortBase {
 
     protected String name;
  
@@ -122,6 +122,14 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
                 }
             }
         }
+    }
+
+    public String getRepid() {
+        return GPSHelper.id();
+    }
+
+    public String getDirection() {
+        return "Uses";
     }
 }
 
