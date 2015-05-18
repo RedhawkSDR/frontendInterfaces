@@ -56,13 +56,7 @@ def zeroSRI(sri):
         sri = BULKIO.StreamSRI(hversion=1, xstart=0.0, xdelta=1.0, 
                               xunits=1, subsize=1, ystart=0.0, ydelta=1.0, 
                               yunits=1, mode=0, streamID="", blocking=False, keywords=[])
-        
-# Time Type Definition
-J1950 = 1
-J1970 = 2
-JCY = 3
-#timeTypes = {'J1950':J1950,'J1970':J1970,'JCY':JCY}
-    
+
 # Tuner Allocation IDs struct. This structure contains allocation tracking data.
 class tunerAllocationIdsStruct:
     def __init__(self):
