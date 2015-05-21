@@ -26,3 +26,5 @@ missing
 /libsrc/cpp/.dirstamp
 /libsrc/java/META-INF/MANIFEST.MF
 /libsrc/java/META-INF/MANIFEST.MF.src
+/libsrc/frontend.pc
+/libsrc/libfrontend-*.la
