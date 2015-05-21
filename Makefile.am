@@ -88,7 +88,7 @@ libfrontendInterfaces_la_LDFLAGS = -version-info 1:0:1
 # DO NOT MODIFY ANY LINES BELOW HERE
 ###############################################################################
 .PHONY: all-local all-python install-python clean-python all-java install-java clean-java compile-java zip-src
-.INTERMEDIATE: build/java.files build/java.export setup.py 
+.INTERMEDIATE: build/java.files setup.py
 LOWER_CASE_IDL_MODULE :=$(shell echo $(IDL_MODULE) | tr A-Z a-z)
 
 idldir = $(datadir)/idl/$(LIBRARY_NAME)/$(IDL_MODULE)
@@ -275,38 +275,21 @@ build/java.files: $(IDL_TO_JAVA_TARGETS)
 	find src/java -name '*.java' > $@
 	$(JAVAC) $(JAVA_CP) -target $(JAVA_TARGET_VERSION) -source $(JAVA_SOURCE_VERSION) -d build/java @$@
 
-build/java.export: build/java.files 
-	@mkdir -p build/java
-	@echo -n "Export-Package:" > $@
-	find src/java -mindepth 1 -type d | sed 's/src\/java\///' | sed 's/\//./g' | sed 's/^/ /' | sed -e '$$ ! s/$$/,/' >> $@
+manifest_edit = $(SED) \
+  -e 's|@bundle_version[@]|$(BUNDLE_VERSION)|g' \
+  -e 's|@bundle_qualifier[@]|$(BUNDLE_QUALIFIER)|g'
 
-build/java/META-INF/MANIFEST.MF: Makefile.am build/java.export
+build/java/META-INF/MANIFEST.MF: MANIFEST.MF.in Makefile
 	@mkdir -p build/java/META-INF
-	@rm -f $@
-	@echo "Manifest-Version: 1.0" >> $@
-	@echo "Bundle-ManifestVersion: 2" >> $@
-	@echo "Bundle-Name: $(BUNDLE_NAME)" >> $@
-	@echo "Bundle-SymbolicName: $(BUNDLE_SYMBOLIC_NAME)" >> $@
-	@echo "Bundle-Version: $(BUNDLE_VERSION).$(BUNDLE_QUALIFIER)" >> $@
-	@echo "Bundle-RequiredExecutionEnvironment: $(BUNDLE_REQUIRED_EXECUTION_ENVIRONMENT)" >> $@
-	@echo "Bundle-Vendor: $(BUNDLE_VENDOR)" >> $@
-	@echo "Require-Bundle: $(REQUIRE_BUNDLES)" >> $@
-	@cat build/java.export >> $@
+	$(AM_V_GEN)$(manifest_edit) MANIFEST.MF.in > $@
  
 $(JAVA_OUTPUT_JAR): build/java.files build/java/META-INF/MANIFEST.MF
 	@mkdir -p build/java
 	${JAR} cMf $@ -C build/java META-INF/MANIFEST.MF -C build/java $(IDL_MODULE)
 
-src/java/META-INF/MANIFEST.MF: Makefile.am
+src/java/META-INF/MANIFEST.MF: MANIFEST.MF.src.in Makefile
 	@mkdir -p src/java/META-INF
-	@rm -f $@
-	@echo "Manifest-Version: 1.0" >> $@
-	@echo "Bundle-ManifestVersion: 2" >> $@
-	@echo "Bundle-Name: $(BUNDLE_NAME) Source" >> $@
-	@echo "Bundle-SymbolicName: $(BUNDLE_SYMBOLIC_NAME).src" >> $@
-	@echo "Bundle-Version: $(BUNDLE_VERSION).$(BUNDLE_QUALIFIER)" >> $@
-	@echo "Bundle-Vendor: $(BUNDLE_VENDOR)" >> $@
-	@echo "Eclipse-SourceBundle: $(BUNDLE_SYMBOLIC_NAME);version=$(BUNDLE_VERSION).$(BUNDLE_QUALIFIER)" >> $@
+	$(AM_V_GEN)$(manifest_edit) MANIFEST.MF.src.in > $@
 
 $(JAVA_SRC_JAR): build/java.files src/java/META-INF/MANIFEST.MF
 	${JAR} cMf $@ -C $(IDLJ_SRC_DEST) .
