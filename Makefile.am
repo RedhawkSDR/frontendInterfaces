@@ -59,20 +59,11 @@ IDL_SOURCE_PATH := .
 # A Qualifier to append to the version, by default this is a timestamp of the build
 BUNDLE_QUALIFIER := v$(shell date +%Y%m%d%H%M%S)
 
-# A user understandable name for the bundle
-BUNDLE_NAME := $(IDL_MODULE) IDL Interface
-
-# The Vendor that produced the bundle / idl
-BUNDLE_VENDOR = REDHAWK
-
 # Version of java the source files support
-JAVA_SOURCE_VERSION = 1.5
+JAVA_SOURCE_VERSION = 1.6
 
 # Version of java to compile to
 JAVA_TARGET_VERSION = $(JAVA_SOURCE_VERSION)
-
-# The required execution envirornment, this should be a JRE version or OSGI environment specification
-BUNDLE_REQUIRED_EXECUTION_ENVIRONMENT := J2SE-$(JAVA_TARGET_VERSION)
 
 # You have to manually set the _SOURCES, automake/libtool does not support
 # makefile variable substituion here...so unfortunately each IDL file
@@ -254,8 +245,6 @@ JAVA_CP := \
 
 # IDL_EXTERNS_LOWER - Translates the external required IDJLs to lower case
 IDL_EXTERNS_LOWER := $(shell echo $(IDL_EXTERNS) | tr A-Z a-z) 
-
-REQUIRE_BUNDLES := $(shell echo $(IDL_EXTERNS_LOWER) | sed 's/^/$(BUNDLE_PREFIX)./' | sed 's/\//./g' | sed 's/$$/;visibility:=reexport/' | sed -e '$$ ! s/$$/,/')
 
 $(IDL_TO_JAVA_TARGETS): src/java/%.idlj: build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
 	@mkdir -p src/java
