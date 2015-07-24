@@ -222,7 +222,6 @@ namespace frontend {
         return true;
     }
 
-
     template < typename TunerStatusStructType >
     FrontendTunerDevice<TunerStatusStructType>::FrontendTunerDevice(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl) :
         Device_impl(devMgr_ior, id, lbl, sftwrPrfl)
@@ -721,8 +720,7 @@ namespace frontend {
 
         return NO_VALID_TUNER;
     }
-
-
+    
     template < typename TunerStatusStructType >
     bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(size_t tuner_id, std::string allocation_id) {
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
