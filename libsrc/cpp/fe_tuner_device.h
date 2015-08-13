@@ -150,7 +150,7 @@ namespace frontend {
         }
     };
 
-    /**
+    /*
      *    Frontend tuner class definition
      */
     template < typename TunerStatusStructType >
