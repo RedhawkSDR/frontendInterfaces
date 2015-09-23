@@ -255,6 +255,8 @@ namespace frontend {
     {
         Resource_impl::_started = false;
         loadProperties();
+        this->frontend_tuner_status.resize(1);
+        this->frontend_tuner_status[0].tuner_type = "RX_DIGITIZER";
     }
 
     template < typename TunerStatusStructType >
@@ -365,6 +367,9 @@ namespace frontend {
     template < typename TunerStatusStructType >
     CORBA::Boolean FrontendTunerDevice<TunerStatusStructType>::allocateCapacity(const CF::Properties & capacities)
     throw (CORBA::SystemException, CF::Device::InvalidCapacity, CF::Device::InvalidState) {
+        if (this->tuner_allocation_ids.size() != this->frontend_tuner_status.size()) {
+            this->tuner_allocation_ids.resize(this->frontend_tuner_status.size());
+        }
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         CORBA::ULong ii;
         try{
@@ -387,7 +392,6 @@ namespace frontend {
                     throw CF::Device::InvalidCapacity("COULD NOT PARSE CAPACITY", capacities);
                 };
                 if (id == "FRONTEND::tuner_allocation"){
-
                     // Check allocation_id
                     if (frontend_tuner_allocation.allocation_id.empty()) {
                         LOG_INFO(FrontendTunerDevice<TunerStatusStructType>,"allocateCapacity: MISSING ALLOCATION_ID");
@@ -426,8 +430,21 @@ namespace frontend {
                         }
 
                         if(frontend_tuner_allocation.device_control){
+                            double orig_bw = frontend_tuner_status[tuner_id].bandwidth;
+                            double orig_cf = frontend_tuner_status[tuner_id].center_frequency;
+                            double orig_sr = frontend_tuner_status[tuner_id].sample_rate;
+                            // pre-load frontend_tuner_status values (just in case the request is filled but the values are not populated)
+                            frontend_tuner_status[tuner_id].bandwidth = frontend_tuner_allocation.bandwidth;
+                            frontend_tuner_status[tuner_id].center_frequency = frontend_tuner_allocation.center_frequency;
+                            frontend_tuner_status[tuner_id].sample_rate = frontend_tuner_allocation.sample_rate;
                             // device control
                             if(!tuner_allocation_ids[tuner_id].control_allocation_id.empty() || !deviceSetTuning(frontend_tuner_allocation, frontend_tuner_status[tuner_id], tuner_id)){
+                                if (frontend_tuner_status[tuner_id].bandwidth == frontend_tuner_allocation.bandwidth)
+                                    frontend_tuner_status[tuner_id].bandwidth = orig_bw;
+                                if (frontend_tuner_status[tuner_id].center_frequency == frontend_tuner_allocation.center_frequency)
+                                    frontend_tuner_status[tuner_id].center_frequency = orig_cf;
+                                if (frontend_tuner_status[tuner_id].sample_rate == frontend_tuner_allocation.sample_rate)
+                                    frontend_tuner_status[tuner_id].sample_rate = orig_sr;
                                 // either not available or didn't succeed setting tuning, try next tuner
                                 LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,
                                     "allocateCapacity: Tuner["<<tuner_id<<"] is either not available or didn't succeed while setting tuning ");
