@@ -73,6 +73,7 @@ JAVA_TARGET_VERSION = $(JAVA_SOURCE_VERSION)
 #            src/cpp/some_fileSK.cpp src/cpp/some_fileDynSK.cpp src/cpp/some_file.h
 lib_LTLIBRARIES = libfrontendInterfaces.la
 libfrontendInterfaces_la_SOURCES = $(redhawk_IDL_SOURCES_auto)
+libfrontendInterfaces_la_LIBADD = $(BULKIO_LIBS) $(OSSIE_LIBS)
 libfrontendInterfaces_la_LDFLAGS = -version-info 1:0:1
 
 ###############################################################################
@@ -111,7 +112,7 @@ pkgincludedir = $(includedir)/$(LIBRARY_NAME)/$(IDL_MODULE)
 pkginclude_HEADERS = $(filter %.h, $(lib$(LOWER_CASE_IDL_MODULE)Interfaces_la_SOURCES))
 
 AM_CXXFLAGS = -Wall -I src/cpp -g $(OMNIORB_CFLAGS) $(OSSIE_CFLAGS)
-AM_LIBS = $(OSSIE_LIBS)
+AM_LIBS = $(OSSIE_LIBS) $(BULKIO_LIBS)
 
 src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%DynSK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%SK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%.h: build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
 	@mkdir -p "src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)"
@@ -129,7 +130,7 @@ $(PACKAGE_NAME).pc: Makefile.am
 	@echo "" >> $@
 	@echo "Name: $(PACKAGE_NAME)" >> $@
 	@echo "Description: $(PACKAGE_NAME) for REDHAWK" >> $@
-	@echo "Requires:" >> $@
+	@echo "Requires: bulkioInterfaces >= 2.0.0" >> $@
 	@echo "Version: $(PACKAGE_VERSION)" >> $@
 	@echo "Libs: -L\$${libdir} -l${LOWER_CASE_IDL_MODULE}Interfaces" >> $@
 	@echo "Cflags: -I\$${includedir}/$(LIBRARY_NAME)" >> $@
