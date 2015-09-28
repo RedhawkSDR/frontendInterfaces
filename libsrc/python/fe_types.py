@@ -19,13 +19,24 @@
 #
 
 import bulkio
+from ossie.cf import CF
 from ossie.properties import simple_property
+from omniORB import any as _any
 
 # Time Type Definition
 J1950 = 1
 J1970 = 2
 JCY = 3
     
+class tuner_allocation_ids_struct(object):
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.control_allocation_id = ''
+        self.listener_allocation_ids = []
+        
+
 class FreqRange(object):
     def __init__(self,min_val=0.0,max_val=0.0, values=[]):
         self.min_val = min_val
@@ -225,9 +236,16 @@ class frontend_tuner_allocation(object):
 
     def isStruct(self):
         return True
-
+    
+    def getProp(self):
+        content = []
+        for member in self.getMembers():
+            content.append(CF.DataType(id=member[0],value=_any.to_any(member[1])))
+        retval = CF.DataType(id=self.getId(),value=_any.to_any(content))
+        return retval
+                                                            
     def getMembers(self):
-        return [("tuner_type",self.tuner_type),("allocation_id",self.allocation_id),("center_frequency",self.center_frequency),("bandwidth",self.bandwidth),("bandwidth_tolerance",self.bandwidth_tolerance),("sample_rate",self.sample_rate),("sample_rate_tolerance",self.sample_rate_tolerance),("device_control",self.device_control),("group_id",self.group_id),("rf_flow_id",self.rf_flow_id)]
+        return [("FRONTEND::tuner_allocation::tuner_type",self.tuner_type),("FRONTEND::tuner_allocation::allocation_id",self.allocation_id),("FRONTEND::tuner_allocation::center_frequency",self.center_frequency),("FRONTEND::tuner_allocation::bandwidth",self.bandwidth),("FRONTEND::tuner_allocation::bandwidth_tolerance",self.bandwidth_tolerance),("FRONTEND::tuner_allocation::sample_rate",self.sample_rate),("FRONTEND::tuner_allocation::sample_rate_tolerance",self.sample_rate_tolerance),("FRONTEND::tuner_allocation::device_control",self.device_control),("FRONTEND::tuner_allocation::group_id",self.group_id),("FRONTEND::tuner_allocation::rf_flow_id",self.rf_flow_id)]
 
 class frontend_listener_allocation(object):
     existing_allocation_id = simple_property(id_="FRONTEND::listener_allocation::existing_allocation_id",
@@ -259,9 +277,16 @@ class frontend_listener_allocation(object):
 
     def isStruct(self):
         return True
+    
+    def getProp(self):
+        content = []
+        for member in self.getMembers():
+            content.append(CF.DataType(id=member[0],value=_any.to_any(member[1])))
+        retval = CF.DataType(id=self.getId(),value=_any.to_any(content))
+        return retval
 
     def getMembers(self):
-        return [("existing_allocation_id",self.existing_allocation_id),("listener_allocation_id",self.listener_allocation_id)]
+        return [("FRONTEND::listener_allocation::existing_allocation_id",self.existing_allocation_id),("FRONTEND::listener_allocation::listener_allocation_id",self.listener_allocation_id)]
 
 class default_frontend_tuner_status_struct_struct(object):
     tuner_type = simple_property(id_="FRONTEND::tuner_status::tuner_type",
@@ -325,6 +350,13 @@ class default_frontend_tuner_status_struct_struct(object):
 
     def isStruct(self):
         return True
+    
+    def getProp(self):
+        content = []
+        for member in self.getMembers():
+            content.append(CF.DataType(id=member[0],value=_any.to_any(member[1])))
+        retval = CF.DataType(id=self.getId(),value=_any.to_any(content))
+        return retval
 
     def getMembers(self):
-        return [("tuner_type",self.tuner_type),("allocation_id_csv",self.allocation_id_csv),("center_frequency",self.center_frequency),("bandwidth",self.bandwidth),("sample_rate",self.sample_rate),("group_id",self.group_id),("rf_flow_id",self.rf_flow_id),("enabled",self.enabled)]
+        return [("FRONTEND::tuner_status::tuner_type",self.tuner_type),("FRONTEND::tuner_status::allocation_id_csv",self.allocation_id_csv),("FRONTEND::tuner_status::center_frequency",self.center_frequency),("FRONTEND::tuner_status::bandwidth",self.bandwidth),("FRONTEND::tuner_status::sample_rate",self.sample_rate),("FRONTEND::tuner_status::group_id",self.group_id),("FRONTEND::tuner_status::rf_flow_id",self.rf_flow_id),("FRONTEND::tuner_status::enabled",self.enabled)]
