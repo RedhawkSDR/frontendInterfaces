@@ -407,10 +407,22 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
  
                     if(frontend_tuner_allocation.device_control.getValue()){
                         // device control
+                        double orig_bw = frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue();
+                        double orig_cf = frontend_tuner_status.getValue().get(tuner_id).center_frequency.getValue();
+                        double orig_sr = frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue();
+                        frontend_tuner_status.getValue().get(tuner_id).bandwidth.setValue(frontend_tuner_allocation.bandwidth.getValue());
+                        frontend_tuner_status.getValue().get(tuner_id).center_frequency.setValue(frontend_tuner_allocation.center_frequency.getValue());
+                        frontend_tuner_status.getValue().get(tuner_id).sample_rate.setValue(frontend_tuner_allocation.sample_rate.getValue());
                         if(tuner_allocation_ids.get(tuner_id).control_allocation_id != null &&
                            (!tuner_allocation_ids.get(tuner_id).control_allocation_id.isEmpty() || 
                             !deviceSetTuning(frontend_tuner_allocation, frontend_tuner_status.getValue().get(tuner_id), tuner_id))){
                             // either not available or didn't succeed setting tuning, try next tuner
+                            if (frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue().equals(frontend_tuner_allocation.bandwidth.getValue()))
+                                frontend_tuner_status.getValue().get(tuner_id).bandwidth.setValue(orig_bw);
+                            if (frontend_tuner_status.getValue().get(tuner_id).center_frequency.getValue().equals(frontend_tuner_allocation.center_frequency.getValue()))
+                                frontend_tuner_status.getValue().get(tuner_id).center_frequency.setValue(orig_cf);
+                            if (frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue().equals(frontend_tuner_allocation.sample_rate.getValue()))
+                                frontend_tuner_status.getValue().get(tuner_id).sample_rate.setValue(orig_sr);
                             logger.debug("allocateTuner: Tuner["+tuner_id+"] is either not available or didn't succeed while setting tuning ");
                             continue;
                         }

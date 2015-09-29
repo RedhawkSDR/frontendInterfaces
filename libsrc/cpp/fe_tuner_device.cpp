@@ -255,8 +255,6 @@ namespace frontend {
     {
         Resource_impl::_started = false;
         loadProperties();
-        this->frontend_tuner_status.resize(1);
-        this->frontend_tuner_status[0].tuner_type = "RX_DIGITIZER";
     }
 
     template < typename TunerStatusStructType >

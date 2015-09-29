@@ -575,6 +575,9 @@ class FrontendTunerDevice(Device):
                         center_frequency = self.frontend_tuner_status[tuner_id].center_frequency
                         bandwidth = self.frontend_tuner_status[tuner_id].bandwidth
                         sample_rate = self.frontend_tuner_status[tuner_id].sample_rate
+                        self.frontend_tuner_status[tuner_id].center_frequency = frontend_tuner_allocation.center_frequency
+                        self.frontend_tuner_status[tuner_id].bandwidth = frontend_tuner_allocation.bandwidth
+                        self.frontend_tuner_status[tuner_id].sample_rate = frontend_tuner_allocation.sample_rate
                         if len(self.tuner_allocation_ids[tuner_id].control_allocation_id)>0 or \
                            not self.deviceSetTuning(frontend_tuner_allocation, self.frontend_tuner_status[tuner_id], tuner_id):
                             # either not available or didn't succeed setting tuning, try next tuner
@@ -730,7 +733,6 @@ class FrontendTunerDevice(Device):
 
                 
         except RuntimeError, e:
-            self.deallocateCapacity(frontend_listener_allocation)
             return False
 
         except AllocationAlreadyExists, e:
@@ -739,16 +741,13 @@ class FrontendTunerDevice(Device):
             raise CF.Device.InvalidCapacity(e)
         
         except CF.Device.InvalidCapacity, e:
-            self.deallocateCapacity(frontend_listener_allocation)
             raise e
         
         except FRONTEND.BadParameterException, e:
-            self.deallocateCapacity(frontend_listener_allocation)
             return False
         
         except Exception, e:
             self._log.info('The following error occurred on allocation:',e)
-            self.deallocateCapacity(frontend_listener_allocation)
             raise e
 
         return False
