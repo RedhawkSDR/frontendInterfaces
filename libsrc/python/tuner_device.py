@@ -449,7 +449,8 @@ def _getAllocationStatus(device, numTuners, allocation_id):
         return device.frontend_tuner_status[0]
     else:
         for i in range(len(device.frontend_tuner_status)):
-            if allocation_id in device.frontend_tuner_status[i].allocation_id_csv:
+            allocation_ids = device.frontend_tuner_status[i].allocation_id_csv.split(',')
+            if allocation_id in allocation_ids:
                 return device.frontend_tuner_status[i]
     return None
 
