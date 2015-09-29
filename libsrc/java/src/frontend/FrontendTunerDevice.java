@@ -274,6 +274,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
  
     private void construct() {
         loadProperties();
+        allocation_id_to_tuner_id = new HashMap();
         frontend_tuner_allocation.setAllocator(new Allocator<frontend.FETypes.frontend_tuner_allocation_struct>() {
             public boolean allocate(frontend.FETypes.frontend_tuner_allocation_struct capacity){
                 boolean status = false;
@@ -366,98 +367,98 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         return CF.DevicePackage.UsageType.ACTIVE;
     }
 
-    public boolean allocateTuner(frontend.FETypes.frontend_tuner_allocation_struct capacity) throws CF.DevicePackage.InvalidCapacity, Exception {
+    public boolean allocateTuner(frontend.FETypes.frontend_tuner_allocation_struct frontend_tuner_allocation) throws CF.DevicePackage.InvalidCapacity, Exception {
         try{
             // Check allocation_id
-            if (frontend_tuner_allocation.getValue().allocation_id != null &&
-                frontend_tuner_allocation.getValue().allocation_id.getValue().isEmpty()) {
+            if (frontend_tuner_allocation.allocation_id != null &&
+                frontend_tuner_allocation.allocation_id.getValue().isEmpty()) {
                 logger.info("allocateTuner: MISSING ALLOCATION_ID");
-                throw new CF.DevicePackage.InvalidCapacity("MISSING ALLOCATION ID", new CF.DataType[]{new DataType("frontend_tuner_allocation", capacity.toAny())});
+                throw new CF.DevicePackage.InvalidCapacity("MISSING ALLOCATION ID", new CF.DataType[]{new DataType("frontend_tuner_allocation", frontend_tuner_allocation.toAny())});
             }
             // Check if allocation ID has already been used
-            if(getTunerMapping(frontend_tuner_allocation.getValue().allocation_id.getValue()) >= 0){
-                logger.info("allocateTuner: ALLOCATION_ID ALREADY IN USE: [" + frontend_tuner_allocation.getValue().allocation_id.getValue() + "]");
-                throw new InvalidCapacity("ALLOCATION_ID ALREADY IN USE", new CF.DataType[]{new DataType("frontend_tuner_allocation", capacity.toAny())});
+            if(this.getTunerMapping(frontend_tuner_allocation.allocation_id.getValue()) >= 0){
+                logger.info("allocateTuner: ALLOCATION_ID ALREADY IN USE: [" + frontend_tuner_allocation.allocation_id.getValue() + "]");
+                throw new InvalidCapacity("ALLOCATION_ID ALREADY IN USE", new CF.DataType[]{new DataType("frontend_tuner_allocation", frontend_tuner_allocation.toAny())});
             }
             // Check if available tuner
-            synchronized(allocation_id_mapping_lock){
+            //synchronized(allocation_id_mapping_lock){
                 // Next, try to allocate a new tuner
-                for (int tuner_id = 0; tuner_id < tuner_allocation_ids.size(); tuner_id++) {
-                    if(!frontend_tuner_status.getValue().get(tuner_id).tuner_type.getValue().equals(frontend_tuner_allocation.getValue().tuner_type.getValue())) {
-                        logger.debug("allocateTuner: Requested tuner type '"+frontend_tuner_allocation.getValue().tuner_type.getValue() +"' does not match tuner[" + tuner_id + "].tuner_type (" + frontend_tuner_status.getValue().get(tuner_id).tuner_type.getValue()+")");
+                for (int tuner_id = 0; tuner_id < this.tuner_allocation_ids.size(); tuner_id++) {
+                    if(!frontend_tuner_status.getValue().get(tuner_id).tuner_type.getValue().equals(frontend_tuner_allocation.tuner_type.getValue())) {
+                        logger.debug("allocateTuner: Requested tuner type '"+frontend_tuner_allocation.tuner_type.getValue() +"' does not match tuner[" + tuner_id + "].tuner_type (" + frontend_tuner_status.getValue().get(tuner_id).tuner_type.getValue()+")");
                         continue;
                     }
 
-                    if(frontend_tuner_allocation.getValue().group_id != null &&
-                       !frontend_tuner_allocation.getValue().group_id.getValue().isEmpty() && 
-                       !frontend_tuner_allocation.getValue().group_id.getValue().equals(frontend_tuner_status.getValue().get(tuner_id).group_id.getValue()) ){
-                        logger.debug("allocateTuner: Requested group_id '" + frontend_tuner_allocation.getValue().group_id.getValue() + "' does not match tuner[" + tuner_id + "].group_id (" + frontend_tuner_status.getValue().get(tuner_id).group_id.getValue() +")");
+                    if(frontend_tuner_allocation.group_id != null &&
+                       !frontend_tuner_allocation.group_id.getValue().isEmpty() && 
+                       !frontend_tuner_allocation.group_id.getValue().equals(frontend_tuner_status.getValue().get(tuner_id).group_id.getValue()) ){
+                        logger.debug("allocateTuner: Requested group_id '" + frontend_tuner_allocation.group_id.getValue() + "' does not match tuner[" + tuner_id + "].group_id (" + this.frontend_tuner_status.getValue().get(tuner_id).group_id.getValue() +")");
                         continue;
                     }
 
                     // special case because allocation is specifying the input stream, which determines the rf_flow_id, etc.
-                   if( frontend_tuner_allocation.getValue().rf_flow_id != null &&
-                        !frontend_tuner_allocation.getValue().rf_flow_id.getValue().isEmpty() &&
-                        !frontend_tuner_allocation.getValue().rf_flow_id.getValue().equals(frontend_tuner_status.getValue().get(tuner_id).rf_flow_id.getValue()) &&
-                        !frontend_tuner_allocation.getValue().tuner_type.equals("CHANNELIZER")){
-                        logger.debug("allocateTuner: Requested rf_flow_id '" + frontend_tuner_allocation.getValue().rf_flow_id.getValue() +"' does not match tuner[" + tuner_id + "].rf_flow_id (" + frontend_tuner_status.getValue().get(tuner_id).rf_flow_id.getValue() + ")");
+                   if( frontend_tuner_allocation.rf_flow_id != null &&
+                        !frontend_tuner_allocation.rf_flow_id.getValue().isEmpty() &&
+                        !frontend_tuner_allocation.rf_flow_id.getValue().equals(frontend_tuner_status.getValue().get(tuner_id).rf_flow_id.getValue()) &&
+                        !frontend_tuner_allocation.tuner_type.equals("CHANNELIZER")){
+                        logger.debug("allocateTuner: Requested rf_flow_id '" + frontend_tuner_allocation.rf_flow_id.getValue() +"' does not match tuner[" + tuner_id + "].rf_flow_id (" + this.frontend_tuner_status.getValue().get(tuner_id).rf_flow_id.getValue() + ")");
                         continue;
                     }
  
-                    if(frontend_tuner_allocation.getValue().device_control.getValue()){
+                    if(frontend_tuner_allocation.device_control.getValue()){
                         // device control
                         if(tuner_allocation_ids.get(tuner_id).control_allocation_id != null &&
                            (!tuner_allocation_ids.get(tuner_id).control_allocation_id.isEmpty() || 
-                            !deviceSetTuning(frontend_tuner_allocation.getValue(), frontend_tuner_status.getValue().get(tuner_id), tuner_id))){
+                            !deviceSetTuning(frontend_tuner_allocation, frontend_tuner_status.getValue().get(tuner_id), tuner_id))){
                             // either not available or didn't succeed setting tuning, try next tuner
                             logger.debug("allocateTuner: Tuner["+tuner_id+"] is either not available or didn't succeed while setting tuning ");
                             continue;
                         }
-                        tuner_allocation_ids.get(tuner_id).control_allocation_id = frontend_tuner_allocation.getValue().allocation_id.getValue();
-                        allocation_id_to_tuner_id.put(frontend_tuner_allocation.getValue().allocation_id.getValue(), tuner_id);
+                        tuner_allocation_ids.get(tuner_id).control_allocation_id = frontend_tuner_allocation.allocation_id.getValue();
+                        allocation_id_to_tuner_id.put(frontend_tuner_allocation.allocation_id.getValue(), tuner_id);
                         frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.setValue(createAllocationIdCsv(tuner_id));
                     } else {
                         // channelizer allocations must specify device control = true
-                        if(frontend_tuner_allocation.getValue().tuner_type.getValue().equals("CHANNELIZER") || frontend_tuner_allocation.getValue().tuner_type.getValue().equals("TX")){
+                        if(frontend_tuner_allocation.tuner_type.getValue().equals("CHANNELIZER") || frontend_tuner_allocation.tuner_type.getValue().equals("TX")){
                             String eout;
-                            eout = frontend_tuner_allocation.getValue().tuner_type.getValue() + " allocation with device_control=false is invalid.";
+                            eout = frontend_tuner_allocation.tuner_type.getValue() + " allocation with device_control=false is invalid.";
                             logger.debug(eout);
-                            throw new CF.DevicePackage.InvalidCapacity(eout, new CF.DataType[]{new DataType("frontend_tuner_allocation", capacity.toAny())});
+                            throw new CF.DevicePackage.InvalidCapacity(eout, new CF.DataType[]{new DataType("frontend_tuner_allocation", frontend_tuner_allocation.toAny())});
                         }
                         // listener
-                        if(tuner_allocation_ids.get(tuner_id).control_allocation_id.isEmpty() || !listenerRequestValidation(frontend_tuner_allocation.getValue(), tuner_id)){
+                        if(tuner_allocation_ids.get(tuner_id).control_allocation_id.isEmpty() || !listenerRequestValidation(frontend_tuner_allocation, tuner_id)){
                             // either not allocated or can't support listener request
                             logger.debug("allocateTuner: Tuner["+tuner_id+"] is either not available or can not support listener request ");
                             continue;
                         }
-                        tuner_allocation_ids.get(tuner_id).listener_allocation_ids.add(frontend_tuner_allocation.getValue().allocation_id.getValue());
-                        allocation_id_to_tuner_id.put(frontend_tuner_allocation.getValue().allocation_id.getValue(), tuner_id);
+                        tuner_allocation_ids.get(tuner_id).listener_allocation_ids.add(frontend_tuner_allocation.allocation_id.getValue());
+                        allocation_id_to_tuner_id.put(frontend_tuner_allocation.allocation_id.getValue(), tuner_id);
                         frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.setValue(createAllocationIdCsv(tuner_id));
-                        this.assignListener(frontend_tuner_allocation.getValue().allocation_id.getValue(),tuner_allocation_ids.get(tuner_id).control_allocation_id);
+                        this.assignListener(frontend_tuner_allocation.allocation_id.getValue(),tuner_allocation_ids.get(tuner_id).control_allocation_id);
                     }
                     // if we've reached here, we found an eligible tuner with correct frequency
 
                     // check tolerances
                     // only check when sample_rate was not set to don't care)
-                    logger.debug(" allocateTuner - SR requested: " + frontend_tuner_allocation.getValue().sample_rate.getValue() + "  SR got: " + frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue());
-                    if( (floatingPointCompare(frontend_tuner_allocation.getValue().sample_rate.getValue(),0)!=0) &&
-                        (floatingPointCompare(frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue(),frontend_tuner_allocation.getValue().sample_rate.getValue())<0 ||
-                        floatingPointCompare(frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue(),frontend_tuner_allocation.getValue().sample_rate.getValue()+frontend_tuner_allocation.getValue().sample_rate.getValue() * frontend_tuner_allocation.getValue().sample_rate_tolerance.getValue()/100.0)>0 )){
-                        String eout = "allocateTuner(" + tuner_id + "): returned sr " + frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue()+" does not meet tolerance criteria of " + frontend_tuner_allocation.getValue().sample_rate_tolerance.getValue()+" percent";
+                    logger.debug(" allocateTuner - SR requested: " + frontend_tuner_allocation.sample_rate.getValue() + "  SR got: " + frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue());
+                    if( (floatingPointCompare(frontend_tuner_allocation.sample_rate.getValue(),0)!=0) &&
+                        (floatingPointCompare(frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue(),frontend_tuner_allocation.sample_rate.getValue())<0 ||
+                        floatingPointCompare(frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue(),frontend_tuner_allocation.sample_rate.getValue()+frontend_tuner_allocation.sample_rate.getValue() * frontend_tuner_allocation.sample_rate_tolerance.getValue()/100.0)>0 )){
+                        String eout = "allocateTuner(" + tuner_id + "): returned sr " + frontend_tuner_status.getValue().get(tuner_id).sample_rate.getValue()+" does not meet tolerance criteria of " + frontend_tuner_allocation.sample_rate_tolerance.getValue()+" percent";
                         logger.info(eout);
                         throw new RuntimeException(eout);
                     }
-                    logger.debug(" allocateTuner - BW requested: " + frontend_tuner_allocation.getValue().bandwidth.getValue() + "  BW got: " + frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue());
+                    logger.debug(" allocateTuner - BW requested: " + frontend_tuner_allocation.bandwidth.getValue() + "  BW got: " + frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue());
                     // Only check when bandwidth was not set to don't care
-                    if( (floatingPointCompare(frontend_tuner_allocation.getValue().bandwidth.getValue(),0)!=0) &&
-                       (floatingPointCompare(frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue(),frontend_tuner_allocation.getValue().bandwidth.getValue())<0 ||
-                        floatingPointCompare(frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue(),frontend_tuner_allocation.getValue().bandwidth.getValue()+frontend_tuner_allocation.getValue().bandwidth.getValue() * frontend_tuner_allocation.getValue().bandwidth_tolerance.getValue()/100.0)>0 )){
-                        String eout = "allocateTuner(" + tuner_id + "): returned bw " + frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue()  + " does not meet tolerance criteria of " + frontend_tuner_allocation.getValue().bandwidth_tolerance.getValue() + " percent";
+                    if( (floatingPointCompare(frontend_tuner_allocation.bandwidth.getValue(),0)!=0) &&
+                       (floatingPointCompare(frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue(),frontend_tuner_allocation.bandwidth.getValue())<0 ||
+                        floatingPointCompare(frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue(),frontend_tuner_allocation.bandwidth.getValue()+frontend_tuner_allocation.bandwidth.getValue() * frontend_tuner_allocation.bandwidth_tolerance.getValue()/100.0)>0 )){
+                        String eout = "allocateTuner(" + tuner_id + "): returned bw " + frontend_tuner_status.getValue().get(tuner_id).bandwidth.getValue()  + " does not meet tolerance criteria of " + frontend_tuner_allocation.bandwidth_tolerance.getValue() + " percent";
                         logger.info(eout);
                         throw new RuntimeException(eout);
                     }
 
-                    if(frontend_tuner_allocation.getValue().device_control.getValue()){
+                    if(frontend_tuner_allocation.device_control.getValue()){
                         // enable tuner after successful allocation
                         try {
                             enableTuner(tuner_id,true);
@@ -473,42 +474,43 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                 String eout = "allocateTuner: NO AVAILABLE TUNER. Make sure that the device has an initialized frontend_tuner_status";
                 logger.info(eout);
                 throw new RuntimeException(eout);
-            }
+            //}
         } catch(RuntimeException e) {
-            deallocateTuner(capacity);
+            //deallocateTuner(frontend_tuner_allocation);
             return false;
         } catch(CF.DevicePackage.InvalidCapacity e) {
             // without the following check, a valid allocation could be deallocated due to an attempt to alloc w/ an existing alloc id
             String exceptionMessage = e.getMessage();
             if (exceptionMessage != null && 
                exceptionMessage.indexOf("ALLOCATION_ID ALREADY IN USE") == -1){
-                deallocateTuner(capacity);
+               //deallocateTuner(frontend_tuner_allocation);
             }
             throw e;
         } catch(Exception e){
-            deallocateTuner(capacity);
+            //deallocateTuner(frontend_tuner_allocation);
             throw e; 
         }
     }
 
-    public void deallocateTuner(frontend.FETypes.frontend_tuner_allocation_struct capacity){
+    public void deallocateTuner(frontend.FETypes.frontend_tuner_allocation_struct frontend_tuner_deallocation){
         try{
             //logger.debug("deallocateTuner()");
             // Try to remove control of the device
-            int tuner_id = getTunerMapping(frontend_tuner_allocation.getValue().allocation_id.getValue());
+            int tuner_id = this.getTunerMapping(frontend_tuner_deallocation.allocation_id.getValue());
             if (tuner_id < 0){
-                logger.debug("ALLOCATION_ID NOT FOUND: [" + frontend_tuner_allocation.getValue().allocation_id.getValue() +"]");
-                throw new CF.DevicePackage.InvalidCapacity("ALLOCATION_ID NOT FOUND", new CF.DataType[]{new DataType("frontend_tuner_allocation", capacity.toAny())});
+                logger.debug("ALLOCATION_ID NOT FOUND: [" + frontend_tuner_deallocation.allocation_id.getValue() +"]");
+                throw new CF.DevicePackage.InvalidCapacity("ALLOCATION_ID NOT FOUND", new CF.DataType[]{new DataType("frontend_tuner_deallocation", frontend_tuner_deallocation.toAny())});
             }
             //logger.debug("deallocateTuner() tuner_id = " + tuner_id);
-            if(tuner_allocation_ids.get(tuner_id).control_allocation_id.equals(frontend_tuner_allocation.getValue().allocation_id.getValue())){
+            if(tuner_allocation_ids.get(tuner_id).control_allocation_id.equals(frontend_tuner_deallocation.allocation_id.getValue())){
                 //logger.debug("deallocateTuner() deallocating control for tuner_id = " + tuner_id);
                 enableTuner(tuner_id, false);
+                frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.setValue("");
                 removeTunerMapping(tuner_id);
-                frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.setValue(createAllocationIdCsv(tuner_id));
+                tuner_allocation_ids.get(tuner_id).control_allocation_id = "";
             }else{
                 // send EOS to listener connection only
-                removeTunerMapping(tuner_id,frontend_tuner_allocation.getValue().allocation_id.getValue());
+                removeTunerMapping(tuner_id,frontend_tuner_deallocation.allocation_id.getValue());
                 frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.setValue(createAllocationIdCsv(tuner_id));
             }
         } catch (Exception e){
@@ -516,31 +518,31 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         }
     }
 
-    public boolean allocateListener(frontend.FETypes.frontend_listener_allocation_struct capacity) throws CF.DevicePackage.InvalidCapacity, Exception {
+    public boolean allocateListener(frontend.FETypes.frontend_listener_allocation_struct frontend_listener_allocation) throws CF.DevicePackage.InvalidCapacity, Exception {
         try{
             // Check validity of allocation_id's
-            if (frontend_listener_allocation.getValue().existing_allocation_id == null || 
-                frontend_listener_allocation.getValue().existing_allocation_id.getValue().isEmpty()){
+            if (frontend_listener_allocation.existing_allocation_id == null || 
+                frontend_listener_allocation.existing_allocation_id.getValue().isEmpty()){
                 logger.info("allocateListener: MISSING EXISTING ALLOCATION ID");
-                throw new CF.DevicePackage.InvalidCapacity("MISSING EXISTING ALLOCATION ID", new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
+                throw new CF.DevicePackage.InvalidCapacity("MISSING EXISTING ALLOCATION ID", new CF.DataType[]{new DataType("frontend_listener_allocation", frontend_listener_allocation.toAny())});
             }
-            if (frontend_listener_allocation.getValue().listener_allocation_id == null ||
-                frontend_listener_allocation.getValue().listener_allocation_id.getValue().isEmpty()){
+            if (frontend_listener_allocation.listener_allocation_id == null ||
+                frontend_listener_allocation.listener_allocation_id.getValue().isEmpty()){
                 logger.info("allocateListener: MISSING LISTENER ALLOCATION ID");
-                throw new CF.DevicePackage.InvalidCapacity("MISSING LISTENER ALLOCATION ID", new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
+                throw new CF.DevicePackage.InvalidCapacity("MISSING LISTENER ALLOCATION ID", new CF.DataType[]{new DataType("frontend_listener_allocation", frontend_listener_allocation.toAny())});
             }
 
-            synchronized(allocation_id_mapping_lock){
+            //synchronized(allocation_id_mapping_lock){
                 // Check if listener allocation ID has already been used
-                if(getTunerMapping(frontend_listener_allocation.getValue().listener_allocation_id.getValue()) >= 0){
+                if(getTunerMapping(frontend_listener_allocation.listener_allocation_id.getValue()) >= 0){
                     logger.error("allocateListener: LISTENER ALLOCATION_ID ALREADY IN USE");
-                    throw new InvalidCapacity("LISTENER ALLOCATION_ID ALREADY IN USE", new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
+                    throw new InvalidCapacity("LISTENER ALLOCATION_ID ALREADY IN USE", new CF.DataType[]{new DataType("frontend_listener_allocation", frontend_listener_allocation.toAny())});
                 }
 
                 // Do not allocate if existing allocation ID does not exist
-                int tuner_id = getTunerMapping(frontend_listener_allocation.getValue().existing_allocation_id.getValue());
+                int tuner_id = getTunerMapping(frontend_listener_allocation.existing_allocation_id.getValue());
                 if (tuner_id < 0){
-                    logger.info("allocateListener: UNKNOWN CONTROL ALLOCATION ID: ["+ frontend_listener_allocation.getValue().existing_allocation_id.getValue() +"]");
+                    logger.info("allocateListener: UNKNOWN CONTROL ALLOCATION ID: ["+ frontend_listener_allocation.existing_allocation_id.getValue() +"]");
                     throw new FRONTEND.BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
                 }
 
@@ -548,45 +550,61 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                 if(frontend_tuner_status.getValue().get(tuner_id).tuner_type.getValue().equals("CHANNELIZER") || frontend_tuner_status.getValue().get(tuner_id).tuner_type.getValue().equals("TX")){
                     String eout = "allocateListener: listener allocations are not permitted for " + frontend_tuner_status.getValue().get(tuner_id).tuner_type.getValue() + " tuner type";
                     logger.debug(eout);
-                    throw new CF.DevicePackage.InvalidCapacity(eout, new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
+                    throw new CF.DevicePackage.InvalidCapacity(eout, new CF.DataType[]{new DataType("frontend_listener_allocation", frontend_listener_allocation.toAny())});
                 }
 
-                tuner_allocation_ids.get(tuner_id).listener_allocation_ids.add(frontend_listener_allocation.getValue().listener_allocation_id.getValue());
-                allocation_id_to_tuner_id.put(frontend_listener_allocation.getValue().listener_allocation_id.getValue(), tuner_id);
+                tuner_allocation_ids.get(tuner_id).listener_allocation_ids.add(frontend_listener_allocation.listener_allocation_id.getValue());
+                allocation_id_to_tuner_id.put(frontend_listener_allocation.listener_allocation_id.getValue(), tuner_id);
                 frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.setValue(createAllocationIdCsv(tuner_id));
-                this.assignListener(frontend_listener_allocation.getValue().listener_allocation_id.getValue(),frontend_listener_allocation.getValue().existing_allocation_id.getValue());
+                this.assignListener(frontend_listener_allocation.listener_allocation_id.getValue(),frontend_listener_allocation.existing_allocation_id.getValue());
                 return true;
-            }
+            //}
         }catch(CF.DevicePackage.InvalidCapacity e){
             String exceptionMessage = e.getMessage();
             // without the following check, a valid allocation could be deallocated due to an attempt to alloc w/ an existing alloc id
             if (exceptionMessage != null && 
                exceptionMessage.indexOf("ALLOCATION_ID ALREADY IN USE") == -1){
-                deallocateListener(capacity);
             }
             throw e;
         } catch (FRONTEND.BadParameterException e){
-            deallocateListener(capacity);
             return false;
         } catch (Exception e){
-            deallocateListener(capacity);
             throw e;
         }
     }
 
-    public void deallocateListener(frontend.FETypes.frontend_listener_allocation_struct capacity){
+    public void deallocateListener(frontend.FETypes.frontend_listener_allocation_struct frontend_listener_allocation){
         try{
-            int tuner_id = getTunerMapping(frontend_listener_allocation.getValue().listener_allocation_id.getValue());
+            int tuner_id = getTunerMapping(frontend_listener_allocation.listener_allocation_id.getValue());
             if (tuner_id < 0){
-                logger.debug("ALLOCATION_ID NOT FOUND: [" + frontend_listener_allocation.getValue().listener_allocation_id.getValue() + "]");
-                throw new CF.DevicePackage.InvalidCapacity("ALLOCATION_ID NOT FOUND", new CF.DataType[]{new DataType("frontend_listener_allocation", capacity.toAny())});
+                logger.debug("ALLOCATION_ID NOT FOUND: [" + frontend_listener_allocation.listener_allocation_id.getValue() + "]");
+                throw new CF.DevicePackage.InvalidCapacity("ALLOCATION_ID NOT FOUND", new CF.DataType[]{new DataType("frontend_listener_allocation", frontend_listener_allocation.toAny())});
             }
             // send EOS to listener connection only
-            removeTunerMapping(tuner_id, frontend_listener_allocation.getValue().listener_allocation_id.getValue());
-            frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.setValue(createAllocationIdCsv(tuner_id));
+            removeTunerMapping(tuner_id, frontend_listener_allocation.listener_allocation_id.getValue());
+            frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.setValue(removeListenerId(tuner_id, frontend_listener_allocation.listener_allocation_id.getValue()));
         } catch (Exception e){
             logger.debug("deallocateListener: ERROR WHEN DEALLOCATING.  SKIPPING...");
         }
+    }
+    
+    public String removeListenerId(final int tuner_id, final String allocation_id) {
+        String[] split_id = frontend_tuner_status.getValue().get(tuner_id).allocation_id_csv.getValue().split(",");
+        int idx;
+        for (idx=0; idx<split_id.length; idx++) {
+            if (split_id[idx].equals(allocation_id)) {
+                break;
+            }
+        }
+        String cleanedString = "";
+        for (int idx_i=0; idx_i<split_id.length; idx_i++) {
+            if (idx == idx_i) {
+                continue;
+            }
+            cleanedString += split_id[idx_i] + ",";
+        }
+        cleanedString = cleanedString.replaceAll(",$","");
+        return cleanedString;
     }
 
     /*****************************************************************/
@@ -668,13 +686,13 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                 iter.remove();
             }
         }
-        synchronized(allocation_id_mapping_lock){
+        //synchronized(allocation_id_mapping_lock){
             if (allocation_id_to_tuner_id.containsKey(allocation_id)){
                 allocation_id_to_tuner_id.remove(allocation_id);
                 return true;
             }
             return false;
-        }
+        //}
     }
 
     protected boolean removeTunerMapping(int tuner_id){
@@ -683,13 +701,13 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         removeAllocationIdRouting(tuner_id);
 
         int cnt = 0;
-        synchronized(allocation_id_mapping_lock){
+        //synchronized(allocation_id_mapping_lock){
             if (allocation_id_to_tuner_id.containsValue(tuner_id)){
                 Iterator<Map.Entry<String,Integer>> iter = allocation_id_to_tuner_id.entrySet().iterator();
                 while (iter.hasNext()) {
                     Map.Entry<String,Integer> entry = iter.next();
                     if(tuner_id == entry.getValue()){
-                        removeListener(entry.getKey());
+                        this.removeListener(entry.getKey());
                         iter.remove();
                         cnt++;
                     }
@@ -697,7 +715,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             }
             tuner_allocation_ids.get(tuner_id).reset();
             return cnt > 0;
-        }
+        //}
     }
 
     protected void assignListener(final String listen_alloc_id, final String alloc_id){
