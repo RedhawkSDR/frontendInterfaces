@@ -492,6 +492,48 @@ class FrontendTunerDevice(Device):
         self.allocation_id_to_tuner_id = {}
         self.allocation_id_mapping_lock = threading.Lock()
 
+    def deallocateCapacity(self, properties):
+        """
+        Takes the list of properties and turns it into a dictionary.  If the 
+        device has a deallocateCapacities(propDict) method it is invoked.
+        
+        Input:
+            <properties>    A list of CF.DataType properties to allocate
+            
+        Output:
+            None
+        """
+        self._log.debug("deallocateCapacity(%s)", properties)
+        # Validate
+        self._validateAllocProps(properties)
+        # Consume
+        propdict = {}
+        for prop in properties:
+            propdef = self._props.getPropDef(prop.id)
+            # if it is a minimal tuner_allocation property (from the IDE), then add None for all the other values
+            if prop.id == 'FRONTEND::tuner_allocation' and len(prop.value._v) == 1 and prop.value._v[0].id == 'FRONTEND::tuner_allocation::allocation_id':
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::tuner_type',value=any.to_any(None))]
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::center_frequency',value=any.to_any(None))]
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::bandwidth',value=any.to_any(None))]
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::bandwidth_tolerance',value=any.to_any(None))]
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::sample_rate',value=any.to_any(None))]
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::sample_rate_tolerance',value=any.to_any(None))]
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::device_control',value=any.to_any(None))]
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::group_id',value=any.to_any(None))]
+                prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::rf_flow_id',value=any.to_any(None))]
+            propdict[prop.id] = propdef._fromAny(prop.value)
+
+        self._capacityLock.acquire()
+        try:
+            self._deallocateCapacities(propdict)
+        finally:
+            self._capacityLock.release()
+
+        # Update usage state
+        self.updateUsageState()
+
+        self._log.debug("deallocateCapacity() -->")
+        
     def createAllocationIdCsv(self, tuner_id):
         alloc_ids = []
         # ensure control allocation_id is first in list
