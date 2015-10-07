@@ -508,6 +508,7 @@ namespace frontend {
                                 throw std::logic_error(eout.str().c_str());
                             }
                         }
+                        _usageState = updateUsageState();
                         return true;
                     }
                     // if we made it here, we failed to find an available tuner
@@ -651,6 +652,7 @@ namespace frontend {
                 LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,"ERROR WHEN DEALLOCATING. SKIPPING...");
             }
         }
+        _usageState = updateUsageState();
     }
 
     /*****************************************************************/

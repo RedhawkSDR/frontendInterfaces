@@ -530,7 +530,7 @@ class FrontendTunerDevice(Device):
             self._capacityLock.release()
 
         # Update usage state
-        self.updateUsageState()
+        self._usageState = self.updateUsageState()
 
         self._log.debug("deallocateCapacity() -->")
         
@@ -684,6 +684,7 @@ class FrontendTunerDevice(Device):
                             self._log.info(eout)
                             raise RuntimeError(eout)
 
+                    self._usageState = self.updateUsageState()
                     return True
             
             except:

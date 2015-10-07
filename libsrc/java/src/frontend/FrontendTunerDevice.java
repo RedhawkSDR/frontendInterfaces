@@ -480,6 +480,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                             throw new RuntimeException(eout);
                         }
                     }
+                    usageState = getUsageState();
                     return true;
                 }
                 // if we made it here, we failed to find an available tuner
@@ -528,6 +529,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         } catch (Exception e){
             System.out.println("deallocateTuner: ERROR WHEN DEALLOCATING.  SKIPPING...");
         }
+        usageState = getUsageState();
     }
 
     public boolean allocateListener(frontend.FETypes.frontend_listener_allocation_struct frontend_listener_allocation) throws CF.DevicePackage.InvalidCapacity, Exception {
