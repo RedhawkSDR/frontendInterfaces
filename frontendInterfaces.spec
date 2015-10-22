@@ -66,15 +66,6 @@ make
 rm -rf --preserve-root $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
-# The Java and Python base class libraries are not yet fully implemented. We
-# include the Python one (because it has important Sandbox helpers), but not
-# the Java one yet.
-%if %{with java}
-rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/frontend.jar
-rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/frontend.src.jar
-%endif
-
-
 %clean
 rm -rf --preserve-root $RPM_BUILD_ROOT
 
