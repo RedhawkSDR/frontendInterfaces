@@ -85,6 +85,8 @@ rm -rf --preserve-root $RPM_BUILD_ROOT
 %{_prefix}/lib/python/frontend-%{version}-py%{python_version}.egg-info
 %endif
 %if %{with java}
+%{_prefix}/lib/frontend.jar
+%{_prefix}/lib/frontend.src.jar
 %{_prefix}/lib/FRONTENDInterfaces.jar
 %{_prefix}/lib/FRONTENDInterfaces.src.jar
 %endif
