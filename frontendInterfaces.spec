@@ -75,11 +75,11 @@ rm -rf --preserve-root $RPM_BUILD_ROOT
 %{_includedir}/redhawk/FRONTEND
 %{_prefix}/lib/python/redhawk/frontendInterfaces
 %{_prefix}/lib/python/frontend
-%{_libdir}/libfrontendInterfaces.*
-%{_libdir}/pkgconfig/frontendInterfaces.pc
+%{_prefix}/lib/libfrontendInterfaces.*
+%{_prefix}/lib/pkgconfig/frontendInterfaces.pc
 %{_includedir}/frontend
-%{_libdir}/libfrontend-*
-%{_libdir}/pkgconfig/frontend.pc
+%{_prefix}/lib/libfrontend-*
+%{_prefix}/lib/pkgconfig/frontend.pc
 %if 0%{?rhel} >= 6
 %{_prefix}/lib/python/frontendInterfaces-%{version}-py%{python_version}.egg-info
 %{_prefix}/lib/python/frontend-%{version}-py%{python_version}.egg-info
