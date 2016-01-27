@@ -122,7 +122,7 @@ clean-cpp:
 	rm -rf src/cpp
 	rm -f $(PACKAGE_NAME).pc
 
-$(PACKAGE_NAME).pc: Makefile.am
+$(PACKAGE_NAME).pc: Makefile.am configure.ac
 	@echo "prefix=$(prefix)" > $@
 	@echo "exec_prefix=$(exec_prefix)" >> $@
 	@echo "libdir=$(libdir)" >> $@
