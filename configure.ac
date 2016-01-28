@@ -32,6 +32,8 @@ OSSIE_CHECK_OSSIE
 OSSIE_OSSIEHOME_AS_PREFIX
 OSSIE_PYTHON_INSTALL_SCHEME
 
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
 AC_CORBA_ORB
 AC_CHECK_PROG([IDL], [omniidl], [omniidl], [no])
 if test "$IDL" = no; then
@@ -70,9 +72,15 @@ if test "x$enable_java" != "xno"; then
   RH_PROG_JAR
   RH_PROG_IDLJ
 
+  # Set up build rules for jarfiles
+  RH_JARFILE_RULES
+
   # Find required libraries
   RH_PKG_CLASSPATH([OSSIE], [ossie])
   RH_PKG_CLASSPATH([BULKIO], [bulkio])
+
+  # Set Java installation directory
+  AC_SUBST([javadir], '${prefix}/lib')
 
   HAVE_JAVASUPPORT=yes
 fi
@@ -81,7 +89,7 @@ AM_CONDITIONAL(HAVE_JAVASUPPORT, test $HAVE_JAVASUPPORT = yes)
 AC_CONFIG_FILES([Makefile frontendInterfaces.pc])
 if test "$enable_base_classes" != "no"; then
   if test "$HAVE_JAVASUPPORT = yes"; then
-    AC_CONFIG_FILES([libsrc/java/META-INF/MANIFEST.MF libsrc/java/META-INF/MANIFEST.MF.src])
+    AC_CONFIG_FILES([libsrc/java/META-INF/MANIFEST.MF])
   fi
   AC_CONFIG_FILES([libsrc/Makefile libsrc/frontend.pc])
 fi
