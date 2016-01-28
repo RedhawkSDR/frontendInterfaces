@@ -106,7 +106,7 @@ SUBDIRS += libsrc
 ###############################################################################
 # C++ (via automake and libtool)
 pkgconfigdir = $(libdir)/pkgconfig
-dist_pkgconfig_DATA = $(PACKAGE_NAME).pc
+dist_pkgconfig_DATA = frontendInterfaces.pc
 
 pkgincludedir = $(includedir)/$(LIBRARY_NAME)/$(IDL_MODULE)
 pkginclude_HEADERS = $(filter %.h, $(lib$(LOWER_CASE_IDL_MODULE)Interfaces_la_SOURCES))
@@ -120,20 +120,6 @@ src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%DynSK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_M
 
 clean-cpp:
 	rm -rf src/cpp
-	rm -f $(PACKAGE_NAME).pc
-
-$(PACKAGE_NAME).pc: Makefile.am configure.ac
-	@echo "prefix=$(prefix)" > $@
-	@echo "exec_prefix=$(exec_prefix)" >> $@
-	@echo "libdir=$(libdir)" >> $@
-	@echo "includedir=$(includedir)" >> $@
-	@echo "" >> $@
-	@echo "Name: $(PACKAGE_NAME)" >> $@
-	@echo "Description: $(PACKAGE_NAME) for REDHAWK" >> $@
-	@echo "Requires: bulkioInterfaces >= 2.0.0" >> $@
-	@echo "Version: $(PACKAGE_VERSION)" >> $@
-	@echo "Libs: -L\$${libdir} -l${LOWER_CASE_IDL_MODULE}Interfaces" >> $@
-	@echo "Cflags: -I\$${includedir}/$(LIBRARY_NAME)" >> $@
 
 ###############################################################################
 # Python
