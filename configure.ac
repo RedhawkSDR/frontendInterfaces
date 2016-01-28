@@ -65,25 +65,14 @@ AC_ARG_ENABLE([java], AS_HELP_STRING([--disable-java], [Disable framework java s
 HAVE_JAVASUPPORT=no
 if test "x$enable_java" != "xno"; then
   # Ensure JAVA_HOME is set
-  AC_ARG_VAR([JAVA_HOME], [Java Development Kit (JDK) location])
-  test -r /usr/share/java-utils/java-functions && \
-    . /usr/share/java-utils/java-functions && \
-    set_jvm
-  AC_MSG_CHECKING([for a valid JAVA_HOME])
-  if test -n "$JAVA_HOME" -a -d "$JAVA_HOME"; then
-    AC_MSG_RESULT([$JAVA_HOME])
-    java_test_paths=$JAVA_HOME/jre/sh$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$PATH
-  else
-    AC_MSG_RESULT([no - this may impact Java tool detection])
-    java_test_paths=$PATH
-  fi
+  RH_JAVA_HOME
+  RH_PROG_JAVAC([1.6])
+  RH_PROG_JAR
+  RH_PROG_IDLJ
 
-  # Locate the tools we need
-  AC_PATH_PROG([JAVAC], [javac], [no], [$java_test_paths])
-  AC_PATH_PROG([JAR], [jar], [no], [$java_test_paths])
-  AC_PATH_PROG([IDLJ], [idlj], [no], [$java_test_paths])
-  AS_IF([test "$JAVAC" = no -o "$JAR" = no -o "$IDLJ" = no],
-        [AC_MSG_ERROR([Cannot find a required Java tool])])
+  # Find required libraries
+  RH_PKG_CLASSPATH([OSSIE], [ossie])
+  RH_PKG_CLASSPATH([BULKIO], [bulkio])
 
   HAVE_JAVASUPPORT=yes
 fi

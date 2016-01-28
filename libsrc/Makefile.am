@@ -92,7 +92,7 @@ if HAVE_JAVASUPPORT
 JAVA_DIR := java
 JAVA_SRCDIR := $(JAVA_DIR)/src
 JAVA_BINDIR := $(JAVA_DIR)/bin
-CLASSPATH := $(OSSIE_HOME)/lib/CFInterfaces.jar:$(OSSIE_HOME)/lib/ossie.jar:$(OSSIE_HOME)/lib/log4j-1.2.15.jar:$(OSSIE_HOME)/lib/BULKIOInterfaces.jar:$(top_builddir)/FRONTENDInterfaces.jar:
+CLASSPATH := $(OSSIE_CLASSPATH):$(BULKIO_CLASSPATH):$(top_builddir)/FRONTENDInterfaces.jar
 BINARY_JAR := $(JAVA_DIR)/frontend.jar
 SOURCE_JAR := $(JAVA_DIR)/frontend.src.jar
 
