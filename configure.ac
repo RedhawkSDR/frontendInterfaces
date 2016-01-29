@@ -72,8 +72,9 @@ if test "x$enable_java" != "xno"; then
   RH_PROG_JAR
   RH_PROG_IDLJ
 
-  # Set up build rules for jarfiles
+  # Set up build rules for jarfiles and IDL-to-Java
   RH_JARFILE_RULES
+  RH_IDLJ_RULES
 
   # Find required libraries
   RH_PKG_CLASSPATH([OSSIE], [ossie])

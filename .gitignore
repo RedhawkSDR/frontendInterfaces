@@ -1,6 +1,7 @@
 .deps/
 .libs/
 .jars/
+.idlj/
 *.jar
 *.lo
 *.o
