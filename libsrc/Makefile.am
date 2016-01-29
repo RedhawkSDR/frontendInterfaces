@@ -121,7 +121,6 @@ FETypes.java \
 FrontendTunerDevice.java
 
 java_JARFILES = frontend.jar
-java_DATA = frontend.src.jar
 
 frontend_jar_SOURCE := $(addprefix $(JAVA_SRCDIR)/frontend/, $(JAVA_SRCS))
 frontend_jar_CLASSPATH := $(OSSIE_CLASSPATH):$(BULKIO_CLASSPATH):$(top_builddir)/FRONTENDInterfaces.jar
