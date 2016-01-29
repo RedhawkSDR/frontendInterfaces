@@ -274,7 +274,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
  
     private void construct() {
         loadProperties();
-        allocation_id_to_tuner_id = new HashMap();
+        allocation_id_to_tuner_id = new HashMap<String,Integer>();
         frontend_tuner_allocation.setAllocator(new Allocator<frontend.FETypes.frontend_tuner_allocation_struct>() {
             public boolean allocate(frontend.FETypes.frontend_tuner_allocation_struct capacity){
                 boolean status = false;
@@ -850,7 +850,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
             "FRONTEND::tuner_status", //id
             "frontend_tuner_status", //name
             frontend_tuner_status_class_type, //type
-            (List)new ArrayList<TunerStatusStructType>(),
+            new ArrayList<TunerStatusStructType>(),
             Mode.READONLY, //mode
             new Kind[] { Kind.CONFIGURE } //kind
         );
