@@ -124,16 +124,16 @@ PYTHON_MODULE_NAME := $(LOWER_CASE_IDL_MODULE)Interfaces
 PYTHON_PACKAGE := $(LIBRARY_NAME).$(PYTHON_MODULE_NAME)
 PYTHON_BASE := $(subst .,/,$(PYTHON_PACKAGE))
 PY_SRC_OUT_DIR := $(addprefix src/python/, $(subst .,/, $(PYTHON_PACKAGE)))
-PY_SRCS := $(addprefix $(PY_SRC_OUT_DIR)/, $(subst .idl,_idl.py, $(IDL_FILES)))
+PY_IDL_SRCS := $(PY_SRC_OUT_DIR)/__init__.py $(addprefix idl/$(LIBRARY_NAME)/$(IDL_MODULE)/, $(IDL_FILES))
 PY_BUILD_OUT_DIR := $(addprefix build/lib/, $(subst .,/, $(PYTHON_PACKAGE)))
 PY_BUILT_SRCS := $(addprefix $(PY_BUILD_OUT_DIR)/, $(subst .idl,_idl.py, $(IDL_FILES)))
 PY_IDL_EXTERNS := $(addprefix -Wbextern=, $(subst ,, $(PYTHON_EXTERNS)))
 
 PY_IDL_INCLUDES := -I idl
 
-$(PY_SRC_OUT_DIR)/%_idl.py: idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
-	mkdir -p $(PY_SRC_OUT_DIR)
-	$(IDL) $(PY_IDL_INCLUDES) $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -C src/python -bpython -Wbpackage=$(PYTHON_PACKAGE) $(PY_IDL_EXTERNS) $<
+$(PY_SRC_OUT_DIR)/__init__.py: $(PY_IDL_SRCS)
+	$(AM_v_at)mkdir -p $(PY_SRC_OUT_DIR)
+	$(AM_v_gen)$(IDL) $(PY_IDL_INCLUDES) $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -C src/python -bpython -Wbpackage=$(PYTHON_PACKAGE) $(PY_IDL_EXTERNS) $^
 
 setup.py: Makefile.am
 # Build up a setup.py line-by-line
@@ -163,7 +163,7 @@ setup.py: Makefile.am
 	@echo "      packages=_packages" >> $@
 	@echo ")" >> $@
 
-$(PY_BUILD_OUT_DIR): $(PY_SRCS) setup.py
+$(PY_BUILD_OUT_DIR): $(PY_SRC_OUT_DIR)/__init__.py setup.py
 	python setup.py build --build-lib build/lib
 	touch $(PY_BUILD_OUT_DIR)
 
