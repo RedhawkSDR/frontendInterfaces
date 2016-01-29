@@ -87,7 +87,6 @@ rm -rf --preserve-root $RPM_BUILD_ROOT
 %if %{with java}
 %{_prefix}/lib/frontend.jar
 %{_prefix}/lib/FRONTENDInterfaces.jar
-%{_prefix}/lib/FRONTENDInterfaces.src.jar
 %endif
 
 %post

@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Bundle-Vendor: REDHAWK
-Eclipse-SourceBundle: idl.frontend;version="@bundle_version@.@bundle_qualifier@"
-Bundle-Version: @bundle_version@.@bundle_qualifier@
-Bundle-Name: FRONTEND IDL Interfaces
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: idl.frontend.source
-
