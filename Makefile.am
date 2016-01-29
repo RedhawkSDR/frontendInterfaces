@@ -53,9 +53,6 @@ IDL_EXTERNS := CF BULKIO
 #     f:p   Assume Python stub file for file f is in package p.
 PYTHON_EXTERNS := bulkioDataTypes:bulkio.bulkioInterfaces DataType:ossie.cf
 
-# Relative path to the location of the IDL files
-IDL_SOURCE_PATH := .
-
 # A Qualifier to append to the version, by default this is a timestamp of the build
 BUNDLE_QUALIFIER := v$(shell date +%Y%m%d%H%M%S)
 
@@ -84,7 +81,7 @@ libfrontendInterfaces_la_LDFLAGS = -version-info 1:0:1
 LOWER_CASE_IDL_MODULE :=$(shell echo $(IDL_MODULE) | tr A-Z a-z)
 
 idldir = $(datadir)/idl/$(LIBRARY_NAME)/$(IDL_MODULE)
-dist_idl_DATA =  $(addprefix build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/, $(IDL_FILES))
+dist_idl_DATA =  $(addprefix idl/$(LIBRARY_NAME)/$(IDL_MODULE)/, $(IDL_FILES))
 
 all-local: all-python all-java
 
@@ -92,10 +89,6 @@ install-exec-hook: install-python install-java
 
 clean-local: clean-python clean-java clean-cpp
 	rm -rf build
-
-build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl: $(IDL_SOURCE_PATH)/%.idl
-	mkdir -p build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)
-	cp $< $@
 
 # Always build the current directory first (this is hack-ish, but the
 # # alternative is to combine the Makefile.am's)
@@ -114,9 +107,9 @@ pkginclude_HEADERS = $(filter %.h, $(lib$(LOWER_CASE_IDL_MODULE)Interfaces_la_SO
 AM_CXXFLAGS = -Wall -I src/cpp -g $(OMNIORB_CFLAGS) $(OSSIE_CFLAGS)
 AM_LIBS = $(OSSIE_LIBS) $(BULKIO_LIBS)
 
-src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%DynSK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%SK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%.h: build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
+src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%DynSK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%SK.cpp src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)/%.h: idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
 	@mkdir -p "src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE)"
-	$(IDL) -I build/idl $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -C src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE) -bcxx -Wba -Wbd=DynSK.cpp -Wbh=.h -Wbs=SK.cpp -Wbkeep_inc_path $<
+	$(IDL) -I idl $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -C src/cpp/$(LIBRARY_NAME)/$(IDL_MODULE) -bcxx -Wba -Wbd=DynSK.cpp -Wbh=.h -Wbs=SK.cpp -Wbkeep_inc_path $<
 
 clean-cpp:
 	rm -rf src/cpp
@@ -136,9 +129,9 @@ PY_BUILD_OUT_DIR := $(addprefix build/lib/, $(subst .,/, $(PYTHON_PACKAGE)))
 PY_BUILT_SRCS := $(addprefix $(PY_BUILD_OUT_DIR)/, $(subst .idl,_idl.py, $(IDL_FILES)))
 PY_IDL_EXTERNS := $(addprefix -Wbextern=, $(subst ,, $(PYTHON_EXTERNS)))
 
-PY_IDL_INCLUDES := -I build/idl
+PY_IDL_INCLUDES := -I idl
 
-$(PY_SRC_OUT_DIR)/%_idl.py: build/idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
+$(PY_SRC_OUT_DIR)/%_idl.py: idl/$(LIBRARY_NAME)/$(IDL_MODULE)/%.idl
 	mkdir -p $(PY_SRC_OUT_DIR)
 	$(IDL) $(PY_IDL_INCLUDES) $(OSSIE_CFLAGS) $(OSSIE_IDLFLAGS) -C src/python -bpython -Wbpackage=$(PYTHON_PACKAGE) $(PY_IDL_EXTERNS) $<
 
@@ -202,11 +195,11 @@ manifest_edit = $(SED) \
   -e 's|@bundle_qualifier[@]|$(BUNDLE_QUALIFIER)|g'
 
 java_JARFILES = FRONTENDInterfaces.jar
-IDLJFLAGS = -i build/idl -i $(OSSIE_IDLDIR)
+IDLJFLAGS = -i idl -i $(OSSIE_IDLDIR)
 IDLJ_BUILDDIR = $(IDLJ_SRC_DEST)
 
 # For IDLJ rules, set VPATH for .idl files so that pattern rules can find them.
-vpath %.idl build/idl/redhawk/FRONTEND
+vpath %.idl idl/redhawk/FRONTEND
 idlj_IDLSRC = $(IDL_FILES)
 
 FRONTENDInterfaces_jar_SOURCE = $(idlj_SOURCE)
