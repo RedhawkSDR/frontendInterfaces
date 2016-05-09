@@ -30,10 +30,6 @@ import org.ossie.component.PortBase;
 
 public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSOperations, PortBase {
 
-    protected String name;
- 
-    protected Object updatingPortsLock;
-
     /**
      * Map of connection Ids to port objects
      */
@@ -41,7 +37,6 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
 
     public OutGPSPort( String portName) {
         super(portName);
-        this.name = portName;
         this.outConnections = new HashMap<String, GPSOperations>();
     }
 

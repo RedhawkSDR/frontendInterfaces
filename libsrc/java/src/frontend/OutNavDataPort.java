@@ -29,10 +29,6 @@ import org.ossie.component.PortBase;
 
 public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> implements NavDataOperations, PortBase {
 
-    protected String name;
- 
-    protected Object updatingPortsLock;
-
     /**
      * Map of connection Ids to port objects
      */
@@ -40,7 +36,6 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
 
     public OutNavDataPort( String portName) {
         super(portName);
-        this.name = portName;
         this.outConnections = new HashMap<String, NavDataOperations>();
     }
 

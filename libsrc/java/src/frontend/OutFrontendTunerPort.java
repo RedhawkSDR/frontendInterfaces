@@ -31,10 +31,6 @@ import org.ossie.component.PortBase;
 
 public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperations> implements FrontendTunerOperations, PortBase {
 
-    protected String name;
-
-    protected Object updatingPortsLock;
-
     /**
      * Map of connection Ids to port objects
      */
@@ -42,7 +38,6 @@ public class OutFrontendTunerPort extends QueryableUsesPort<FrontendTunerOperati
 
     public OutFrontendTunerPort(String portName) { 
         super(portName);
-        this.name = portName;
         this.outConnections = new HashMap<String, FrontendTunerOperations>();
     }
 

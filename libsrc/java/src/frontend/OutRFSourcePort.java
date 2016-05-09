@@ -29,10 +29,6 @@ import org.ossie.component.PortBase;
 
 public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> implements RFSourceOperations, PortBase {
 
-    protected String name;
- 
-    protected Object updatingPortsLock;
-
     /**
      * Map of connection Ids to port objects
      */
@@ -40,7 +36,6 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
 
     public OutRFSourcePort( String portName) {
         super(portName);
-        this.name = portName;
         this.outConnections = new HashMap<String, RFSourceOperations>();
     }
 
