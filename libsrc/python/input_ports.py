@@ -27,47 +27,47 @@ import copy
 '''provides port(s)'''
 
 class tuner_delegation(object):
-    def getTunerType(id):
+    def getTunerType(self, id):
         raise FRONTEND.NotSupportedException("getTunerType not supported")
-    def getTunerDeviceControl(id):
+    def getTunerDeviceControl(self, id):
         raise FRONTEND.NotSupportedException("getTunerDeviceControl not supported")
-    def getTunerGroupId(id):
+    def getTunerGroupId(self, id):
         raise FRONTEND.NotSupportedException("getTunerGroupId not supported")
-    def getTunerRfFlowId(id):
+    def getTunerRfFlowId(self, id):
         raise FRONTEND.NotSupportedException("getTunerRfFlowId not supported")
-    def getTunerStatus(id):
+    def getTunerStatus(self, id):
         raise FRONTEND.NotSupportedException("getTunerStatus not supported")
 
 class analog_tuner_delegation(tuner_delegation):
-    def setTunerCenterFrequency(id, freq):
+    def setTunerCenterFrequency(self, id, freq):
         raise FRONTEND.NotSupportedException("setTunerCenterFrequency not supported")
-    def getTunerCenterFrequency(id):
+    def getTunerCenterFrequency(self, id):
         raise FRONTEND.NotSupportedException("getTunerCenterFrequency not supported")
-    def setTunerBandwidth(bw):
+    def setTunerBandwidth(self, bw):
         raise FRONTEND.NotSupportedException("setTunerBandwidth not supported")
-    def getTunerBandwidth(id):
+    def getTunerBandwidth(self, id):
         raise FRONTEND.NotSupportedException("getTunerBandwidth not supported")
-    def setTunerAgcEnable(id, enable):
+    def setTunerAgcEnable(self, id, enable):
         raise FRONTEND.NotSupportedException("setTunerAgcEnable not supported")
-    def getTunerAgcEnable(id):
+    def getTunerAgcEnable(self, id):
         raise FRONTEND.NotSupportedException("getTunerAgcEnable not supported")
-    def setTunerGain(id,gain):
+    def setTunerGain(self, id,gain):
         raise FRONTEND.NotSupportedException("setTunerGain not supported")
-    def getTunerGain(id):
+    def getTunerGain(self, id):
         raise FRONTEND.NotSupportedException("getTunerGain not supported")
-    def setTunerReferenceSource(id, source):
+    def setTunerReferenceSource(self, id, source):
         raise FRONTEND.NotSupportedException("setTunerReferenceSource not supported")
-    def getTunerReferenceSource(id):
+    def getTunerReferenceSource(self, id):
         raise FRONTEND.NotSupportedException("getTunerReferenceSource not supported")
-    def setTunerEnable(id, enable):
+    def setTunerEnable(self, id, enable):
         raise FRONTEND.NotSupportedException("setTunerEnable not supported")
-    def getTunerEnable(id):
+    def getTunerEnable(self, id):
         raise FRONTEND.NotSupportedException("getTunerEnable not supported")
 
 class digital_tuner_delegation(analog_tuner_delegation):
-    def setTunerOutputSampleRate(id, sr):
+    def setTunerOutputSampleRate(self, id, sr):
         raise FRONTEND.NotSupportedException("setTunerOutputSampleRate not supported")
-    def getTunerOutputSampleRate(id):
+    def getTunerOutputSampleRate(self, id):
         raise FRONTEND.NotSupportedException("getTunerOutputSampleRate not supported")
 
 class InFrontendTunerPort(FRONTEND__POA.FrontendTuner):
@@ -111,7 +111,7 @@ class InFrontendTunerPort(FRONTEND__POA.FrontendTuner):
         finally:
             self.port_lock.release()
 
-class InAnalogTunerPort(FRONTEND__POA.AnalogTuner):
+class InAnalogTunerPort(FRONTEND__POA.AnalogTuner, InFrontendTunerPort):
     def __init__(self, name, parent=analog_tuner_delegation()):
         self.name = name
         self.port_lock = threading.Lock()
@@ -201,7 +201,7 @@ class InAnalogTunerPort(FRONTEND__POA.AnalogTuner):
         finally:
             self.port_lock.release()
 
-class InDigitalTunerPort(FRONTEND__POA.DigitalTuner):
+class InDigitalTunerPort(FRONTEND__POA.DigitalTuner, InAnalogTunerPort):
     def __init__(self, name, parent=digital_tuner_delegation()):
         self.name = name
         self.port_lock = threading.Lock()
@@ -222,13 +222,13 @@ class InDigitalTunerPort(FRONTEND__POA.DigitalTuner):
             self.port_lock.release()
 
 class gps_delegation(object):
-    def get_gps_info(port_name):
+    def get_gps_info(self, port_name):
         return frontend.GPSInfo()
-    def set_gps_info(port_name, gps_info):
+    def set_gps_info(self, port_name, gps_info):
         pass
-    def get_gps_time_pos(port_name):
+    def get_gps_time_pos(self, port_name):
         return frontend.GpsTimePos()
-    def set_gps_time_pos(port_name, gps_time_pos):
+    def set_gps_time_pos(self, port_name, gps_time_pos):
         pass
 
 class InGPSPort(FRONTEND__POA.GPS):
@@ -266,13 +266,13 @@ class InGPSPort(FRONTEND__POA.GPS):
             self.port_lock.release()
 
 class rfinfo_delegation(object):
-    def get_rf_flow_id(port_name):
+    def get_rf_flow_id(self, port_name):
         return "none"
-    def set_rf_flow_id(port_name, id):
+    def set_rf_flow_id(self, port_name, id):
         pass
-    def get_rfinfo_pkt(port_name):
+    def get_rfinfo_pkt(self, port_name):
         return frontend.RFInfoPkt()
-    def set_rfinfo_pkt(port_name, pkt):
+    def set_rfinfo_pkt(self, port_name, pkt):
         pass
 
 class InRFInfoPort(FRONTEND__POA.RFInfo):
@@ -310,13 +310,13 @@ class InRFInfoPort(FRONTEND__POA.RFInfo):
             self.port_lock.release()
 
 class rfsource_delegation(object):
-    def get_available_rf_inputs(port_name):
+    def get_available_rf_inputs(self, port_name):
         return []
-    def set_available_rf_inputs(port_name, inputs):
+    def set_available_rf_inputs(self, port_name, inputs):
         pass
-    def get_current_rf_input(port_name):
+    def get_current_rf_input(self, port_name):
         return frontend.RFInfoPkt()
-    def set_current_rf_input(port_name, input):
+    def set_current_rf_input(self, port_name, input):
         pass
 
 class InRFSourcePort(FRONTEND__POA.RFSource):
@@ -354,9 +354,9 @@ class InRFSourcePort(FRONTEND__POA.RFSource):
             self.port_lock.release()
 
 class nav_delegation(object):
-    def get_nav_packet(port_name):
+    def get_nav_packet(self, port_name):
         return frontend.NavigationPacket()
-    def set_nav_packet(port_name, nav_info):
+    def set_nav_packet(self, port_name, nav_info):
         pass
 
 class InNavDataPort(FRONTEND__POA.NavData):

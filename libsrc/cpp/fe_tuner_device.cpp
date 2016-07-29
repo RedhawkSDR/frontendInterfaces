@@ -538,7 +538,7 @@ namespace frontend {
                     // Do not allocate if existing allocation ID does not exist
                     long tuner_id = getTunerMapping(frontend_listener_allocation.existing_allocation_id);
                     if (tuner_id < 0){
-                        LOG_INFO(FrontendTunerDevice<TunerStatusStructType>,"allocateCapacity: UNKNOWN CONTROL ALLOCATION ID: ["<< frontend_listener_allocation.existing_allocation_id <<"]");
+                        LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,"allocateCapacity: UNKNOWN CONTROL ALLOCATION ID: ["<< frontend_listener_allocation.existing_allocation_id <<"]");
                         throw FRONTEND::BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
                     }
 

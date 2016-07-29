@@ -533,7 +533,10 @@ class FrontendTunerDevice(Device):
         self._usageState = self.updateUsageState()
 
         self._log.debug("deallocateCapacity() -->")
-        
+
+    def getControlAllocationId(self, idx):
+        return self.tuner_allocation_ids[idx].control_allocation_id
+
     def createAllocationIdCsv(self, tuner_id):
         alloc_ids = []
         # ensure control allocation_id is first in list
@@ -722,6 +725,17 @@ class FrontendTunerDevice(Device):
         if tuner_id < 0:
             self._log.debug("deallocate_frontend_tuner_allocation: ALLOCATION_ID NOT FOUND: [" + str(frontend_tuner_allocation.allocation_id) + "]")
             raise CF.Device.InvalidCapacity("ALLOCATION_ID NOT FOUND: [" + str(frontend_tuner_allocation.allocation_id) + "]",frontend_tuner_allocation)
+        
+        while self.frontend_tuner_status[self.allocation_id_to_tuner_id[frontend_tuner_allocation.allocation_id]].allocation_id_csv != frontend_tuner_allocation.allocation_id:
+            split_id = self.frontend_tuner_status[self.allocation_id_to_tuner_id[frontend_tuner_allocation.allocation_id]].allocation_id_csv.split(',')
+            for idx in range(len(split_id)):
+                if split_id[idx] == frontend_tuner_allocation.allocation_id:
+                    continue
+                else:
+                    self.removeTunerMappingByAllocationId(split_id[idx])
+                    self.removeListenerId(tuner_id, split_id[idx])
+                break
+        
         if self.tuner_allocation_ids[tuner_id].control_allocation_id == frontend_tuner_allocation.allocation_id:
             self.enableTuner(tuner_id,False)
             self.removeTunerMappingByAllocationId(frontend_tuner_allocation.allocation_id)
@@ -759,7 +773,7 @@ class FrontendTunerDevice(Device):
             # Do not allocate if existing allocation ID does not exist
             tuner_id = self.getTunerMapping(frontend_listener_allocation.existing_allocation_id)
             if tuner_id < 0:
-                self._log.info("allocate_frontend_listener_allocation: UNKNOWN CONTROL ALLOCATION ID: [" + str(frontend_listener_allocation.existing_allocation_id)+"]")
+                self._log.debug("allocate_frontend_listener_allocation: UNKNOWN CONTROL ALLOCATION ID: [" + str(frontend_listener_allocation.existing_allocation_id)+"]")
                 raise FRONTEND.BadParameterException("UNKNOWN CONTROL ALLOCATION ID")
 
             # listener allocations are not permitted for channelizers or TX
@@ -821,11 +835,11 @@ class FrontendTunerDevice(Device):
     def enableTuner(self, tuner_id, enable):
         prev_enabled = self.frontend_tuner_status[tuner_id].enabled
         # If going from disabled to enabled
-        if not prev_enabled and enable:
+        if enable:
             self.deviceEnable(self.frontend_tuner_status[tuner_id], tuner_id)
 
         # If going from enabled to disabled
-        if prev_enabled and not enable:
+        if not enable:
             self.deviceDisable(self.frontend_tuner_status[tuner_id], tuner_id)
 
         return True
@@ -880,6 +894,7 @@ class FrontendTunerDevice(Device):
 
     def removeTunerMappingByAllocationId(self, allocation_id):
         self._log.trace("removeTunerMapping(allocation_id) allocation_id " + str(allocation_id))
+        self.deviceDeleteTuning(self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]], self.allocation_id_to_tuner_id[allocation_id])
         self.removeListener(allocation_id)
         self.allocation_id_mapping_lock.acquire()
         try:
