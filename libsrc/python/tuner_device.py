@@ -927,9 +927,11 @@ class FrontendTunerDevice(Device):
         return True
 
     def assignListener(self, listen_alloc_id, alloc_id):
+        # this function is specialized in the generated code
         pass
 
     def removeListener(self, listen_alloc_id):
+        # this function is specialized in the generated code
         pass
 
     ############################
