@@ -490,7 +490,7 @@ class FrontendTunerDevice(Device):
     
         # Provides mapping from unique allocation ID to internal tuner (channel) number
         self.allocation_id_to_tuner_id = {}
-        self.allocation_id_mapping_lock = threading.Lock()
+        self.allocation_id_mapping_lock = threading.RLock()
 
     def deallocateCapacity(self, properties):
         """
@@ -541,13 +541,17 @@ class FrontendTunerDevice(Device):
 
     def createAllocationIdCsv(self, tuner_id):
         alloc_ids = []
-        # ensure control allocation_id is first in list
-        if self.tuner_allocation_ids[tuner_id].control_allocation_id:
-            alloc_ids = [self.tuner_allocation_ids[tuner_id].control_allocation_id]
-        # now add the rest
-        for allocID,tunerID in self.allocation_id_to_tuner_id.items():
-            if tunerID == tuner_id and allocID not in alloc_ids:
-                alloc_ids.append(allocID)
+        self.allocation_id_mapping_lock.acquire()
+        try:
+            # ensure control allocation_id is first in list
+            if self.tuner_allocation_ids[tuner_id].control_allocation_id:
+                alloc_ids = [self.tuner_allocation_ids[tuner_id].control_allocation_id]
+            # now add the rest
+            for allocID,tunerID in self.allocation_id_to_tuner_id.items():
+                if tunerID == tuner_id and allocID not in alloc_ids:
+                    alloc_ids.append(allocID)
+        finally:
+            self.allocation_id_mapping_lock.release()
 
         return ','.join(alloc_ids)
 
@@ -560,16 +564,20 @@ class FrontendTunerDevice(Device):
            self._usageState = CF.Device.BUSY   # in use, with no capacity remaining for allocation
         """
         tunerAllocated = 0
-        for tuner in self.tuner_allocation_ids:
-            if tuner.control_allocation_id:
-                tunerAllocated+=1
+        self.allocation_id_mapping_lock.acquire()
+        try:
+            for tuner in self.tuner_allocation_ids:
+                if tuner.control_allocation_id:
+                    tunerAllocated+=1
 
-        # If no tuners are allocated, device is idle
-        if tunerAllocated == 0:
-            return CF.Device.IDLE
-        # If all tuners are allocated, device is busy
-        if tunerAllocated == len(self.tuner_allocation_ids):
-            return CF.Device.BUSY
+            # If no tuners are allocated, device is idle
+            if tunerAllocated == 0:
+                return CF.Device.IDLE
+            # If all tuners are allocated, device is busy
+            if tunerAllocated == len(self.tuner_allocation_ids):
+                return CF.Device.BUSY
+        finally:
+            self.allocation_id_mapping_lock.release()
         # Else, device is active
         return CF.Device.ACTIVE
 
@@ -582,7 +590,11 @@ class FrontendTunerDevice(Device):
             tuner_status.tuner_type = tuner_type
             tuner_status.enabled = False
             self.frontend_tuner_status.append(tuner_status)
-        self.tuner_allocation_ids = []
+        self.allocation_id_mapping_lock.acquire()
+        try:
+            self.tuner_allocation_ids = []
+        finally:
+            self.allocation_id_mapping_lock.release()
 
     """ Allocation handlers """
     def allocate_frontend_tuner_allocation(self, frontend_tuner_allocation):
@@ -596,12 +608,13 @@ class FrontendTunerDevice(Device):
             if  self.getTunerMapping(frontend_tuner_allocation.allocation_id) >= 0:
                 self._log.info("allocate_frontend_tuner_allocation: ALLOCATION_ID "+frontend_tuner_allocation.allocation_id+" ALREADY IN USE")
                 raise CF.Device.InvalidCapacity("ALLOCATION_ID "+frontend_tuner_allocation.allocation_id+" ALREADY IN USE", frontend_tuner_allocation)
-            if len(self.tuner_allocation_ids) != len(self.frontend_tuner_status):
-                for idx in range(len(self.frontend_tuner_status)-len(self.tuner_allocation_ids)):
-                    self.tuner_allocation_ids.append(tuner_allocation_ids_struct())
 
+            self.allocation_id_mapping_lock.acquire()
             # Next, try to allocate a new tuner
             try:
+                if len(self.tuner_allocation_ids) != len(self.frontend_tuner_status):
+                    for idx in range(len(self.frontend_tuner_status)-len(self.tuner_allocation_ids)):
+                        self.tuner_allocation_ids.append(tuner_allocation_ids_struct())
                 for tuner_id in range(len(self.tuner_allocation_ids)):
                     if self.frontend_tuner_status[tuner_id].tuner_type != frontend_tuner_allocation.tuner_type:
                         self._log.debug("allocate_frontend_tuner_allocation: Requested tuner type '" + str(frontend_tuner_allocation.tuner_type) + "' does not match tuner[" + str(tuner_id) + "].tuner_type ("+str(self.frontend_tuner_status[tuner_id].tuner_type)+")")
@@ -654,7 +667,6 @@ class FrontendTunerDevice(Device):
                             self._log.debug("allocate_frontend_tuner_allocation: Tuner["+str(tuner_id)+"] is either not available or can not support listener request ")
                             continue
                         self.tuner_allocation_ids[tuner_id].listener_allocation_ids.append(frontend_tuner_allocation.allocation_id)
-                        self.allocation_id_to_tuner_id[frontend_tuner_allocation.allocation_id] = tuner_id
                         self.frontend_tuner_status[tuner_id].allocation_id_csv = self.createAllocationIdCsv(tuner_id)
                         self.assignListener(frontend_tuner_allocation.allocation_id,self.tuner_allocation_ids[tuner_id].control_allocation_id)
 
@@ -697,6 +709,8 @@ class FrontendTunerDevice(Device):
                 eout = "allocate_frontend_tuner_allocation: NO AVAILABLE TUNER. Make sure that the device has an initialized frontend_tuner_status"
                 self._log.info(eout)
                 raise RuntimeError(eout)
+            finally:
+                self.allocation_id_mapping_lock.release()
                     
         except RuntimeError, e:
             self.deallocate_frontend_tuner_allocation(frontend_tuner_allocation)
@@ -728,26 +742,33 @@ class FrontendTunerDevice(Device):
             self._log.debug("deallocate_frontend_tuner_allocation: ALLOCATION_ID NOT FOUND: [" + str(frontend_tuner_allocation.allocation_id) + "]")
             raise CF.Device.InvalidCapacity("ALLOCATION_ID NOT FOUND: [" + str(frontend_tuner_allocation.allocation_id) + "]",frontend_tuner_allocation)
         
-        while self.frontend_tuner_status[self.allocation_id_to_tuner_id[frontend_tuner_allocation.allocation_id]].allocation_id_csv != frontend_tuner_allocation.allocation_id:
-            split_id = self.frontend_tuner_status[self.allocation_id_to_tuner_id[frontend_tuner_allocation.allocation_id]].allocation_id_csv.split(',')
-            for idx in range(len(split_id)):
-                if split_id[idx] == frontend_tuner_allocation.allocation_id:
-                    continue
-                else:
-                    self.removeTunerMappingByAllocationId(split_id[idx])
-                    self.removeListenerId(tuner_id, split_id[idx])
-                break
+        self.allocation_id_mapping_lock.acquire()
+        try:
+            while self.frontend_tuner_status[self.allocation_id_to_tuner_id[frontend_tuner_allocation.allocation_id]].allocation_id_csv != frontend_tuner_allocation.allocation_id:
+                split_id = self.frontend_tuner_status[self.allocation_id_to_tuner_id[frontend_tuner_allocation.allocation_id]].allocation_id_csv.split(',')
+                for idx in range(len(split_id)):
+                    if split_id[idx] == frontend_tuner_allocation.allocation_id:
+                        continue
+                    else:
+                        self.removeTunerMappingByAllocationId(split_id[idx])
+                        self.removeListenerId(tuner_id, split_id[idx])
+                    break
+        except:
+            self.allocation_id_mapping_lock.release()
         
-        if self.tuner_allocation_ids[tuner_id].control_allocation_id == frontend_tuner_allocation.allocation_id:
-            self.enableTuner(tuner_id,False)
-            self.removeTunerMappingByAllocationId(frontend_tuner_allocation.allocation_id)
-            self.frontend_tuner_status[tuner_id].allocation_id_csv = ''
-            self.removeTuner(tuner_id)
-        else:
-            self.removeTunerMappingByAllocationId(frontend_tuner_allocation.allocation_id)
-            self.frontend_tuner_status[tuner_id].allocation_id_csv = ''
+        self.allocation_id_mapping_lock.acquire()
+        try:
+            if self.tuner_allocation_ids[tuner_id].control_allocation_id == frontend_tuner_allocation.allocation_id:
+                self.enableTuner(tuner_id,False)
+                self.removeTunerMappingByAllocationId(frontend_tuner_allocation.allocation_id)
+                self.frontend_tuner_status[tuner_id].allocation_id_csv = ''
+                self.removeTuner(tuner_id)
+            else:
+                self.removeTunerMappingByAllocationId(frontend_tuner_allocation.allocation_id)
+                self.frontend_tuner_status[tuner_id].allocation_id_csv = ''
+        finally:
+            self.allocation_id_mapping_lock.release()
         
-        #self.frontend_tuner_status[tuner_id].allocation_id_csv = self.create_allocation_id_csv(tuner_id, frontend_tuner_allocation.allocation_id)
         self.frontend_tuner_status[tuner_id].allocation_id_csv = ''
 
     def allocate_frontend_listener_allocation(self, frontend_listener_allocation):
@@ -784,13 +805,15 @@ class FrontendTunerDevice(Device):
                 self._log.debug(eout)
                 raise CF.Device.InvalidCapacity(eout, frontend_listener_allocation)
 
-            self.tuner_allocation_ids[tuner_id].listener_allocation_ids.append(frontend_listener_allocation.listener_allocation_id)
-            self.allocation_id_to_tuner_id[frontend_listener_allocation.listener_allocation_id] = tuner_id
+            self.allocation_id_mapping_lock.acquire()
+            try:
+                self.tuner_allocation_ids[tuner_id].listener_allocation_ids.append(frontend_listener_allocation.listener_allocation_id)
+                self.allocation_id_to_tuner_id[frontend_listener_allocation.listener_allocation_id] = tuner_id
+            finally:
+                self.allocation_id_mapping_lock.release()
             self.frontend_tuner_status[tuner_id].allocation_id_csv = self.createAllocationIdCsv(tuner_id)
             self.assignListener(frontend_listener_allocation.listener_allocation_id,frontend_listener_allocation.existing_allocation_id)
             return True
-            #self.tuner_allocation_ids[tuner_id].lock.release()
-
                 
         except RuntimeError, e:
             return False
@@ -889,44 +912,36 @@ class FrontendTunerDevice(Device):
 
     def getTunerMapping(self, _allocation_id):
         NO_VALID_TUNER = -1
-        for key in self.allocation_id_to_tuner_id:
-            if key == _allocation_id:
-                return self.allocation_id_to_tuner_id[_allocation_id]
+        self.allocation_id_mapping_lock.acquire()
+        try:
+            for key in self.allocation_id_to_tuner_id:
+                if key == _allocation_id:
+                    return self.allocation_id_to_tuner_id[_allocation_id]
+        finally:
+            self.allocation_id_mapping_lock.acquire()
         return NO_VALID_TUNER
 
     def removeTunerMappingByAllocationId(self, allocation_id):
         self._log.trace("removeTunerMapping(allocation_id) allocation_id " + str(allocation_id))
-        if self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]].allocation_id_csv.split(',')[0] == allocation_id:
-            self.deviceDeleteTuning(self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]], self.allocation_id_to_tuner_id[allocation_id])
-        self.removeListener(allocation_id)
         self.allocation_id_mapping_lock.acquire()
         try:
+            if self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]].allocation_id_csv.split(',')[0] == allocation_id:
+                self.deviceDeleteTuning(self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]], self.allocation_id_to_tuner_id[allocation_id])
+            self.removeListener(allocation_id)
             if allocation_id in self.allocation_id_to_tuner_id:
                 del self.allocation_id_to_tuner_id[allocation_id]
                 return True
             return False
         finally:
             self.allocation_id_mapping_lock.release()
-    
-    def removeTunerMappingByTunerId(self, tuner_id):
-        self._log.trace("removeTunerMapping(tuner_id) tuner_id " + str(tuner_id))
-        deviceDeleteTuning(self.frontend_tuner_status[tuner_id], tuner_id)
-        removeAllocationIdRouting(tuner_id)
-
-        self.allocation_id_mapping_lock.acquire()
-        try:
-            cnt = 0
-            for k,v in self.allocation_id_to_tuner_id.items():
-                if v == tuner_id:
-                    del self.allocation_id_to_tuner_id[k]
-                    cnt+=1
-            return cnt > 0
-        finally:
-            self.allocation_id_mapping_lock.release()
 
     def removeTuner(self, tuner_id):
         self.enableTuner(tuner_id, False)
-        self.tuner_allocation_ids[tuner_id].reset()
+        self.allocation_id_mapping_lock.acquire()
+        try:
+            self.tuner_allocation_ids[tuner_id].reset()
+        finally:
+            self.allocation_id_mapping_lock.acquire()
         return True
 
     def assignListener(self, listen_alloc_id, alloc_id):
