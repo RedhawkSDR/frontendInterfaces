@@ -521,6 +521,8 @@ class FrontendTunerDevice(Device):
                 prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::device_control',value=any.to_any(None))]
                 prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::group_id',value=any.to_any(None))]
                 prop.value._v += [CF.DataType(id='FRONTEND::tuner_allocation::rf_flow_id',value=any.to_any(None))]
+            if prop.id == 'FRONTEND::listener_allocation' and len(prop.value._v) == 1:
+                prop.value._v += [CF.DataType(id='FRONTEND::listener_allocation::existing_allocation_id',value=any.to_any(None))]
             propdict[prop.id] = propdef._fromAny(prop.value)
 
         self._capacityLock.acquire()
