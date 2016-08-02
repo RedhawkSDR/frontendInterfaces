@@ -896,7 +896,8 @@ class FrontendTunerDevice(Device):
 
     def removeTunerMappingByAllocationId(self, allocation_id):
         self._log.trace("removeTunerMapping(allocation_id) allocation_id " + str(allocation_id))
-        self.deviceDeleteTuning(self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]], self.allocation_id_to_tuner_id[allocation_id])
+        if self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]].allocation_id_csv.split(',')[0] == allocation_id:
+            self.deviceDeleteTuning(self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]], self.allocation_id_to_tuner_id[allocation_id])
         self.removeListener(allocation_id)
         self.allocation_id_mapping_lock.acquire()
         try:
