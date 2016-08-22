@@ -538,7 +538,7 @@ namespace frontend {
                     // Do not allocate if existing allocation ID does not exist
                     long tuner_id = getTunerMapping(frontend_listener_allocation.existing_allocation_id);
                     if (tuner_id < 0){
-                        LOG_DEBUG(FrontendTunerDevice<TunerStatusStructType>,"allocateCapacity: UNKNOWN CONTROL ALLOCATION ID: ["<< frontend_listener_allocation.existing_allocation_id <<"]");
+                        LOG_INFO(FrontendTunerDevice<TunerStatusStructType>,"allocateCapacity: UNKNOWN CONTROL ALLOCATION ID: ["<< frontend_listener_allocation.existing_allocation_id <<"]");
                         throw FRONTEND::BadParameterException("UNKNOWN CONTROL ALLOCATION ID");
                     }
 
@@ -738,10 +738,35 @@ namespace frontend {
         return NO_VALID_TUNER;
     }
     
+
+    template < typename TunerStatusStructType >
+    void FrontendTunerDevice<TunerStatusStructType>::sendEOS(std::string allocation_id) {
+        CF::PortSet::PortInfoSequence_var ports = this->getPortSet();
+        for (unsigned int port_idx=0; port_idx<ports->length(); port_idx++) {
+            std::string repid = std::string(ports[port_idx].repid);
+            if (repid.find("BULKIO") != std::string::npos) {
+                ExtendedCF::QueryablePort_ptr prt = ExtendedCF::QueryablePort::_narrow(ports[port_idx].obj_ptr);
+                try {
+                    prt->disconnectPort(allocation_id.c_str());
+                } catch ( ... ) {
+                    continue;
+                }
+                ExtendedCF::UsesConnectionSequence_var _connections = prt->connections();
+                for (unsigned int connection_idx=0; connection_idx<_connections->length(); connection_idx++) {
+                    if (std::string(_connections[connection_idx].connectionId) == allocation_id) {
+                        prt->connectPort(_connections[connection_idx].port, allocation_id.c_str());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
     template < typename TunerStatusStructType >
     bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(size_t tuner_id, std::string allocation_id) {
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
         removeListener(allocation_id);
+        sendEOS(allocation_id);
         std::vector<std::string>::iterator it = tuner_allocation_ids[tuner_id].listener_allocation_ids.begin();
         while(it != tuner_allocation_ids[tuner_id].listener_allocation_ids.end()){
             if(*it == allocation_id){
@@ -755,7 +780,7 @@ namespace frontend {
             return true;
         return false;
     }
-
+    
     template < typename TunerStatusStructType >
     bool FrontendTunerDevice<TunerStatusStructType>::removeTunerMapping(size_t tuner_id) {
         LOG_TRACE(FrontendTunerDevice<TunerStatusStructType>,__PRETTY_FUNCTION__);
@@ -769,21 +794,13 @@ namespace frontend {
             if(it->second == tuner_id){
                 std::string allocation_id = it->first;
                 removeListener(allocation_id);
+                sendEOS(allocation_id);
                 allocation_id_to_tuner_id.erase(it++);
                 cnt++;
             } else {
                 ++it;
             }
         }
-        /*
-        for(std::vector<std::string>::iterator it = tuner_allocation_ids[tuner_id].listener_allocation_ids.begin(); it != tuner_allocation_ids[tuner_id].listener_allocation_ids.end();it++){
-            removeListener(*it);
-            allocation_id_to_tuner_id.erase(*it);
-            cnt++;
-        }
-        removeListener(tuner_allocation_ids[tuner_id].control_allocation_id);
-        allocation_id_to_tuner_id.erase(tuner_allocation_ids[tuner_id].control_allocation_id);
-        */
         tuner_allocation_ids[tuner_id].reset();
         return cnt > 0;
     }

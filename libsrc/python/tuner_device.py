@@ -32,6 +32,7 @@ from ossie.utils import model
 import threading
 from bulkio.bulkioInterfaces import BULKIO
 from redhawk.frontendInterfaces import FRONTEND
+from ossie.cf import ExtendedCF
 from fe_types import *
 
 class AllocationAlreadyExists(CF.Device.InvalidCapacity):
@@ -921,6 +922,22 @@ class FrontendTunerDevice(Device):
             self.allocation_id_mapping_lock.acquire()
         return NO_VALID_TUNER
 
+    def sendEOS(self, allocation_id):
+        ports = self.getPortSet()
+        for port in ports:
+            repid = str(port.repid)
+            if 'BULKIO' in repid:
+                prt = port.obj_ptr._narrow(ExtendedCF.QueryablePort)
+                try:
+                    prt.disconnectPort(allocation_id)
+                except:
+                    continue
+                _connections = prt._get_connections()
+                for _connection in _connections:
+                    if _connection.connectionId == allocation_id:
+                        prt.connectPort(_connection.port, allocation_id)
+                        break
+        
     def removeTunerMappingByAllocationId(self, allocation_id):
         self._log.trace("removeTunerMapping(allocation_id) allocation_id " + str(allocation_id))
         self.allocation_id_mapping_lock.acquire()
@@ -928,6 +945,7 @@ class FrontendTunerDevice(Device):
             if self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]].allocation_id_csv.split(',')[0] == allocation_id:
                 self.deviceDeleteTuning(self.frontend_tuner_status[self.allocation_id_to_tuner_id[allocation_id]], self.allocation_id_to_tuner_id[allocation_id])
             self.removeListener(allocation_id)
+            self.sendEOS(allocation_id)
             if allocation_id in self.allocation_id_to_tuner_id:
                 del self.allocation_id_to_tuner_id[allocation_id]
                 return True

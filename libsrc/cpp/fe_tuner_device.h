@@ -207,6 +207,7 @@ namespace frontend {
             virtual std::vector<std::string> getListenerAllocationIds(size_t tuner_id);
             virtual long getTunerMapping(std::string allocation_id);
             std::string createAllocationIdCsv(size_t tuner_id);
+            virtual void sendEOS(std::string allocation_id);
             virtual bool removeTunerMapping(size_t tuner_id, std::string allocation_id);
             virtual bool removeTunerMapping(size_t tuner_id);
             virtual void assignListener(const std::string& listen_alloc_id, const std::string& alloc_id);

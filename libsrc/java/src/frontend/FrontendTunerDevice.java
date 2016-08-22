@@ -30,7 +30,9 @@ import CF.DevicePackage.InvalidCapacity;
 import CF.DevicePackage.InvalidCapacityHelper;
 import CF.DevicePackage.InvalidState;
 import CF.DevicePackage.UsageType;
+import CF.PortSetPackage.PortInfoType;
 import CF.InvalidObjectReference;
+import ExtendedCF.UsesConnection;
 import FRONTEND.RFInfoPkt;
 import FRONTEND.BadParameterException;
 import java.lang.Math.*;
@@ -690,9 +692,35 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
         return NO_VALID_TUNER;
     }
 
+    protected void sendEOS(String allocation_id) {
+        CF.PortSetPackage.PortInfoType ports[] = this.getPortSet();
+        for (int port_idx=0; port_idx<ports.length; port_idx++) {
+            String repid = ports[port_idx].repid;
+            if (repid.indexOf("BULKIO") != -1) {
+                ExtendedCF.QueryablePort prt = ExtendedCF.QueryablePortHelper.narrow(ports[port_idx].obj_ptr);
+                try {
+                    prt.disconnectPort(allocation_id);
+                } catch (final Throwable t) {
+                    continue;
+                }
+                ExtendedCF.UsesConnection _connections[] = prt.connections();
+                for (int connection_idx=0; connection_idx<_connections.length; connection_idx++) {
+                    if (_connections[connection_idx].connectionId == allocation_id) {
+                        try {
+                            prt.connectPort(_connections[connection_idx].port, allocation_id);
+                        } catch (final Throwable t) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     protected boolean removeTunerMapping(int tuner_id, String allocation_id){
         logger.trace("removeTunerMapping() tuner_id " + tuner_id + ", allocation_id " + allocation_id);
         removeListener(allocation_id);
+        this.sendEOS(allocation_id);
         Iterator<String> iter = tuner_allocation_ids.get(tuner_id).listener_allocation_ids.iterator();
         while(iter.hasNext()){
             String nextString = iter.next();
@@ -722,6 +750,7 @@ public abstract class FrontendTunerDevice<TunerStatusStructType extends frontend
                     Map.Entry<String,Integer> entry = iter.next();
                     if(tuner_id == entry.getValue()){
                         this.removeListener(entry.getKey());
+                        this.sendEOS(entry.getKey());
                         iter.remove();
                         cnt++;
                     }
