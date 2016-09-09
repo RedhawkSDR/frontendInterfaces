@@ -76,7 +76,13 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (GPSOperations p : this.outConnections.values()) {
-                    retval = p.gps_info();
+                    try {
+                        retval = p.gps_info();
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -88,7 +94,13 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (GPSOperations p : this.outConnections.values()) {
-                    p.gps_info(data);
+                    try {
+                        p.gps_info(data);
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -101,7 +113,13 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
         synchronized(this.updatingPortsLock) { 
             if (this.active) {
                 for (GPSOperations p : this.outConnections.values()) {
-                    retval = p.gps_time_pos();
+                    try {
+                        retval = p.gps_time_pos();
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -113,7 +131,13 @@ public class OutGPSPort extends QueryableUsesPort<GPSOperations> implements GPSO
         synchronized(this.updatingPortsLock) {
             if (this.active) {
                 for (GPSOperations p : this.outConnections.values()) {
-                    p.gps_time_pos(data);
+                    try {
+                        p.gps_time_pos(data);
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

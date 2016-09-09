@@ -48,11 +48,14 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA implements PortBase {
             try{
                 if ( delegate != null ){ 
                     return delegate.get_available_rf_inputs(this.name);
+                } else {
+                    throw new RuntimeException("InRFSourcePort get_available_rf_inputs() callback delegate not defined");
                 }
-            }catch(Exception e){
-                System.out.println("InRFSourcePort available_rf_inputs() exception " + e.getMessage());
+            } catch(org.omg.CORBA.SystemException e) {
+                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
-            return null;
         }
     }
 
@@ -61,9 +64,13 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA implements PortBase {
             try{
                 if ( delegate != null){ 
                     delegate.set_available_rf_inputs(this.name, data);
+                } else {
+                    throw new RuntimeException("InRFSourcePort set_available_rf_inputs(RFInfoPkt[] data) callback delegate not defined");
                 }
-            }catch(Exception e){
-                System.out.println("InRFSourcePort available_rf_inputs(RFInfoPkt[] data) exception " + e.getMessage());
+            } catch(org.omg.CORBA.SystemException e) {
+                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -73,11 +80,14 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA implements PortBase {
             try{
                 if ( delegate != null){
                     return (delegate.get_current_rf_input(this.name));
+                } else {
+                    throw new RuntimeException("InRFSourcePort get_current_rf_input() callback delegate not defined");
                 }
-            }catch(Exception e){
-                System.out.println("InRFSourcePort current_rf_input() exception " + e.getMessage());
+            } catch(org.omg.CORBA.SystemException e) {
+                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
-            return null;
         }
     }
 
@@ -86,9 +96,13 @@ public class InRFSourcePort extends FRONTEND.RFSourcePOA implements PortBase {
             try{
                 if ( delegate != null) {
                     delegate.set_current_rf_input(this.name, data);
+                } else {
+                    throw new RuntimeException("InRFSourcePort set_current_rf_input(RFInfoPkt data) callback delegate not defined");
                 }
-            }catch(Exception e){
-                System.out.println("InRFSourcePort current_rf_input(RFInfoPkt data) exception " + e.getMessage());
+            } catch(org.omg.CORBA.SystemException e) {
+                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
         }
     }

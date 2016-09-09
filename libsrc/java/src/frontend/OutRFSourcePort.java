@@ -72,7 +72,13 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (RFSourceOperations p : this.outConnections.values()) {
-                    retval = p.available_rf_inputs();
+                    try {
+                        retval = p.available_rf_inputs();
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -83,7 +89,13 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (RFSourceOperations p : this.outConnections.values()) {
-                    p.available_rf_inputs(data);
+                    try {
+                        p.available_rf_inputs(data);
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -95,7 +107,13 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (RFSourceOperations p : this.outConnections.values()) {
-                    retval = p.current_rf_input();
+                    try {
+                        retval = p.current_rf_input();
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -106,7 +124,13 @@ public class OutRFSourcePort extends QueryableUsesPort<RFSourceOperations> imple
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (RFSourceOperations p : this.outConnections.values()) {
-                    p.current_rf_input(data);
+                    try {
+                        p.current_rf_input(data);
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

@@ -51,11 +51,14 @@ public class InNavDataPort extends FRONTEND.NavDataPOA implements PortBase {
             try{
                 if ( delegate != null ) {
                     return delegate.get_nav_packet(this.name);
+                } else {
+                    throw new RuntimeException("InNavDataPort get_nav_packet() callback delegate not defined");
                 }
-            }catch(Exception e){
-                System.out.println("InNavDataPort nav_packet() exception " + e.getMessage());
+            } catch(org.omg.CORBA.SystemException e) {
+                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
-            return null;
         }
     }
 
@@ -64,9 +67,13 @@ public class InNavDataPort extends FRONTEND.NavDataPOA implements PortBase {
             try{
                 if ( delegate != null) {
                     delegate.set_nav_packet(this.name, data);
+                } else {
+                    throw new RuntimeException("InNavDataPort set_nav_packet(NavigationPacket data) callback delegate not defined");
                 }
-            }catch(Exception e){
-                System.out.println("InNavDataPort nav_packet(NavigationPacket data) exception " + e.getMessage());
+            } catch(org.omg.CORBA.SystemException e) {
+                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
         }
     }

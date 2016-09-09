@@ -46,92 +46,82 @@ public class InFrontendTunerPort extends FRONTEND.FrontendTunerPOA implements Po
     }
 
 
-    public String getTunerType(String id) throws BadParameterException, FrontendException, NotSupportedException{
+    public String getTunerType(String id) {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
                     return delegate.getTunerType(id);
                 } else {
-                    throw new FrontendException("InFrontendTunerPort getTunerType(String id) callback delegate not defined");
+                    throw new RuntimeException("InFrontendTunerPort getTunerType(String id) callback delegate not defined");
                 }
-            }catch(BadParameterException e){
+            } catch(org.omg.CORBA.SystemException e) {
                 throw e;
-            }catch(FrontendException e){
-                throw e;
-            }catch(NotSupportedException e){
-                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    public boolean getTunerDeviceControl(String id) throws BadParameterException, FrontendException, NotSupportedException {
+    public boolean getTunerDeviceControl(String id) {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
                     return delegate.getTunerDeviceControl(id);
                 } else {
-                    throw new FrontendException("InFrontendTunerPort getTunerDeviceControl(String id) callback delegate not defined");
+                    throw new RuntimeException("InFrontendTunerPort getTunerDeviceControl(String id) callback delegate not defined");
                 }
-            }catch(BadParameterException e){
+            } catch(org.omg.CORBA.SystemException e) {
                 throw e;
-            }catch(FrontendException e){
-                throw e;
-            }catch(NotSupportedException e){
-                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    public String getTunerGroupId(String id) throws BadParameterException, FrontendException, NotSupportedException {
+    public String getTunerGroupId(String id) {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
                     return delegate.getTunerGroupId(id);
                 } else {
-                    throw new FrontendException("InFrontendTunerPort getTunerGroupId(String id) callback delegate not defined");
+                    throw new RuntimeException("InFrontendTunerPort getTunerGroupId(String id) callback delegate not defined");
                 }
-            }catch(BadParameterException e){
+            } catch(org.omg.CORBA.SystemException e) {
                 throw e;
-            }catch(FrontendException e){
-                throw e;
-            }catch(NotSupportedException e){
-                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    public String getTunerRfFlowId(String id) throws BadParameterException, FrontendException, NotSupportedException {
+    public String getTunerRfFlowId(String id) {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
                     return delegate.getTunerRfFlowId(id);
                 } else {
-                    throw new FrontendException("InFrontendTunerPort getTunerRfFlowId(String id) callback delegate not defined");
+                    throw new RuntimeException("InFrontendTunerPort getTunerRfFlowId(String id) callback delegate not defined");
                 }
-            }catch(BadParameterException e){
+            } catch(org.omg.CORBA.SystemException e) {
                 throw e;
-            }catch(FrontendException e){
-                throw e;
-            }catch(NotSupportedException e){
-                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    public CF.DataType[] getTunerStatus(String id) throws BadParameterException, FrontendException, NotSupportedException {
+    public CF.DataType[] getTunerStatus(String id) {
         synchronized(this.portAccess){
             try{
                 if ( delegate != null ){
                     return delegate.getTunerStatus(id);
                 } else {
-                    throw new FrontendException("InFrontendTunerPort getTunerStatus(String id) callback delegate not defined");
+                    throw new RuntimeException("InFrontendTunerPort getTunerStatus(String id) callback delegate not defined");
                 }
-            }catch(BadParameterException e){
+            } catch(org.omg.CORBA.SystemException e) {
                 throw e;
-            }catch(FrontendException e){
-                throw e;
-            }catch(NotSupportedException e){
-                throw e;
+            } catch(Throwable e) {
+                throw new RuntimeException(e);
             }
         }
     }

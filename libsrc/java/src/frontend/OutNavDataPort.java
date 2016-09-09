@@ -75,7 +75,13 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (NavDataOperations p : this.outConnections.values()) {
-                    retval = p.nav_packet();
+                    try {
+                        retval = p.nav_packet();
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -87,7 +93,13 @@ public class OutNavDataPort extends QueryableUsesPort<NavDataOperations> impleme
         synchronized(updatingPortsLock){
             if (this.active) {
                 for (NavDataOperations p : this.outConnections.values()) {
-                    p.nav_packet(data);
+                    try {
+                        p.nav_packet(data);
+                    } catch(org.omg.CORBA.SystemException e) {
+                        throw e;
+                    } catch(Throwable e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
