@@ -102,11 +102,8 @@ namespace frontend {
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                        try {
-                            const FRONTEND::GPSInfo_var tmp = ((*i).first)->gps_info();
-                            retval = frontend::returnGPSInfo(tmp);
-                        } catch(...) {
-                        }
+                        const FRONTEND::GPSInfo_var tmp = ((*i).first)->gps_info();
+                        retval = frontend::returnGPSInfo(tmp);
                     }
                 }
                 return retval;
@@ -116,26 +113,20 @@ namespace frontend {
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                        try {
-                            const FRONTEND::GPSInfo_var tmp = frontend::returnGPSInfo(gps);
-                            ((*i).first)->gps_info(tmp);
-                        } catch(...) {
-                        }
+                        const FRONTEND::GPSInfo_var tmp = frontend::returnGPSInfo(gps);
+                        ((*i).first)->gps_info(tmp);
                     }
                 }
                 return;
             };
             frontend::GpsTimePos gps_time_pos() {
-                frontend::RFInfoPkt retval;
+                frontend::GpsTimePos retval;
                 typename std::vector < std::pair < PortType_var, std::string > >::iterator i;
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                        try {
-                            const FRONTEND::GpsTimePos_var tmp = ((*i).first)->gps_time_pos();
-                            retval = frontend::returnGpsTimePos(tmp);
-                        } catch(...) {
-                        }
+                        const FRONTEND::GpsTimePos_var tmp = ((*i).first)->gps_time_pos();
+                        retval = frontend::returnGpsTimePos(tmp);
                     }
                 }
                 return retval;
@@ -145,11 +136,8 @@ namespace frontend {
                 boost::mutex::scoped_lock lock(this->updatingPortsLock);   // don't want to process while command information is coming in
                 if (this->active) {
                     for (i = this->outConnections.begin(); i != this->outConnections.end(); ++i) {
-                        try {
-                            const FRONTEND::GpsTimePos_var tmp = frontend::returnGpsTimePos(gps_time_pos);
-                            ((*i).first)->gps_time_pos(tmp);
-                        } catch(...) {
-                        }
+                        const FRONTEND::GpsTimePos_var tmp = frontend::returnGpsTimePos(gps_time_pos);
+                        ((*i).first)->gps_time_pos(tmp);
                     }
                 }
                 return;
