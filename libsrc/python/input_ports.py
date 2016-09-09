@@ -21,6 +21,7 @@
 import threading
 from redhawk.frontendInterfaces import FRONTEND__POA
 from redhawk.frontendInterfaces import FRONTEND
+from bulkio.bulkioInterfaces import BULKIO
 import copy
 
 
@@ -223,11 +224,14 @@ class InDigitalTunerPort(FRONTEND__POA.DigitalTuner, InAnalogTunerPort):
 
 class gps_delegation(object):
     def get_gps_info(self, port_name):
-        return frontend.GPSInfo()
+        _gpsinfo = FRONTEND.GPSInfo('','','',1L,1L,1L,1.0,1.0,1.0,1.0,1,1.0,'',BULKIO.PrecisionUTCTime(1,1,1.0,1.0,1.0),[])
+        return _gpsinfo
     def set_gps_info(self, port_name, gps_info):
         pass
     def get_gps_time_pos(self, port_name):
-        return frontend.GpsTimePos()
+        _positioninfo = FRONTEND.PositionInfo(False,'DATUM_WGS84',0.0,0.0,0.0)
+        _gpstimepos = FRONTEND.GpsTimePos(_positioninfo,BULKIO.PrecisionUTCTime(1,1,1.0,1.0,1.0))
+        return _gpstimepos
     def set_gps_time_pos(self, port_name, gps_time_pos):
         pass
 
@@ -267,11 +271,17 @@ class InGPSPort(FRONTEND__POA.GPS):
 
 class rfinfo_delegation(object):
     def get_rf_flow_id(self, port_name):
-        return "none"
+        return ""
     def set_rf_flow_id(self, port_name, id):
         pass
     def get_rfinfo_pkt(self, port_name):
-        return frontend.RFInfoPkt()
+        _antennainfo=FRONTEND.AntennaInfo('','','','')
+        _freqrange=FRONTEND.FreqRange(0,0,[])
+        _feedinfo=FRONTEND.FeedInfo('','',_freqrange)
+        _sensorinfo=FRONTEND.SensorInfo('','','',_antennainfo,_feedinfo)
+        _rfcapabilities=FRONTEND.RFCapabilities(_freqrange,_freqrange)
+        _rfinfopkt=FRONTEND.RFInfoPkt('',0.0,0.0,0.0,False,_sensorinfo,[],_rfcapabilities,[])
+        return _rfinfopkt
     def set_rfinfo_pkt(self, port_name, pkt):
         pass
 
@@ -298,14 +308,14 @@ class InRFInfoPort(FRONTEND__POA.RFInfo):
     def _get_rfinfo_pkt(self):
         self.port_lock.acquire()
         try:
-            return copy.deepcopy(self.parent.get_rf_info_pkt(self.name))
+            return copy.deepcopy(self.parent.get_rfinfo_pkt(self.name))
         finally:
             self.port_lock.release()
 
     def _set_rfinfo_pkt(self, data):
         self.port_lock.acquire()
         try:
-            return self.parent.set_rf_info_pkt(self.name,copy.deepcopy(data))
+            return self.parent.set_rfinfo_pkt(self.name,copy.deepcopy(data))
         finally:
             self.port_lock.release()
 
@@ -315,7 +325,13 @@ class rfsource_delegation(object):
     def set_available_rf_inputs(self, port_name, inputs):
         pass
     def get_current_rf_input(self, port_name):
-        return frontend.RFInfoPkt()
+        _antennainfo=FRONTEND.AntennaInfo('','','','')
+        _freqrange=FRONTEND.FreqRange(0,0,[])
+        _feedinfo=FRONTEND.FeedInfo('','',_freqrange)
+        _sensorinfo=FRONTEND.SensorInfo('','','',_antennainfo,_feedinfo)
+        _rfcapabilities=FRONTEND.RFCapabilities(_freqrange,_freqrange)
+        _rfinfopkt=FRONTEND.RFInfoPkt('',0.0,0.0,0.0,False,_sensorinfo,[],_rfcapabilities,[])
+        return _rfinfopkt
     def set_current_rf_input(self, port_name, input):
         pass
 
@@ -355,7 +371,14 @@ class InRFSourcePort(FRONTEND__POA.RFSource):
 
 class nav_delegation(object):
     def get_nav_packet(self, port_name):
-        return frontend.NavigationPacket()
+        _time = BULKIO.PrecisionUTCTime(1,1,1.0,1.0,1.0)
+        _positioninfo = FRONTEND.PositionInfo(False,'DATUM_WGS84',0.0,0.0,0.0)
+        _cartesianpos=FRONTEND.CartesianPositionInfo(False,'DATUM_WGS84',0.0,0.0,0.0)
+        _velocityinfo=FRONTEND.VelocityInfo(False,'DATUM_WGS84','',0.0,0.0,0.0)
+        _accelerationinfo=FRONTEND.AccelerationInfo(False,'DATUM_WGS84','',0.0,0.0,0.0)
+        _attitudeinfo=FRONTEND.AttitudeInfo(False,0.0,0.0,0.0)
+        _navpacket=FRONTEND.NavigationPacket('','',_positioninfo,_cartesianpos,_velocityinfo,_accelerationinfo,_attitudeinfo,_time,[])
+        return _navpacket
     def set_nav_packet(self, port_name, nav_info):
         pass
 
